@@ -11,8 +11,36 @@
   --color-charcoal: #1A1814;
   --color-blush: #E8D5CC;
 
+  /* Semantic colors — dark mode by default */
+  --color-surface: #1A1814;
+  --color-surface-alt: #232019;
+  --color-on-surface: #F5F0E8;
+  --color-on-surface-muted: rgba(245, 240, 232, 0.6);
+  --color-on-surface-faint: rgba(245, 240, 232, 0.4);
+  --color-border: rgba(245, 240, 232, 0.1);
+  --color-border-hover: rgba(245, 240, 232, 0.2);
+  --color-card: #1A1814;
+  --color-card-info: rgba(255, 255, 255, 0.06);
+  --color-overlay: rgba(26, 24, 20, 0.9);
+
   --font-serif: 'Cormorant Garamond', Georgia, serif;
   --font-sans: 'DM Sans', system-ui, sans-serif;
+}
+
+/* Light mode overrides */
+@media (prefers-color-scheme: light) {
+  :root {
+    --color-surface: #F5F0E8;
+    --color-surface-alt: #EDE7DB;
+    --color-on-surface: #1A1814;
+    --color-on-surface-muted: rgba(26, 24, 20, 0.6);
+    --color-on-surface-faint: rgba(26, 24, 20, 0.4);
+    --color-border: rgba(26, 24, 20, 0.1);
+    --color-border-hover: rgba(26, 24, 20, 0.2);
+    --color-card: #FFFFFF;
+    --color-card-info: rgba(255, 255, 255, 0.6);
+    --color-overlay: rgba(245, 240, 232, 0.9);
+  }
 }
 
 @layer base {
@@ -21,8 +49,8 @@
   }
   body {
     font-family: var(--font-sans);
-    background-color: var(--color-charcoal);
-    color: var(--color-cream);
+    background-color: var(--color-surface);
+    color: var(--color-on-surface);
     overflow-x: hidden;
   }
   h1, h2, h3, h4 {
@@ -45,7 +73,7 @@
   top: 50%;
   transform: translate(-50%, -50%);
   color: var(--color-gold);
-  background: var(--color-charcoal);
+  background: var(--color-surface);
   padding: 0 0.75rem;
   font-size: 0.75rem;
 }
@@ -83,7 +111,7 @@
   width: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--color-charcoal);
+  background: var(--color-surface);
 }
 ::-webkit-scrollbar-thumb {
   background: var(--color-terracotta);

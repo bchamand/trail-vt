@@ -1,12 +1,12 @@
 ---
 import { races } from '../data/races';
 ---
-<section id="epreuves" class="relative py-20 sm:py-28 bg-charcoal">
+<section id="epreuves" class="relative py-20 sm:py-28 bg-surface">
   <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
     <!-- Section header -->
     <div class="text-center mb-12">
       <p class="text-gold uppercase tracking-[0.25em] text-xs font-medium mb-4">Les parcours</p>
-      <h2 class="font-serif text-3xl sm:text-4xl md:text-5xl font-bold text-cream mb-6">
+      <h2 class="font-serif text-3xl sm:text-4xl md:text-5xl font-bold text-on-surface mb-6">
         Choisissez votre épreuve
       </h2>
     </div>
@@ -19,7 +19,7 @@ import { races } from '../data/races';
             'race-tab flex items-center gap-2 px-4 sm:px-6 py-3 rounded-full text-sm font-medium transition-all duration-300 cursor-pointer border',
             i === 0
               ? 'bg-gold/15 border-gold/40 text-gold'
-              : 'bg-charcoal border-cream/10 text-cream/50 hover:border-cream/20 hover:text-cream/80',
+              : 'bg-surface border-border text-on-surface-muted hover:border-border-hover hover:text-on-surface',
           ]}
           data-race-index={i}
           data-gpx={race.gpx}
@@ -44,32 +44,32 @@ import { races } from '../data/races';
           <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-2 mb-2">
             <div>
               <p class="text-gold/70 text-xs uppercase tracking-wider">{race.type}</p>
-              <h3 class="font-serif text-2xl sm:text-3xl font-bold text-cream">{race.title}</h3>
+              <h3 class="font-serif text-2xl sm:text-3xl font-bold text-on-surface">{race.title}</h3>
             </div>
             <span class="race-distance text-gold font-serif text-3xl sm:text-4xl font-bold" data-distance-index={i}>—</span>
           </div>
-          <p class="text-cream/50 text-sm max-w-2xl leading-relaxed">{race.desc}</p>
+          <p class="text-on-surface-muted text-sm max-w-2xl leading-relaxed">{race.desc}</p>
         </div>
       ))}
     </div>
 
     <!-- Stats bar -->
     <div class="flex flex-wrap gap-4 sm:gap-6 text-sm mb-6 px-1">
-      <div><span class="text-cream/40">Distance : </span><span class="text-cream font-medium" id="stat-distance">—</span></div>
-      <div><span class="text-cream/40">D+ : </span><span class="text-cream font-medium" id="stat-ascent">—</span></div>
-      <div><span class="text-cream/40">D- : </span><span class="text-cream font-medium" id="stat-descent">—</span></div>
-      <div><span class="text-cream/40">Alt. min : </span><span class="text-cream font-medium" id="stat-min-ele">—</span></div>
-      <div><span class="text-cream/40">Alt. max : </span><span class="text-cream font-medium" id="stat-max-ele">—</span></div>
+      <div><span class="text-on-surface-faint">Distance : </span><span class="text-on-surface font-medium" id="stat-distance">—</span></div>
+      <div><span class="text-on-surface-faint">D+ : </span><span class="text-on-surface font-medium" id="stat-ascent">—</span></div>
+      <div><span class="text-on-surface-faint">D- : </span><span class="text-on-surface font-medium" id="stat-descent">—</span></div>
+      <div><span class="text-on-surface-faint">Alt. min : </span><span class="text-on-surface font-medium" id="stat-min-ele">—</span></div>
+      <div><span class="text-on-surface-faint">Alt. max : </span><span class="text-on-surface font-medium" id="stat-max-ele">—</span></div>
     </div>
 
     <!-- Map -->
-    <div class="rounded-xl overflow-hidden border border-cream/10 mb-6">
+    <div class="rounded-xl overflow-hidden border border-border mb-6">
       <div id="race-map" class="map-container"></div>
     </div>
 
     <!-- Elevation -->
-    <div class="bg-charcoal border border-cream/10 rounded-xl p-4 sm:p-6">
-      <p class="text-cream/40 text-xs uppercase tracking-wider mb-3">Profil altimétrique</p>
+    <div class="bg-card border border-border rounded-xl p-4 sm:p-6">
+      <p class="text-on-surface-faint text-xs uppercase tracking-wider mb-3">Profil altimétrique</p>
       <div class="elevation-container">
         <canvas id="elevation-chart"></canvas>
       </div>
@@ -96,7 +96,6 @@ import { races } from '../data/races';
     return base.endsWith('/') ? base + path.replace(/^\//, '') : base + path;
   }
 
-  // Pre-load all GPX data and populate all distances across the page
   const allTrackData: TrackData[] = [];
 
   async function preloadAll() {
@@ -106,8 +105,6 @@ import { races } from '../data/races';
     results.forEach((data, i) => {
       allTrackData[i] = data;
       const dist = `${data.totalDistance.toFixed(1)} km`;
-
-      // Update all distance placeholders for this race index
       document.querySelectorAll(`[data-distance-index="${i}"]`).forEach(el => el.textContent = dist);
       document.querySelectorAll(`[data-tab-dist-index="${i}"]`).forEach(el => el.textContent = dist);
       document.querySelectorAll(`[data-concept-dist="${i}"]`).forEach(el => el.textContent = dist);
@@ -128,11 +125,11 @@ import { races } from '../data/races';
     tabs.forEach((tab, i) => {
       const el = tab as HTMLElement;
       if (i === selectedIndex) {
-        el.classList.remove('bg-charcoal', 'border-cream/10', 'text-cream/50');
+        el.classList.remove('bg-surface', 'border-border', 'text-on-surface-muted');
         el.classList.add('bg-gold/15', 'border-gold/40', 'text-gold');
       } else {
         el.classList.remove('bg-gold/15', 'border-gold/40', 'text-gold');
-        el.classList.add('bg-charcoal', 'border-cream/10', 'text-cream/50');
+        el.classList.add('bg-surface', 'border-border', 'text-on-surface-muted');
       }
     });
     infoPanels.forEach((panel, i) => {
@@ -164,7 +161,6 @@ import { races } from '../data/races';
     });
   });
 
-  // Listen for clicks on concept cards to select the right race tab
   document.querySelectorAll('.concept-card').forEach((card) => {
     card.addEventListener('click', () => {
       const index = parseInt((card as HTMLElement).dataset.conceptRace!);

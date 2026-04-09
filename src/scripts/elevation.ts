@@ -4,7 +4,18 @@ import type { TrackData } from './gpx-parser';
 Chart.register(...registerables);
 
 const GOLD = '#D4A843';
-const TERRACOTTA = '#C4533A';
+
+function getThemeColors() {
+  const dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  return {
+    tickColor: dark ? 'rgba(245, 240, 232, 0.4)' : 'rgba(26, 24, 20, 0.4)',
+    gridColor: dark ? 'rgba(245, 240, 232, 0.05)' : 'rgba(26, 24, 20, 0.08)',
+    borderColor: dark ? 'rgba(245, 240, 232, 0.1)' : 'rgba(26, 24, 20, 0.15)',
+    tooltipBg: dark ? 'rgba(26, 24, 20, 0.95)' : 'rgba(255, 255, 255, 0.95)',
+    tooltipBody: dark ? '#F5F0E8' : '#1A1814',
+    hoverBorder: dark ? '#fff' : '#1A1814',
+  };
+}
 
 export function initElevationChart(
   canvas: HTMLCanvasElement,
@@ -12,19 +23,17 @@ export function initElevationChart(
   onHover?: (index: number) => void,
 ): Chart {
   const ctx = canvas.getContext('2d')!;
+  const theme = getThemeColors();
 
   // Gradient fill
   const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
   gradient.addColorStop(0, 'rgba(196, 83, 58, 0.4)');
   gradient.addColorStop(1, 'rgba(196, 83, 58, 0.02)');
 
-  // Build data as {x, y} points so X axis is linear (true distance)
   const dataPoints = trackData.distances.map((d, i) => ({
     x: d,
     y: trackData.elevations[i],
   }));
-
-  const totalKm = Math.ceil(trackData.totalDistance);
 
   const chart = new Chart(ctx, {
     type: 'line',
@@ -38,7 +47,7 @@ export function initElevationChart(
         pointRadius: 0,
         pointHoverRadius: 5,
         pointHoverBackgroundColor: GOLD,
-        pointHoverBorderColor: '#fff',
+        pointHoverBorderColor: theme.hoverBorder,
         pointHoverBorderWidth: 2,
         tension: 0.3,
       }],
@@ -53,9 +62,9 @@ export function initElevationChart(
       plugins: {
         legend: { display: false },
         tooltip: {
-          backgroundColor: 'rgba(26, 24, 20, 0.95)',
+          backgroundColor: theme.tooltipBg,
           titleColor: GOLD,
-          bodyColor: '#F5F0E8',
+          bodyColor: theme.tooltipBody,
           borderColor: 'rgba(212, 168, 67, 0.3)',
           borderWidth: 1,
           cornerRadius: 8,
@@ -80,21 +89,21 @@ export function initElevationChart(
             }
           },
           ticks: {
-            color: 'rgba(245, 240, 232, 0.4)',
+            color: theme.tickColor,
             font: { size: 10 },
-            callback: (val) => `${val} km`,
+            callback: (val) => Number.isInteger(val) ? `${val} km` : null,
           },
-          grid: { color: 'rgba(245, 240, 232, 0.05)' },
-          border: { color: 'rgba(245, 240, 232, 0.1)' },
+          grid: { color: theme.gridColor },
+          border: { color: theme.borderColor },
         },
         y: {
           ticks: {
-            color: 'rgba(245, 240, 232, 0.4)',
+            color: theme.tickColor,
             font: { size: 10 },
             callback: (val) => `${val} m`,
           },
-          grid: { color: 'rgba(245, 240, 232, 0.05)' },
-          border: { color: 'rgba(245, 240, 232, 0.1)' },
+          grid: { color: theme.gridColor },
+          border: { color: theme.borderColor },
         },
       },
       onHover: (_event, elements) => {

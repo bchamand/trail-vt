@@ -5,6 +5,12 @@ const GOLD = '#D4A843';
 const GOLD_GLOW = 'rgba(212, 168, 67, 0.3)';
 const TERRACOTTA = '#C4533A';
 const PADDING = 50;
+const DARK_STYLE = 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json';
+const LIGHT_STYLE = 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json';
+
+function isDarkMode(): boolean {
+  return window.matchMedia('(prefers-color-scheme: dark)').matches;
+}
 
 export function initMap(
   container: HTMLElement,
@@ -18,7 +24,7 @@ export function initMap(
   // Create map without maxBounds first — we'll set them after fitBounds
   const map = new maplibregl.Map({
     container,
-    style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
+    style: isDarkMode() ? DARK_STYLE : LIGHT_STYLE,
     bounds: trackBounds,
     fitBoundsOptions: { padding: PADDING },
     maxZoom: 15,
@@ -160,9 +166,10 @@ export function initMap(
       const pt = trackData.points[i];
       if (pt.dist >= nextKm) {
         const el = document.createElement('div');
+        const kmBg = isDarkMode() ? 'rgba(26, 24, 20, 0.85)' : 'rgba(255, 255, 255, 0.9)';
         el.style.cssText = `
           width: 22px; height: 22px;
-          background: rgba(26, 24, 20, 0.85);
+          background: ${kmBg};
           border: 2px solid ${GOLD};
           border-radius: 50%;
           display: flex; align-items: center; justify-content: center;
