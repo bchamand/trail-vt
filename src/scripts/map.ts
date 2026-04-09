@@ -4,25 +4,46 @@ import type { TrackData } from './gpx-parser';
 const GOLD = '#D4A843';
 const GOLD_GLOW = 'rgba(212, 168, 67, 0.3)';
 const TERRACOTTA = '#C4533A';
+const PADDING = 50;
 
 export function initMap(
   container: HTMLElement,
   trackData: TrackData,
   onHoverPoint?: (index: number) => void,
 ): { map: maplibregl.Map; setMarkerAt: (index: number) => void } {
-  const firstCoord = trackData.coords[0];
-  const bounds = new maplibregl.LngLatBounds(firstCoord, firstCoord);
-  trackData.coords.forEach(c => bounds.extend(new maplibregl.LngLat(c[0], c[1])));
+  // Compute track bounds
+  const trackBounds = new maplibregl.LngLatBounds(trackData.coords[0], trackData.coords[0]);
+  trackData.coords.forEach(c => trackBounds.extend(new maplibregl.LngLat(c[0], c[1])));
 
+  // Create map without maxBounds first — we'll set them after fitBounds
   const map = new maplibregl.Map({
     container,
     style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
-    bounds,
-    fitBoundsOptions: { padding: 50 },
+    bounds: trackBounds,
+    fitBoundsOptions: { padding: PADDING },
     attributionControl: false,
   });
 
   map.addControl(new maplibregl.NavigationControl(), 'top-right');
+
+  // After fitBounds resolves, read the actual visible bounds and lock them
+  function lockBounds() {
+    const visibleBounds = map.getBounds();
+    map.setMaxBounds(visibleBounds);
+    map.setMinZoom(map.getZoom());
+  }
+
+  map.on('load', () => {
+    lockBounds();
+  });
+
+  // On resize, recalculate
+  map.on('resize', () => {
+    map.setMaxBounds(undefined as any); // temporarily remove constraint
+    map.setMinZoom(0);
+    map.fitBounds(trackBounds, { padding: PADDING, duration: 0 });
+    requestAnimationFrame(lockBounds);
+  });
 
   // Hover marker
   const markerEl = document.createElement('div');
@@ -126,10 +147,10 @@ export function initMap(
       new maplibregl.Marker({ element: el }).setLngLat(coord).addTo(map);
     });
 
-    // Animate trace
+    // Animate trace drawing
     let step = 0;
     const totalSteps = trackData.coords.length;
-    const speed = Math.max(1, Math.floor(totalSteps / 120)); // ~2 seconds animation
+    const speed = Math.max(1, Math.floor(totalSteps / 120));
 
     function animate() {
       step = Math.min(step + speed, totalSteps);

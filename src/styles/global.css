@@ -53,25 +53,19 @@
 /* Map container */
 .map-container {
   width: 100%;
-  height: 350px;
+  height: 50vh;
+  min-height: 280px;
+  max-height: 600px;
   border-radius: 0.5rem;
   overflow: hidden;
-}
-@media (min-width: 768px) {
-  .map-container {
-    height: 450px;
-  }
 }
 
 /* Elevation chart */
 .elevation-container {
   width: 100%;
-  height: 180px;
-}
-@media (min-width: 768px) {
-  .elevation-container {
-    height: 220px;
-  }
+  height: 20vh;
+  min-height: 140px;
+  max-height: 250px;
 }
 
 /* Subtle grain texture overlay */
