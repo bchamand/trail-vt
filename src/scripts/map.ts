@@ -21,6 +21,7 @@ export function initMap(
     style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
     bounds: trackBounds,
     fitBoundsOptions: { padding: PADDING },
+    maxZoom: 15,
     attributionControl: false,
     dragRotate: false,
     pitchWithRotate: false,
