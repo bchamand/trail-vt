@@ -10,8 +10,9 @@ export function initMap(
   trackData: TrackData,
   onHoverPoint?: (index: number) => void,
 ): { map: maplibregl.Map; setMarkerAt: (index: number) => void } {
-  const bounds = new maplibregl.LngLatBounds();
-  trackData.coords.forEach(c => bounds.extend(c as [number, number]));
+  const firstCoord = trackData.coords[0];
+  const bounds = new maplibregl.LngLatBounds(firstCoord, firstCoord);
+  trackData.coords.forEach(c => bounds.extend(new maplibregl.LngLat(c[0], c[1])));
 
   const map = new maplibregl.Map({
     container,
