@@ -22,9 +22,15 @@ export function initMap(
     bounds: trackBounds,
     fitBoundsOptions: { padding: PADDING },
     attributionControl: false,
+    dragRotate: false,
+    pitchWithRotate: false,
+    touchZoomRotate: true,
   });
 
-  map.addControl(new maplibregl.NavigationControl(), 'top-right');
+  // Disable rotation via touch
+  map.touchZoomRotate.disableRotation();
+
+  map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right');
 
   // After fitBounds resolves, read the actual visible bounds and lock them
   function lockBounds() {
