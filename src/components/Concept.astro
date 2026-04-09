@@ -1,30 +1,5 @@
 ---
-const features = [
-  {
-    icon: '🏃',
-    title: 'Course 12 km',
-    subtitle: 'La Quête de l\'Or',
-    desc: 'Un parcours exigeant à travers les coteaux et vallons du Lauragais.',
-  },
-  {
-    icon: '🚶',
-    title: 'Marche 6 km',
-    subtitle: 'Le Chemin des Anciens',
-    desc: 'Une randonnée accessible pour découvrir les paysages à son rythme.',
-  },
-  {
-    icon: '⚡',
-    title: 'Course Enfants',
-    subtitle: 'Les Petits Gaulois',
-    desc: 'Un parcours adapté pour que les plus jeunes vivent l\'aventure.',
-  },
-  {
-    icon: '🔥',
-    title: '32 km Élimination',
-    subtitle: 'L\'Épreuve des Quatre Torques',
-    desc: '4 boucles, 4 temps impartis. Seuls les plus résistants iront au bout.',
-  },
-];
+import { races } from '../data/races';
 ---
 <section id="concept" class="relative py-20 sm:py-28 bg-charcoal grain-overlay">
   <div class="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -42,12 +17,14 @@ const features = [
 
     <!-- Cards grid -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-      {features.map((f) => (
-        <a href="#epreuves" class="group block bg-charcoal border border-cream/10 rounded-xl p-6 hover:border-gold/30 transition-all duration-300 hover:-translate-y-1">
-          <div class="text-3xl mb-4">{f.icon}</div>
-          <p class="text-gold/80 text-xs uppercase tracking-wider mb-1 font-medium">{f.subtitle}</p>
-          <h3 class="font-serif text-xl font-bold text-cream mb-3 group-hover:text-gold transition-colors">{f.title}</h3>
-          <p class="text-cream/50 text-sm leading-relaxed">{f.desc}</p>
+      {races.map((race, i) => (
+        <a href="#epreuves" class="concept-card group block bg-charcoal border border-cream/10 rounded-xl p-6 hover:border-gold/30 transition-all duration-300 hover:-translate-y-1" data-concept-race={i}>
+          <div class="text-3xl mb-4">{race.icon}</div>
+          <p class="text-gold/80 text-xs uppercase tracking-wider mb-1 font-medium">{race.title}</p>
+          <h3 class="font-serif text-xl font-bold text-cream mb-3 group-hover:text-gold transition-colors">
+            <span class="concept-distance" data-concept-dist={i}>—</span> · {race.type}
+          </h3>
+          <p class="text-cream/50 text-sm leading-relaxed">{race.desc}</p>
         </a>
       ))}
     </div>
@@ -60,13 +37,13 @@ const features = [
         L'Épreuve des Quatre Torques
       </h3>
       <p class="text-cream/70 text-sm sm:text-base leading-relaxed mb-4">
-        Une course par élimination de 32 km en 4 boucles de 8 km.
+        Une course par élimination en 4 boucles.
         Chaque boucle doit être bouclée dans un temps imparti.
       </p>
       <div class="flex flex-wrap justify-center gap-3 mt-8">
         <div class="bg-forest/30 border border-gold/20 rounded-lg px-4 py-3 text-center min-w-[140px]">
           <p class="text-gold font-serif text-lg font-bold">Boucle 1</p>
-          <p class="text-cream/60 text-xs mt-1">12 km — max 1h</p>
+          <p class="text-cream/60 text-xs mt-1">max 1h</p>
         </div>
         <div class="bg-forest/30 border border-gold/20 rounded-lg px-4 py-3 text-center min-w-[140px]">
           <p class="text-gold font-serif text-lg font-bold">Boucle 2</p>

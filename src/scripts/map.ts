@@ -147,6 +147,29 @@ export function initMap(
       new maplibregl.Marker({ element: el }).setLngLat(coord).addTo(map);
     });
 
+    // Km markers along the track
+    let nextKm = 1;
+    for (let i = 0; i < trackData.points.length; i++) {
+      const pt = trackData.points[i];
+      if (pt.dist >= nextKm) {
+        const el = document.createElement('div');
+        el.style.cssText = `
+          width: 22px; height: 22px;
+          background: rgba(26, 24, 20, 0.85);
+          border: 2px solid ${GOLD};
+          border-radius: 50%;
+          display: flex; align-items: center; justify-content: center;
+          font-size: 9px; font-weight: 700; color: ${GOLD};
+          font-family: 'DM Sans', sans-serif;
+        `;
+        el.textContent = `${nextKm}`;
+        new maplibregl.Marker({ element: el })
+          .setLngLat(trackData.coords[i])
+          .addTo(map);
+        nextKm++;
+      }
+    }
+
     // Animate trace drawing
     let step = 0;
     const totalSteps = trackData.coords.length;

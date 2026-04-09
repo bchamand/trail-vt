@@ -18,14 +18,19 @@ export function initElevationChart(
   gradient.addColorStop(0, 'rgba(196, 83, 58, 0.4)');
   gradient.addColorStop(1, 'rgba(196, 83, 58, 0.02)');
 
-  const labels = trackData.distances.map(d => d.toFixed(1));
+  // Build data as {x, y} points so X axis is linear (true distance)
+  const dataPoints = trackData.distances.map((d, i) => ({
+    x: d,
+    y: trackData.elevations[i],
+  }));
+
+  const totalKm = Math.ceil(trackData.totalDistance);
 
   const chart = new Chart(ctx, {
     type: 'line',
     data: {
-      labels,
       datasets: [{
-        data: trackData.elevations,
+        data: dataPoints,
         borderColor: GOLD,
         borderWidth: 2,
         backgroundColor: gradient,
@@ -57,21 +62,27 @@ export function initElevationChart(
           padding: 12,
           displayColors: false,
           callbacks: {
-            title: (items) => `${items[0].label} km`,
-            label: (item) => `Altitude : ${item.raw} m`,
+            title: (items) => `${(items[0].parsed.x).toFixed(1)} km`,
+            label: (item) => `Altitude : ${item.parsed.y} m`,
           },
         },
       },
       scales: {
         x: {
+          type: 'linear',
+          min: 0,
+          max: trackData.totalDistance,
+          afterBuildTicks: (axis) => {
+            const last = Math.floor(trackData.totalDistance);
+            axis.ticks = [];
+            for (let km = 0; km <= last; km++) {
+              axis.ticks.push({ value: km });
+            }
+          },
           ticks: {
             color: 'rgba(245, 240, 232, 0.4)',
             font: { size: 10 },
-            maxTicksLimit: 8,
-            callback: function(val, index) {
-              const v = parseFloat(labels[index]);
-              return Number.isInteger(v) ? `${v} km` : '';
-            },
+            callback: (val) => `${val} km`,
           },
           grid: { color: 'rgba(245, 240, 232, 0.05)' },
           border: { color: 'rgba(245, 240, 232, 0.1)' },

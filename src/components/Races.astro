@@ -1,42 +1,5 @@
 ---
-const races = [
-  {
-    id: 'quete-or',
-    title: 'La Quête de l\'Or',
-    distance: '12 km',
-    type: 'Course trail',
-    desc: 'Le parcours phare du Trail des Tectosages. 12 kilomètres à travers les coteaux boisés et les chemins ancestraux de Vieille-Toulouse.',
-    gpx: '/traces/quete-or.gpx',
-    icon: '🏃',
-  },
-  {
-    id: 'chemin-anciens',
-    title: 'Le Chemin des Anciens',
-    distance: '6 km',
-    type: 'Marche / Randonnée',
-    desc: 'Un parcours accessible à tous pour découvrir les paysages et le patrimoine du Lauragais à son propre rythme.',
-    gpx: '/traces/chemin-anciens.gpx',
-    icon: '🚶',
-  },
-  {
-    id: 'petits-gaulois',
-    title: 'Les Petits Gaulois',
-    distance: 'Adapté',
-    type: 'Course enfants',
-    desc: 'Les futurs guerriers tectosages se lancent sur un parcours adapté à leur âge. Médaille pour tous les finishers !',
-    gpx: '/traces/petits-gaulois.gpx',
-    icon: '⚡',
-  },
-  {
-    id: 'quatre-torques',
-    title: 'L\'Épreuve des Quatre Torques',
-    distance: '32 km',
-    type: 'Course par élimination',
-    desc: '4 boucles chronométrées. Chaque boucle doit être bouclée dans le temps imparti. Arriverez-vous au bout des 4 torques ?',
-    gpx: '/traces/quatre-torques.gpx',
-    icon: '🔥',
-  },
-];
+import { races } from '../data/races';
 ---
 <section id="epreuves" class="relative py-20 sm:py-28 bg-charcoal">
   <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -63,7 +26,7 @@ const races = [
         >
           <span class="text-lg">{race.icon}</span>
           <span class="hidden sm:inline">{race.title}</span>
-          <span class="sm:hidden">{race.distance}</span>
+          <span class="sm:hidden race-tab-distance" data-tab-dist-index={i}>—</span>
         </button>
       ))}
     </div>
@@ -83,7 +46,7 @@ const races = [
               <p class="text-gold/70 text-xs uppercase tracking-wider">{race.type}</p>
               <h3 class="font-serif text-2xl sm:text-3xl font-bold text-cream">{race.title}</h3>
             </div>
-            <span class="text-gold font-serif text-3xl sm:text-4xl font-bold">{race.distance}</span>
+            <span class="race-distance text-gold font-serif text-3xl sm:text-4xl font-bold" data-distance-index={i}>—</span>
           </div>
           <p class="text-cream/50 text-sm max-w-2xl leading-relaxed">{race.desc}</p>
         </div>
@@ -115,7 +78,7 @@ const races = [
 </section>
 
 <script>
-  import { parseGPX } from '../scripts/gpx-parser';
+  import { parseGPX, type TrackData } from '../scripts/gpx-parser';
   import { initMap } from '../scripts/map';
   import { initElevationChart } from '../scripts/elevation';
 
@@ -128,7 +91,32 @@ const races = [
   let currentChart: any = null;
   let activeIndex = 0;
 
-  function updateStats(data: Awaited<ReturnType<typeof parseGPX>>) {
+  function resolveUrl(path: string): string {
+    const base = import.meta.env.BASE_URL;
+    return base.endsWith('/') ? base + path.replace(/^\//, '') : base + path;
+  }
+
+  // Pre-load all GPX data and populate all distances across the page
+  const allTrackData: TrackData[] = [];
+
+  async function preloadAll() {
+    const gpxUrls = Array.from(tabs).map(tab => (tab as HTMLElement).dataset.gpx!);
+    const results = await Promise.all(gpxUrls.map(url => parseGPX(resolveUrl(url))));
+
+    results.forEach((data, i) => {
+      allTrackData[i] = data;
+      const dist = `${data.totalDistance.toFixed(1)} km`;
+
+      // Update all distance placeholders for this race index
+      document.querySelectorAll(`[data-distance-index="${i}"]`).forEach(el => el.textContent = dist);
+      document.querySelectorAll(`[data-tab-dist-index="${i}"]`).forEach(el => el.textContent = dist);
+      document.querySelectorAll(`[data-concept-dist="${i}"]`).forEach(el => el.textContent = dist);
+    });
+
+    showRace(0);
+  }
+
+  function showStats(data: TrackData) {
     document.getElementById('stat-distance')!.textContent = `${data.totalDistance.toFixed(1)} km`;
     document.getElementById('stat-ascent')!.textContent = `${Math.round(data.totalAscent)} m`;
     document.getElementById('stat-descent')!.textContent = `${Math.round(data.totalDescent)} m`;
@@ -152,19 +140,13 @@ const races = [
     });
   }
 
-  async function loadRace(gpxUrl: string) {
-    // Cleanup previous
-    if (currentMap) {
-      currentMap.map.remove();
-      currentMap = null;
-    }
-    if (currentChart) {
-      currentChart.destroy();
-      currentChart = null;
-    }
+  function showRace(raceIndex: number) {
+    if (currentMap) { currentMap.map.remove(); currentMap = null; }
+    if (currentChart) { currentChart.destroy(); currentChart = null; }
 
-    const trackData = await parseGPX(gpxUrl);
-    updateStats(trackData);
+    const trackData = allTrackData[raceIndex];
+    showStats(trackData);
+    updateTabStyles(raceIndex);
 
     currentMap = initMap(mapContainer, trackData);
     currentChart = initElevationChart(canvas, trackData, (index) => {
@@ -172,28 +154,26 @@ const races = [
     });
   }
 
-  // Tab click handlers
   tabs.forEach((tab) => {
     tab.addEventListener('click', () => {
       const el = tab as HTMLElement;
       const index = parseInt(el.dataset.raceIndex!);
-      const gpx = el.dataset.gpx!;
-
       if (index === activeIndex) return;
       activeIndex = index;
-
-      updateTabStyles(index);
-      loadRace(resolveUrl(gpx));
+      showRace(index);
     });
   });
 
-  // Resolve GPX URL with base path
-  function resolveUrl(path: string): string {
-    const base = import.meta.env.BASE_URL;
-    return base.endsWith('/') ? base + path.replace(/^\//, '') : base + path;
-  }
+  // Listen for clicks on concept cards to select the right race tab
+  document.querySelectorAll('.concept-card').forEach((card) => {
+    card.addEventListener('click', () => {
+      const index = parseInt((card as HTMLElement).dataset.conceptRace!);
+      if (allTrackData.length > 0 && index !== activeIndex) {
+        activeIndex = index;
+        showRace(index);
+      }
+    });
+  });
 
-  // Load first race on page load
-  const firstGpx = (tabs[0] as HTMLElement).dataset.gpx!;
-  loadRace(resolveUrl(firstGpx));
+  preloadAll();
 </script>
