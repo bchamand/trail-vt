@@ -1,0 +1,193 @@
+---
+const races = [
+  {
+    id: 'quete-or',
+    title: 'La Quête de l\'Or',
+    distance: '12 km',
+    type: 'Course trail',
+    desc: 'Le parcours phare du Trail des Tectosages. 12 kilomètres à travers les coteaux boisés et les chemins ancestraux de Vieille-Toulouse.',
+    gpx: '/traces/quete-or.gpx',
+    icon: '🏃',
+  },
+  {
+    id: 'chemin-anciens',
+    title: 'Le Chemin des Anciens',
+    distance: '6 km',
+    type: 'Marche / Randonnée',
+    desc: 'Un parcours accessible à tous pour découvrir les paysages et le patrimoine du Lauragais à son propre rythme.',
+    gpx: '/traces/chemin-anciens.gpx',
+    icon: '🚶',
+  },
+  {
+    id: 'petits-gaulois',
+    title: 'Les Petits Gaulois',
+    distance: 'Adapté',
+    type: 'Course enfants',
+    desc: 'Les futurs guerriers tectosages se lancent sur un parcours adapté à leur âge. Médaille pour tous les finishers !',
+    gpx: '/traces/petits-gaulois.gpx',
+    icon: '⚡',
+  },
+  {
+    id: 'quatre-torques',
+    title: 'L\'Épreuve des Quatre Torques',
+    distance: '32 km',
+    type: 'Course par élimination',
+    desc: '4 boucles chronométrées. Chaque boucle doit être bouclée dans le temps imparti. Arriverez-vous au bout des 4 torques ?',
+    gpx: '/traces/quatre-torques.gpx',
+    icon: '🔥',
+  },
+];
+---
+<section id="epreuves" class="relative py-20 sm:py-28 bg-charcoal">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Section header -->
+    <div class="text-center mb-12">
+      <p class="text-gold uppercase tracking-[0.25em] text-xs font-medium mb-4">Les parcours</p>
+      <h2 class="font-serif text-3xl sm:text-4xl md:text-5xl font-bold text-cream mb-6">
+        Choisissez votre épreuve
+      </h2>
+    </div>
+
+    <!-- Race selector tabs -->
+    <div class="flex flex-wrap justify-center gap-2 sm:gap-3 mb-10">
+      {races.map((race, i) => (
+        <button
+          class:list={[
+            'race-tab flex items-center gap-2 px-4 sm:px-6 py-3 rounded-full text-sm font-medium transition-all duration-300 cursor-pointer border',
+            i === 0
+              ? 'bg-gold/15 border-gold/40 text-gold'
+              : 'bg-charcoal border-cream/10 text-cream/50 hover:border-cream/20 hover:text-cream/80',
+          ]}
+          data-race-index={i}
+          data-gpx={race.gpx}
+        >
+          <span class="text-lg">{race.icon}</span>
+          <span class="hidden sm:inline">{race.title}</span>
+          <span class="sm:hidden">{race.distance}</span>
+        </button>
+      ))}
+    </div>
+
+    <!-- Race info panel -->
+    <div class="mb-8">
+      {races.map((race, i) => (
+        <div
+          class:list={[
+            'race-info transition-all duration-300',
+            i === 0 ? '' : 'hidden',
+          ]}
+          data-info-index={i}
+        >
+          <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-2 mb-2">
+            <div>
+              <p class="text-gold/70 text-xs uppercase tracking-wider">{race.type}</p>
+              <h3 class="font-serif text-2xl sm:text-3xl font-bold text-cream">{race.title}</h3>
+            </div>
+            <span class="text-gold font-serif text-3xl sm:text-4xl font-bold">{race.distance}</span>
+          </div>
+          <p class="text-cream/50 text-sm max-w-2xl leading-relaxed">{race.desc}</p>
+        </div>
+      ))}
+    </div>
+
+    <!-- Stats bar -->
+    <div class="flex flex-wrap gap-4 sm:gap-6 text-sm mb-6 px-1">
+      <div><span class="text-cream/40">Distance : </span><span class="text-cream font-medium" id="stat-distance">—</span></div>
+      <div><span class="text-cream/40">D+ : </span><span class="text-cream font-medium" id="stat-ascent">—</span></div>
+      <div><span class="text-cream/40">D- : </span><span class="text-cream font-medium" id="stat-descent">—</span></div>
+      <div><span class="text-cream/40">Alt. min : </span><span class="text-cream font-medium" id="stat-min-ele">—</span></div>
+      <div><span class="text-cream/40">Alt. max : </span><span class="text-cream font-medium" id="stat-max-ele">—</span></div>
+    </div>
+
+    <!-- Map -->
+    <div class="rounded-xl overflow-hidden border border-cream/10 mb-6">
+      <div id="race-map" class="map-container"></div>
+    </div>
+
+    <!-- Elevation -->
+    <div class="bg-charcoal border border-cream/10 rounded-xl p-4 sm:p-6">
+      <p class="text-cream/40 text-xs uppercase tracking-wider mb-3">Profil altimétrique</p>
+      <div class="elevation-container">
+        <canvas id="elevation-chart"></canvas>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { parseGPX } from '../scripts/gpx-parser';
+  import { initMap } from '../scripts/map';
+  import { initElevationChart } from '../scripts/elevation';
+
+  const tabs = document.querySelectorAll('.race-tab');
+  const infoPanels = document.querySelectorAll('.race-info');
+  const mapContainer = document.getElementById('race-map')!;
+  const canvas = document.getElementById('elevation-chart') as HTMLCanvasElement;
+
+  let currentMap: ReturnType<typeof initMap> | null = null;
+  let currentChart: any = null;
+  let activeIndex = 0;
+
+  function updateStats(data: Awaited<ReturnType<typeof parseGPX>>) {
+    document.getElementById('stat-distance')!.textContent = `${data.totalDistance.toFixed(1)} km`;
+    document.getElementById('stat-ascent')!.textContent = `${Math.round(data.totalAscent)} m`;
+    document.getElementById('stat-descent')!.textContent = `${Math.round(data.totalDescent)} m`;
+    document.getElementById('stat-min-ele')!.textContent = `${Math.round(data.minEle)} m`;
+    document.getElementById('stat-max-ele')!.textContent = `${Math.round(data.maxEle)} m`;
+  }
+
+  function updateTabStyles(selectedIndex: number) {
+    tabs.forEach((tab, i) => {
+      const el = tab as HTMLElement;
+      if (i === selectedIndex) {
+        el.classList.remove('bg-charcoal', 'border-cream/10', 'text-cream/50');
+        el.classList.add('bg-gold/15', 'border-gold/40', 'text-gold');
+      } else {
+        el.classList.remove('bg-gold/15', 'border-gold/40', 'text-gold');
+        el.classList.add('bg-charcoal', 'border-cream/10', 'text-cream/50');
+      }
+    });
+    infoPanels.forEach((panel, i) => {
+      panel.classList.toggle('hidden', i !== selectedIndex);
+    });
+  }
+
+  async function loadRace(gpxUrl: string) {
+    // Cleanup previous
+    if (currentMap) {
+      currentMap.map.remove();
+      currentMap = null;
+    }
+    if (currentChart) {
+      currentChart.destroy();
+      currentChart = null;
+    }
+
+    const trackData = await parseGPX(gpxUrl);
+    updateStats(trackData);
+
+    currentMap = initMap(mapContainer, trackData);
+    currentChart = initElevationChart(canvas, trackData, (index) => {
+      currentMap?.setMarkerAt(index);
+    });
+  }
+
+  // Tab click handlers
+  tabs.forEach((tab) => {
+    tab.addEventListener('click', () => {
+      const el = tab as HTMLElement;
+      const index = parseInt(el.dataset.raceIndex!);
+      const gpx = el.dataset.gpx!;
+
+      if (index === activeIndex) return;
+      activeIndex = index;
+
+      updateTabStyles(index);
+      loadRace(gpx);
+    });
+  });
+
+  // Load first race on page load
+  const firstGpx = (tabs[0] as HTMLElement).dataset.gpx!;
+  loadRace(firstGpx);
+</script>

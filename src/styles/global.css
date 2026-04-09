@@ -1,0 +1,97 @@
+@import "tailwindcss";
+@import "maplibre-gl/dist/maplibre-gl.css";
+
+@theme {
+  --color-terracotta: #C4533A;
+  --color-terracotta-dark: #9E3F2C;
+  --color-gold: #D4A843;
+  --color-gold-light: #E8C96A;
+  --color-forest: #2D4A3E;
+  --color-cream: #F5F0E8;
+  --color-charcoal: #1A1814;
+  --color-blush: #E8D5CC;
+
+  --font-serif: 'Cormorant Garamond', Georgia, serif;
+  --font-sans: 'DM Sans', system-ui, sans-serif;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    font-family: var(--font-sans);
+    background-color: var(--color-charcoal);
+    color: var(--color-cream);
+    overflow-x: hidden;
+  }
+  h1, h2, h3, h4 {
+    font-family: var(--font-serif);
+  }
+}
+
+/* Celtic knot separator */
+.celtic-separator {
+  position: relative;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--color-gold), transparent);
+  margin: 3rem auto;
+  max-width: 300px;
+}
+.celtic-separator::before {
+  content: '◆';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  color: var(--color-gold);
+  background: var(--color-charcoal);
+  padding: 0 0.75rem;
+  font-size: 0.75rem;
+}
+
+/* Map container */
+.map-container {
+  width: 100%;
+  height: 350px;
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+@media (min-width: 768px) {
+  .map-container {
+    height: 450px;
+  }
+}
+
+/* Elevation chart */
+.elevation-container {
+  width: 100%;
+  height: 180px;
+}
+@media (min-width: 768px) {
+  .elevation-container {
+    height: 220px;
+  }
+}
+
+/* Subtle grain texture overlay */
+.grain-overlay::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  pointer-events: none;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-charcoal);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-terracotta);
+  border-radius: 4px;
+}

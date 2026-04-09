@@ -1,0 +1,55 @@
+---
+---
+<section id="hero" class="relative min-h-screen flex items-center justify-center overflow-hidden grain-overlay">
+  <!-- Background gradient -->
+  <div class="absolute inset-0 bg-gradient-to-b from-charcoal via-forest/30 to-charcoal"></div>
+
+  <!-- Animated golden circles (celtic motif) -->
+  <div class="absolute inset-0 overflow-hidden pointer-events-none">
+    <div class="absolute top-1/4 left-1/4 w-96 h-96 rounded-full border border-gold/10 animate-pulse"></div>
+    <div class="absolute bottom-1/4 right-1/4 w-64 h-64 rounded-full border border-terracotta/10 animate-pulse" style="animation-delay: 1s;"></div>
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full border border-gold/5"></div>
+  </div>
+
+  <div class="relative z-10 text-center px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
+    <!-- Petit label -->
+    <p class="text-gold/80 uppercase tracking-[0.3em] text-xs sm:text-sm mb-6 font-sans font-medium">
+      Vieille-Toulouse &bull; 2025
+    </p>
+
+    <!-- Titre principal -->
+    <h1 class="font-serif text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold text-cream leading-[0.95] mb-6">
+      Trail des<br/>
+      <span class="text-gold">Tectosages</span>
+    </h1>
+
+    <!-- Baseline -->
+    <p class="font-serif italic text-blush/90 text-lg sm:text-xl md:text-2xl mb-4">
+      Sur les traces de l'or de Tolosa
+    </p>
+
+    <!-- Separator -->
+    <div class="celtic-separator my-8"></div>
+
+    <!-- Description courte -->
+    <p class="text-cream/70 max-w-xl mx-auto text-sm sm:text-base mb-10 leading-relaxed">
+      Un trail d'un nouveau genre au c&oelig;ur des coteaux toulousains.
+      4 &eacute;preuves in&eacute;dites pour tous les niveaux.
+    </p>
+
+    <!-- CTA -->
+    <a href="#epreuves" class="inline-flex items-center gap-2 bg-terracotta hover:bg-terracotta-dark text-cream px-8 py-4 rounded-full font-sans font-semibold text-sm sm:text-base transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-terracotta/20">
+      D&eacute;couvrir les &eacute;preuves
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+      </svg>
+    </a>
+  </div>
+
+  <!-- Scroll indicator -->
+  <div class="absolute bottom-8 left-1/2 -translate-x-1/2 opacity-50">
+    <div class="w-6 h-10 border-2 border-cream/30 rounded-full flex justify-center pt-2">
+      <div class="w-1 h-3 bg-cream/50 rounded-full animate-bounce"></div>
+    </div>
+  </div>
+</section>
