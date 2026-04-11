@@ -32,22 +32,27 @@
 
 /* Celtic knot separator */
 .celtic-separator {
-  position: relative;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, var(--color-gold), transparent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
   margin: 3rem auto;
   max-width: 300px;
+  color: var(--color-gold);
+  font-size: 0.75rem;
+  line-height: 1;
+}
+.celtic-separator::before,
+.celtic-separator::after {
+  content: '';
+  flex: 1;
+  height: 2px;
 }
 .celtic-separator::before {
-  content: '◆';
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  color: var(--color-gold);
-  background: var(--color-charcoal);
-  padding: 0 0.75rem;
-  font-size: 0.75rem;
+  background: linear-gradient(90deg, transparent, var(--color-gold));
+}
+.celtic-separator::after {
+  background: linear-gradient(90deg, var(--color-gold), transparent);
 }
 
 /* Map container */
@@ -88,4 +93,13 @@
 ::-webkit-scrollbar-thumb {
   background: var(--color-terracotta);
   border-radius: 4px;
+}
+
+/* Hide scrollbar on horizontal carousels */
+.scrollbar-hide {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
 }

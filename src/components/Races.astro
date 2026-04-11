@@ -1,61 +1,97 @@
 ---
 import { races } from '../data/races';
 ---
-<section id="epreuves" class="relative py-20 sm:py-28 bg-charcoal">
-  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-    <!-- Section header -->
-    <div class="text-center mb-12">
-      <p class="text-gold uppercase tracking-[0.25em] text-xs font-medium mb-4">Les parcours</p>
+<section id="epreuves" class="relative py-20 sm:py-28 bg-charcoal grain-overlay">
+  <div class="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Storytelling header -->
+    <div class="text-center mb-16">
+      <p class="text-gold uppercase tracking-[0.25em] text-xs font-medium mb-4">L'héritage des Volques Tectosages</p>
       <h2 class="font-serif text-3xl sm:text-4xl md:text-5xl font-bold text-cream mb-6">
-        Choisissez votre épreuve
+        Les traileurs sont-ils les<br/>descendants des Tectosages&nbsp;?
       </h2>
+      <p class="text-cream/60 max-w-2xl mx-auto text-sm sm:text-base leading-relaxed mb-4">
+        Il y a 2300 ans, Vieille-Toulouse était la capitale du peuple des Volques Tectosages.
+        Leurs valeurs — <span class="text-gold">l'esprit de conquête, le courage, la bravoure, l'honneur</span> —
+        résonnent encore aujourd'hui dans l'âme des coureurs.
+      </p>
+      <p class="text-cream/40 text-sm italic">
+        Partez à la conquête du territoire de Tolosa — choisissez votre épreuve.
+      </p>
     </div>
 
-    <!-- Race selector tabs -->
-    <div class="flex flex-wrap justify-center gap-2 sm:gap-3 mb-10">
+    <!-- Visual race selector -->
+    <!-- Small screens: horizontal snap carousel / ≥lg: grid with all 5 cards -->
+    <div
+      id="race-carousel"
+      class="flex lg:grid lg:grid-cols-5 gap-3 sm:gap-4 mb-6 lg:mb-12 overflow-x-auto lg:overflow-visible snap-x snap-mandatory scroll-smooth scrollbar-hide px-4 lg:px-0 -mx-4 lg:mx-0"
+    >
       {races.map((race, i) => (
         <button
           class:list={[
-            'race-tab flex items-center gap-2 px-4 sm:px-6 py-3 rounded-full text-sm font-medium transition-all duration-300 cursor-pointer border',
+            'race-card group relative text-left bg-charcoal border rounded-xl p-4 sm:p-5 transition-all duration-300 cursor-pointer lg:hover:-translate-y-1 snap-center lg:snap-align-none flex-shrink-0 w-[78%] sm:w-[55%] md:w-[38%] lg:w-auto',
             i === 0
-              ? 'bg-gold/15 border-gold/40 text-gold'
-              : 'bg-charcoal border-cream/10 text-cream/50 hover:border-cream/20 hover:text-cream/80',
+              ? 'border-gold/40 bg-gold/5'
+              : 'border-cream/10 lg:hover:border-gold/30',
           ]}
           data-race-index={i}
           data-gpx={race.gpx}
         >
-          <span class="text-lg">{race.icon}</span>
-          <span class="hidden sm:inline">{race.title}</span>
-          <span class="sm:hidden race-tab-distance" data-tab-dist-index={i}>—</span>
+          <div class="text-3xl sm:text-4xl mb-3">{race.icon}</div>
+          <p class="text-gold/70 text-[10px] sm:text-xs uppercase tracking-wider mb-1 font-medium leading-tight">{race.type}</p>
+          <h3 class="font-serif text-base sm:text-lg font-bold text-cream mb-2 leading-tight">{race.title}</h3>
+          <p class="text-gold font-serif text-xl sm:text-2xl font-bold">{race.distance}</p>
+          {race.ascent && <p class="text-cream/40 text-xs mt-1">{race.ascent}</p>}
         </button>
       ))}
     </div>
 
-    <!-- Race info panel -->
+    <!-- Pagination dots (shown below lg breakpoint) -->
+    <div id="race-dots" class="flex justify-center gap-2 mb-10 lg:hidden">
+      {races.map((_, i) => (
+        <button
+          class:list={[
+            'race-dot h-2 rounded-full transition-all duration-300 cursor-pointer',
+            i === 0 ? 'w-6 bg-gold' : 'w-2 bg-cream/20',
+          ]}
+          data-dot-index={i}
+          aria-label={`Aller à l'épreuve ${i + 1}`}
+        ></button>
+      ))}
+    </div>
+
+    <!-- Selected race details -->
     <div class="mb-8">
       {races.map((race, i) => (
         <div
           class:list={[
-            'race-info transition-all duration-300',
+            'race-info',
             i === 0 ? '' : 'hidden',
           ]}
           data-info-index={i}
         >
-          <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-2 mb-2">
+          <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-2 mb-3">
             <div>
               <p class="text-gold/70 text-xs uppercase tracking-wider">{race.type}</p>
               <h3 class="font-serif text-2xl sm:text-3xl font-bold text-cream">{race.title}</h3>
             </div>
-            <span class="race-distance text-gold font-serif text-3xl sm:text-4xl font-bold" data-distance-index={i}>—</span>
+            <div class="text-right">
+              <span class="text-gold font-serif text-3xl sm:text-4xl font-bold">{race.distance}</span>
+              {race.ascent && <p class="text-cream/40 text-xs mt-1">{race.ascent}</p>}
+            </div>
           </div>
-          <p class="text-cream/50 text-sm max-w-2xl leading-relaxed">{race.desc}</p>
+          <p class="text-cream/60 text-sm max-w-2xl leading-relaxed mb-3">{race.desc}</p>
+          <div class="flex flex-wrap gap-x-4 gap-y-1 text-xs text-cream/40">
+            <span>🕐 Départ {race.startTime}</span>
+            {race.duration && <span>· {race.duration}</span>}
+            <span>· {race.timed ? 'Chronométré' : 'Non chronométré'}</span>
+          </div>
         </div>
       ))}
     </div>
 
-    <!-- Stats bar -->
+    <!-- Stats bar (from GPX) -->
     <div class="flex flex-wrap gap-4 sm:gap-6 text-sm mb-6 px-1">
-      <div><span class="text-cream/40">Distance : </span><span class="text-cream font-medium" id="stat-distance">—</span></div>
+      <div><span class="text-cream/40">Distance GPX : </span><span class="text-cream font-medium" id="stat-distance">—</span></div>
       <div><span class="text-cream/40">D+ : </span><span class="text-cream font-medium" id="stat-ascent">—</span></div>
       <div><span class="text-cream/40">D- : </span><span class="text-cream font-medium" id="stat-descent">—</span></div>
       <div><span class="text-cream/40">Alt. min : </span><span class="text-cream font-medium" id="stat-min-ele">—</span></div>
@@ -82,7 +118,9 @@ import { races } from '../data/races';
   import { initMap } from '../scripts/map';
   import { initElevationChart } from '../scripts/elevation';
 
-  const tabs = document.querySelectorAll('.race-tab');
+  const cards = document.querySelectorAll('.race-card');
+  const dots = document.querySelectorAll('.race-dot');
+  const carousel = document.getElementById('race-carousel')!;
   const infoPanels = document.querySelectorAll('.race-info');
   const mapContainer = document.getElementById('race-map')!;
   const canvas = document.getElementById('elevation-chart') as HTMLCanvasElement;
@@ -96,23 +134,12 @@ import { races } from '../data/races';
     return base.endsWith('/') ? base + path.replace(/^\//, '') : base + path;
   }
 
-  // Pre-load all GPX data and populate all distances across the page
   const allTrackData: TrackData[] = [];
 
   async function preloadAll() {
-    const gpxUrls = Array.from(tabs).map(tab => (tab as HTMLElement).dataset.gpx!);
+    const gpxUrls = Array.from(cards).map(card => (card as HTMLElement).dataset.gpx!);
     const results = await Promise.all(gpxUrls.map(url => parseGPX(resolveUrl(url))));
-
-    results.forEach((data, i) => {
-      allTrackData[i] = data;
-      const dist = `${data.totalDistance.toFixed(1)} km`;
-
-      // Update all distance placeholders for this race index
-      document.querySelectorAll(`[data-distance-index="${i}"]`).forEach(el => el.textContent = dist);
-      document.querySelectorAll(`[data-tab-dist-index="${i}"]`).forEach(el => el.textContent = dist);
-      document.querySelectorAll(`[data-concept-dist="${i}"]`).forEach(el => el.textContent = dist);
-    });
-
+    results.forEach((data, i) => { allTrackData[i] = data; });
     showRace(0);
   }
 
@@ -124,15 +151,25 @@ import { races } from '../data/races';
     document.getElementById('stat-max-ele')!.textContent = `${Math.round(data.maxEle)} m`;
   }
 
-  function updateTabStyles(selectedIndex: number) {
-    tabs.forEach((tab, i) => {
-      const el = tab as HTMLElement;
+  function updateCardStyles(selectedIndex: number) {
+    cards.forEach((card, i) => {
+      const el = card as HTMLElement;
       if (i === selectedIndex) {
-        el.classList.remove('bg-charcoal', 'border-cream/10', 'text-cream/50');
-        el.classList.add('bg-gold/15', 'border-gold/40', 'text-gold');
+        el.classList.remove('border-cream/10');
+        el.classList.add('border-gold/40', 'bg-gold/5');
       } else {
-        el.classList.remove('bg-gold/15', 'border-gold/40', 'text-gold');
-        el.classList.add('bg-charcoal', 'border-cream/10', 'text-cream/50');
+        el.classList.remove('border-gold/40', 'bg-gold/5');
+        el.classList.add('border-cream/10');
+      }
+    });
+    dots.forEach((dot, i) => {
+      const el = dot as HTMLElement;
+      if (i === selectedIndex) {
+        el.classList.remove('w-2', 'bg-cream/20');
+        el.classList.add('w-6', 'bg-gold');
+      } else {
+        el.classList.remove('w-6', 'bg-gold');
+        el.classList.add('w-2', 'bg-cream/20');
       }
     });
     infoPanels.forEach((panel, i) => {
@@ -146,7 +183,7 @@ import { races } from '../data/races';
 
     const trackData = allTrackData[raceIndex];
     showStats(trackData);
-    updateTabStyles(raceIndex);
+    updateCardStyles(raceIndex);
 
     currentMap = initMap(mapContainer, trackData);
     currentChart = initElevationChart(canvas, trackData, (index) => {
@@ -154,26 +191,61 @@ import { races } from '../data/races';
     });
   }
 
-  tabs.forEach((tab) => {
-    tab.addEventListener('click', () => {
-      const el = tab as HTMLElement;
+  const CAROUSEL_BREAKPOINT = 1024; // lg: in Tailwind
+
+  cards.forEach((card) => {
+    card.addEventListener('click', () => {
+      const el = card as HTMLElement;
       const index = parseInt(el.dataset.raceIndex!);
       if (index === activeIndex) return;
       activeIndex = index;
       showRace(index);
+      // Scroll carousel to this card when in carousel mode
+      if (window.innerWidth < CAROUSEL_BREAKPOINT) {
+        el.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+      }
     });
   });
 
-  // Listen for clicks on concept cards to select the right race tab
-  document.querySelectorAll('.concept-card').forEach((card) => {
-    card.addEventListener('click', () => {
-      const index = parseInt((card as HTMLElement).dataset.conceptRace!);
-      if (allTrackData.length > 0 && index !== activeIndex) {
+  // Dots click → scroll to corresponding card
+  dots.forEach((dot) => {
+    dot.addEventListener('click', () => {
+      const index = parseInt((dot as HTMLElement).dataset.dotIndex!);
+      const card = cards[index] as HTMLElement;
+      card.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+      if (index !== activeIndex) {
         activeIndex = index;
         showRace(index);
       }
     });
   });
+
+  // Sync dots with carousel scroll position (carousel mode only)
+  let scrollTimeout: number;
+  carousel.addEventListener('scroll', () => {
+    if (window.innerWidth >= CAROUSEL_BREAKPOINT) return;
+    clearTimeout(scrollTimeout);
+    scrollTimeout = window.setTimeout(() => {
+      // Find the card closest to the carousel center
+      const carouselRect = carousel.getBoundingClientRect();
+      const carouselCenter = carouselRect.left + carouselRect.width / 2;
+      let closestIndex = 0;
+      let closestDist = Infinity;
+      cards.forEach((card, i) => {
+        const rect = (card as HTMLElement).getBoundingClientRect();
+        const cardCenter = rect.left + rect.width / 2;
+        const dist = Math.abs(cardCenter - carouselCenter);
+        if (dist < closestDist) {
+          closestDist = dist;
+          closestIndex = i;
+        }
+      });
+      if (closestIndex !== activeIndex) {
+        activeIndex = closestIndex;
+        showRace(closestIndex);
+      }
+    }, 100);
+  }, { passive: true });
 
   preloadAll();
 </script>
