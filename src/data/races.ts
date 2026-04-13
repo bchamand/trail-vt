@@ -1,3 +1,13 @@
+export interface RaceLoop {
+  label: string;
+  distance: string;
+  ascent: string;
+  timeLimit: string;
+  value: string;
+  status: string;
+  color: string;
+}
+
 export interface Race {
   id: string;
   title: string;
@@ -5,16 +15,12 @@ export interface Race {
   desc: string;
   gpx: string;
   icon: string;
-  /** Distance officielle en km (remplacée par la valeur GPX si disponible) */
   distance: string;
-  /** Dénivelé positif officiel */
   ascent: string;
-  /** Heure de départ */
   startTime: string;
-  /** Durée/temps limite */
   duration?: string;
-  /** Chronométré / non chronométré */
   timed?: boolean;
+  loops?: RaceLoop[];
 }
 
 export const races: Race[] = [
@@ -30,6 +36,44 @@ export const races: Race[] = [
     startTime: '15h45',
     duration: 'Fin 20h45',
     timed: true,
+    loops: [
+      {
+        label: 'Boucle 1',
+        distance: '12 km',
+        ascent: 'D+ 400 m',
+        timeLimit: '1h45',
+        value: 'L\'esprit de conquête',
+        status: 'Qualificative',
+        color: '#D4A843',
+      },
+      {
+        label: 'Boucle 2',
+        distance: '6 km',
+        ascent: 'D+ 220 m',
+        timeLimit: '1h00',
+        value: 'Le courage',
+        status: 'Qualificative',
+        color: '#C4533A',
+      },
+      {
+        label: 'Boucle 3',
+        distance: '6 km',
+        ascent: 'D+ 220 m',
+        timeLimit: '1h00',
+        value: 'La bravoure',
+        status: 'Qualificative',
+        color: '#4A8C6F',
+      },
+      {
+        label: 'Boucle 4',
+        distance: '6 km',
+        ascent: 'D+ 220 m',
+        timeLimit: '1h00',
+        value: 'L\'honneur',
+        status: 'Classement final',
+        color: '#E8D5CC',
+      },
+    ],
   },
   {
     id: 'oppidum',

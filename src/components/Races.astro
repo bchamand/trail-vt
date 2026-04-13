@@ -20,7 +20,6 @@ import { races } from '../data/races';
     </div>
 
     <!-- Visual race selector -->
-    <!-- Small screens: horizontal snap carousel / ≥lg: grid with all 5 cards -->
     <div
       id="race-carousel"
       class="flex lg:grid lg:grid-cols-5 gap-3 sm:gap-4 mb-6 lg:mb-12 overflow-x-auto lg:overflow-visible snap-x snap-mandatory scroll-smooth scrollbar-hide px-4 lg:px-0 -mx-4 lg:mx-0"
@@ -35,6 +34,7 @@ import { races } from '../data/races';
           ]}
           data-race-index={i}
           data-gpx={race.gpx}
+          data-has-loops={race.loops ? 'true' : 'false'}
         >
           <div class="text-3xl sm:text-4xl mb-3">{race.icon}</div>
           <p class="text-gold/70 text-[10px] sm:text-xs uppercase tracking-wider mb-1 font-medium leading-tight">{race.type}</p>
@@ -45,7 +45,7 @@ import { races } from '../data/races';
       ))}
     </div>
 
-    <!-- Pagination dots (shown below lg breakpoint) -->
+    <!-- Pagination dots -->
     <div id="race-dots" class="flex justify-center gap-2 mb-10 lg:hidden">
       {races.map((_, i) => (
         <button
@@ -63,10 +63,7 @@ import { races } from '../data/races';
     <div class="mb-8">
       {races.map((race, i) => (
         <div
-          class:list={[
-            'race-info',
-            i === 0 ? '' : 'hidden',
-          ]}
+          class:list={['race-info', i === 0 ? '' : 'hidden']}
           data-info-index={i}
         >
           <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-2 mb-3">
@@ -89,13 +86,29 @@ import { races } from '../data/races';
       ))}
     </div>
 
-    <!-- Stats bar (from GPX) -->
-    <div class="flex flex-wrap gap-4 sm:gap-6 text-sm mb-6 px-1">
-      <div><span class="text-cream/40">Distance GPX : </span><span class="text-cream font-medium" id="stat-distance">—</span></div>
+    <!-- Stats bar (single race) -->
+    <div id="stats-single" class="flex flex-wrap gap-4 sm:gap-6 text-sm mb-6 px-1">
+      <div><span class="text-cream/40">Distance : </span><span class="text-cream font-medium" id="stat-distance">—</span></div>
       <div><span class="text-cream/40">D+ : </span><span class="text-cream font-medium" id="stat-ascent">—</span></div>
       <div><span class="text-cream/40">D- : </span><span class="text-cream font-medium" id="stat-descent">—</span></div>
       <div><span class="text-cream/40">Alt. min : </span><span class="text-cream font-medium" id="stat-min-ele">—</span></div>
       <div><span class="text-cream/40">Alt. max : </span><span class="text-cream font-medium" id="stat-max-ele">—</span></div>
+    </div>
+
+    <!-- Stats bar (multi-loop race) — total + per-segment -->
+    <div id="stats-multi" class="hidden mb-6 px-1">
+      <!-- Total line -->
+      <div class="flex flex-wrap gap-4 sm:gap-6 text-sm mb-3">
+        <div><span class="text-cream/40">Total : </span><span class="text-cream font-medium" id="stat-total-distance">—</span></div>
+        <div><span class="text-cream/40">D+ : </span><span class="text-cream font-medium" id="stat-total-ascent">—</span></div>
+        <div><span class="text-cream/40">D- : </span><span class="text-cream font-medium" id="stat-total-descent">—</span></div>
+        <div><span class="text-cream/40">Alt. min : </span><span class="text-cream font-medium" id="stat-total-min-ele">—</span></div>
+        <div><span class="text-cream/40">Alt. max : </span><span class="text-cream font-medium" id="stat-total-max-ele">—</span></div>
+      </div>
+      <!-- Segment chips -->
+      <div id="loop-chips" class="flex flex-wrap gap-2">
+        <!-- Populated dynamically -->
+      </div>
     </div>
 
     <!-- Map -->
@@ -114,9 +127,10 @@ import { races } from '../data/races';
 </section>
 
 <script>
-  import { parseGPX, type TrackData } from '../scripts/gpx-parser';
-  import { initMap } from '../scripts/map';
+  import { parseGPX, parseMultiTrackGPX, type TrackData } from '../scripts/gpx-parser';
+  import { initMap, initMultiLoopMap, type MultiLoopMapResult } from '../scripts/map';
   import { initElevationChart } from '../scripts/elevation';
+  import { races as racesData } from '../data/races';
 
   const cards = document.querySelectorAll('.race-card');
   const dots = document.querySelectorAll('.race-dot');
@@ -124,10 +138,17 @@ import { races } from '../data/races';
   const infoPanels = document.querySelectorAll('.race-info');
   const mapContainer = document.getElementById('race-map')!;
   const canvas = document.getElementById('elevation-chart') as HTMLCanvasElement;
+  const statsSingle = document.getElementById('stats-single')!;
+  const statsMulti = document.getElementById('stats-multi')!;
+  const loopChips = document.getElementById('loop-chips')!;
 
   let currentMap: ReturnType<typeof initMap> | null = null;
+  let currentMultiMap: MultiLoopMapResult | null = null;
   let currentChart: any = null;
   let activeIndex = 0;
+  let activeLoopIndex = 0;
+
+  const loopTrackDataCache: Record<number, TrackData[]> = {};
 
   function resolveUrl(path: string): string {
     const base = import.meta.env.BASE_URL;
@@ -143,12 +164,64 @@ import { races } from '../data/races';
     showRace(0);
   }
 
-  function showStats(data: TrackData) {
+  function showStatsSingle(data: TrackData) {
     document.getElementById('stat-distance')!.textContent = `${data.totalDistance.toFixed(1)} km`;
     document.getElementById('stat-ascent')!.textContent = `${Math.round(data.totalAscent)} m`;
     document.getElementById('stat-descent')!.textContent = `${Math.round(data.totalDescent)} m`;
     document.getElementById('stat-min-ele')!.textContent = `${Math.round(data.minEle)} m`;
     document.getElementById('stat-max-ele')!.textContent = `${Math.round(data.maxEle)} m`;
+  }
+
+  function showStatsMultiTotal(loopData: TrackData[]) {
+    const totalDist = loopData.reduce((s, d) => s + d.totalDistance, 0);
+    const totalAsc = loopData.reduce((s, d) => s + d.totalAscent, 0);
+    const totalDesc = loopData.reduce((s, d) => s + d.totalDescent, 0);
+    const minEle = Math.min(...loopData.map(d => d.minEle));
+    const maxEle = Math.max(...loopData.map(d => d.maxEle));
+
+    document.getElementById('stat-total-distance')!.textContent = `${totalDist.toFixed(1)} km`;
+    document.getElementById('stat-total-ascent')!.textContent = `${Math.round(totalAsc)} m`;
+    document.getElementById('stat-total-descent')!.textContent = `${Math.round(totalDesc)} m`;
+    document.getElementById('stat-total-min-ele')!.textContent = `${Math.round(minEle)} m`;
+    document.getElementById('stat-total-max-ele')!.textContent = `${Math.round(maxEle)} m`;
+  }
+
+  function buildLoopChips(raceIndex: number, loopTrackData: TrackData[]) {
+    const race = racesData[raceIndex];
+    if (!race.loops) return;
+
+    loopChips.innerHTML = '';
+    race.loops.forEach((loop, i) => {
+      const data = loopTrackData[i];
+      const isActive = i === 0;
+      const chip = document.createElement('button');
+      chip.className = `loop-chip flex items-center gap-2 px-3 py-2 rounded-lg border text-xs transition-all duration-300 cursor-pointer ${
+        isActive ? 'border-gold/40 bg-gold/5' : 'border-cream/10 bg-charcoal hover:border-cream/20'
+      }`;
+      chip.dataset.loopIndex = String(i);
+
+      chip.innerHTML = `
+        <span class="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold text-white flex-shrink-0" style="background: ${loop.color};">${i + 1}</span>
+        <span class="text-cream/70 font-medium">${data.totalDistance.toFixed(1)} km</span>
+        <span class="text-cream/40">${Math.round(data.totalAscent)} D+</span>
+        <span class="text-cream/30 hidden sm:inline">⏱ ${loop.timeLimit}</span>
+      `;
+
+      chip.addEventListener('click', () => selectLoop(raceIndex, i, loopTrackData));
+      loopChips.appendChild(chip);
+    });
+  }
+
+  function updateChipStyles(activeLoop: number) {
+    loopChips.querySelectorAll('.loop-chip').forEach((chip, i) => {
+      if (i === activeLoop) {
+        chip.classList.remove('border-cream/10', 'bg-charcoal');
+        chip.classList.add('border-gold/40', 'bg-gold/5');
+      } else {
+        chip.classList.remove('border-gold/40', 'bg-gold/5');
+        chip.classList.add('border-cream/10', 'bg-charcoal');
+      }
+    });
   }
 
   function updateCardStyles(selectedIndex: number) {
@@ -177,21 +250,71 @@ import { races } from '../data/races';
     });
   }
 
-  function showRace(raceIndex: number) {
-    if (currentMap) { currentMap.map.remove(); currentMap = null; }
+  function selectLoop(raceIndex: number, loopIndex: number, loopTrackData: TrackData[]) {
+    activeLoopIndex = loopIndex;
+    updateChipStyles(loopIndex);
+
+    if (currentMultiMap) {
+      currentMultiMap.setActiveLoop(loopIndex);
+    }
+
     if (currentChart) { currentChart.destroy(); currentChart = null; }
-
-    const trackData = allTrackData[raceIndex];
-    showStats(trackData);
-    updateCardStyles(raceIndex);
-
-    currentMap = initMap(mapContainer, trackData);
-    currentChart = initElevationChart(canvas, trackData, (index) => {
-      currentMap?.setMarkerAt(index);
+    currentChart = initElevationChart(canvas, loopTrackData[loopIndex], (index) => {
+      currentMultiMap?.setMarkerAt(index);
     });
   }
 
-  const CAROUSEL_BREAKPOINT = 1024; // lg: in Tailwind
+  function cleanupMap() {
+    if (currentMap) { currentMap.map.remove(); currentMap = null; }
+    if (currentMultiMap) { currentMultiMap.map.remove(); currentMultiMap = null; }
+    if (currentChart) { currentChart.destroy(); currentChart = null; }
+  }
+
+  async function showRace(raceIndex: number) {
+    cleanupMap();
+    updateCardStyles(raceIndex);
+
+    const race = racesData[raceIndex];
+
+    if (race.loops) {
+      statsSingle.classList.add('hidden');
+      statsMulti.classList.remove('hidden');
+
+      if (!loopTrackDataCache[raceIndex]) {
+        loopTrackDataCache[raceIndex] = await parseMultiTrackGPX(resolveUrl(race.gpx));
+      }
+
+      const loopTrackData = loopTrackDataCache[raceIndex];
+      const colors = race.loops.map(l => l.color);
+
+      showStatsMultiTotal(loopTrackData);
+      buildLoopChips(raceIndex, loopTrackData);
+
+      activeLoopIndex = 0;
+
+      currentMultiMap = initMultiLoopMap(mapContainer, loopTrackData, colors, 0);
+      currentChart = initElevationChart(canvas, loopTrackData[0], (index) => {
+        currentMultiMap?.setMarkerAt(index);
+      });
+
+      mapContainer.addEventListener('loopchange', ((e: CustomEvent) => {
+        selectLoop(raceIndex, e.detail.index, loopTrackData);
+      }) as EventListener);
+    } else {
+      statsSingle.classList.remove('hidden');
+      statsMulti.classList.add('hidden');
+
+      const trackData = allTrackData[raceIndex];
+      showStatsSingle(trackData);
+
+      currentMap = initMap(mapContainer, trackData);
+      currentChart = initElevationChart(canvas, trackData, (index) => {
+        currentMap?.setMarkerAt(index);
+      });
+    }
+  }
+
+  const CAROUSEL_BREAKPOINT = 1024;
 
   cards.forEach((card) => {
     card.addEventListener('click', () => {
@@ -200,14 +323,12 @@ import { races } from '../data/races';
       if (index === activeIndex) return;
       activeIndex = index;
       showRace(index);
-      // Scroll carousel to this card when in carousel mode
       if (window.innerWidth < CAROUSEL_BREAKPOINT) {
         el.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
       }
     });
   });
 
-  // Dots click → scroll to corresponding card
   dots.forEach((dot) => {
     dot.addEventListener('click', () => {
       const index = parseInt((dot as HTMLElement).dataset.dotIndex!);
@@ -220,13 +341,11 @@ import { races } from '../data/races';
     });
   });
 
-  // Sync dots with carousel scroll position (carousel mode only)
   let scrollTimeout: number;
   carousel.addEventListener('scroll', () => {
     if (window.innerWidth >= CAROUSEL_BREAKPOINT) return;
     clearTimeout(scrollTimeout);
     scrollTimeout = window.setTimeout(() => {
-      // Find the card closest to the carousel center
       const carouselRect = carousel.getBoundingClientRect();
       const carouselCenter = carouselRect.left + carouselRect.width / 2;
       let closestIndex = 0;

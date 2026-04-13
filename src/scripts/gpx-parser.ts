@@ -27,13 +27,7 @@ function haversine(lat1: number, lon1: number, lat2: number, lon2: number): numb
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
-export async function parseGPX(url: string): Promise<TrackData> {
-  const resp = await fetch(url);
-  const text = await resp.text();
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(text, 'text/xml');
-  const trkpts = doc.querySelectorAll('trkpt');
-
+function parseTrackPoints(trkpts: NodeListOf<Element>): TrackData {
   const points: TrackPoint[] = [];
   const coords: [number, number][] = [];
   const elevations: number[] = [];
@@ -72,4 +66,33 @@ export async function parseGPX(url: string): Promise<TrackData> {
     totalAscent,
     totalDescent,
   };
+}
+
+/** Parse a single-track GPX file → one TrackData */
+export async function parseGPX(url: string): Promise<TrackData> {
+  const resp = await fetch(url);
+  const text = await resp.text();
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(text, 'text/xml');
+  const trkpts = doc.querySelectorAll('trkpt');
+  return parseTrackPoints(trkpts);
+}
+
+/** Parse a multi-track GPX file → one TrackData per <trk> element */
+export async function parseMultiTrackGPX(url: string): Promise<TrackData[]> {
+  const resp = await fetch(url);
+  const text = await resp.text();
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(text, 'text/xml');
+  const tracks = doc.querySelectorAll('trk');
+
+  const results: TrackData[] = [];
+  tracks.forEach((trk) => {
+    const trkpts = trk.querySelectorAll('trkpt');
+    if (trkpts.length > 0) {
+      results.push(parseTrackPoints(trkpts));
+    }
+  });
+
+  return results;
 }
