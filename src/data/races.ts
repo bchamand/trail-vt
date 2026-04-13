@@ -23,8 +23,7 @@ export const races: Race[] = [
     title: 'Le Défi de Copilos',
     type: 'Course par élimination',
     desc: 'Sur les pas du dernier chef gaulois des Tectosages. 1 boucle de 12 km puis 3 boucles de 6 km, chaque boucle dans un temps imparti. Seuls les dignes héritiers iront au bout et décrocheront le statut d\'« Héritier de Copilos ».',
-    // GPX historique : quatre-torques (anciennement L'Épreuve des Quatre Torques)
-    gpx: '/traces/quatre-torques.gpx',
+    gpx: '/traces/defi-copilos.gpx',
     icon: '🔥',
     distance: '32 km',
     ascent: 'D+ 1100 m',
@@ -37,8 +36,7 @@ export const races: Race[] = [
     title: 'La Boucle de l\'Oppidum',
     type: 'Trail chronométré',
     desc: 'Une boucle de 12 km à travers les coteaux de l\'ancienne capitale des Volques Tectosages. Chronométrée, avec classement final.',
-    // GPX historique : quete-or (anciennement La Quête de l'Or)
-    gpx: '/traces/quete-or.gpx',
+    gpx: '/traces/oppidum.gpx',
     icon: '🏃',
     distance: '12 km',
     ascent: 'D+ 400 m',
@@ -64,8 +62,7 @@ export const races: Race[] = [
     title: 'La Randonnée des Sages',
     type: 'Marche / Randonnée',
     desc: 'Un parcours non chronométré pour découvrir les paysages et le patrimoine des coteaux à son propre rythme.',
-    // GPX historique : chemin-anciens (anciennement Le Chemin des Anciens)
-    gpx: '/traces/chemin-anciens.gpx',
+    gpx: '/traces/randonnee-sages.gpx',
     icon: '🚶',
     distance: '6 km',
     ascent: 'D+ 180 m',
@@ -78,8 +75,7 @@ export const races: Race[] = [
     title: 'La Tectokids',
     type: 'Course enfants',
     desc: 'Les futurs guerriers tectosages se lancent sur un parcours adapté. Des boucles de 1 à 3 km avec classement pour vivre l\'aventure en famille.',
-    // GPX historique : petits-gaulois (anciennement Les Petits Gaulois)
-    gpx: '/traces/petits-gaulois.gpx',
+    gpx: '/traces/tectokids.gpx',
     icon: '🌟',
     distance: '1 à 3 km',
     ascent: '',
