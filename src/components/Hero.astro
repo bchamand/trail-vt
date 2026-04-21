@@ -25,19 +25,40 @@ const heroBg = `${base}${base.endsWith('/') ? '' : '/'}images/garonne.jpg`;
 
   <!-- Content -->
   <div class="absolute inset-0 flex flex-col justify-end px-5 pb-10 sm:px-10 sm:pb-16 lg:px-20 lg:pb-16">
-    <p class="mono-label mb-4 sm:mb-6" style="line-height: 1.5;">
-      <span class="hidden sm:inline">— SAMEDI 3 OCTOBRE 2026 · COUCHER DU SOLEIL 19H32</span>
-      <span class="sm:hidden">— SAM. 3 OCT. 2026 · 15H45</span>
-    </p>
+    <!-- Édition badge -->
+    <div class="inline-flex self-start items-center gap-2.5"
+         style="padding: 7px 12px; border: 1px solid var(--color-accent); color: var(--color-accent); margin-bottom: 20px; background: rgba(15,20,18,0.35); backdrop-filter: blur(6px);">
+      <span style="width: 6px; height: 6px; background: var(--color-accent); border-radius: 50%; display: inline-block;"></span>
+      <span class="text-[10px] sm:text-[11px] tracking-[0.28em]" style="font-family: var(--font-mono); font-weight: 600;">ÉDITION I · 2026</span>
+      <span style="width: 1px; height: 12px; background: rgba(212,165,116,0.5);"></span>
+      <span class="text-[10px] sm:text-[11px] tracking-[0.2em] opacity-85" style="font-family: var(--font-mono);">
+        <span class="sm:hidden">3 OCT</span>
+        <span class="hidden sm:inline">SAM. 3 OCTOBRE</span>
+      </span>
+    </div>
 
-    <h1 class="hero-title">
-      Sur la trace<br/>
-      des <em style="color: var(--color-accent); font-style: italic;">Volques<br/>Tectosages.</em>
-    </h1>
+    <!-- Name block (primary) -->
+    <div style="margin-bottom: clamp(18px, 3vw, 28px);">
+      <div class="text-[10px] sm:text-[11px] tracking-[0.3em]"
+           style="font-family: var(--font-mono); color: rgba(232,227,211,0.6); margin-bottom: clamp(10px, 1.5vw, 14px);">
+        VIEILLE-TOULOUSE · HAUTE-GARONNE
+      </div>
+      <h1 style="font-family: var(--font-serif); font-weight: 400; line-height: 0.86; letter-spacing: -0.038em; margin: 0; font-size: clamp(52px, 12vw, 156px);">
+        Trail des<br/><em style="font-style: italic; color: var(--color-accent);">Tectosages.</em>
+      </h1>
+    </div>
 
-    <div class="mt-7 sm:mt-12 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-5">
-      <p class="max-w-[460px] text-[14px] sm:text-[16px] opacity-85 leading-[1.5] m-0" style="text-wrap: pretty;">
-        Vieille-Toulouse fut la capitale des Volques Tectosages il y a 2300 ans. Cinq épreuves, une forêt protégée, un territoire à reconquérir avant la nuit.
+    <!-- Tagline (secondary) with top border -->
+    <div style="padding-top: clamp(18px, 2.5vw, 24px); border-top: 1px solid rgba(232,227,211,0.18); margin-bottom: clamp(8px, 1vw, 12px);">
+      <p style="font-family: var(--font-serif); font-style: italic; font-weight: 400; line-height: 1.2; margin: 0; opacity: 0.95; text-wrap: balance; max-width: 820px; font-size: clamp(22px, 3.2vw, 36px);">
+        Sur la trace des Volques Tectosages.
+      </p>
+    </div>
+
+    <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-5"
+         style="margin-top: clamp(20px, 3vw, 32px);">
+      <p class="max-w-[440px] text-[13px] sm:text-[15px] opacity-80 leading-[1.5] m-0" style="text-wrap: pretty;">
+        Vieille-Toulouse fut la capitale des Volques Tectosages il y a 2300 ans. Cinq épreuves, un territoire, une première édition.
       </p>
       <!-- Mobile CTA -->
       <div class="sm:hidden w-full">
