@@ -47,41 +47,41 @@ import { races } from '../data/races';
   <!-- Details area: map + details panel -->
   <div class="grid grid-cols-1 lg:grid-cols-[1fr_1.2fr] gap-8 lg:gap-16 items-start"
        style="margin-top: clamp(32px, 5vw, 64px);">
-    <!-- Left: map + stats + elevation -->
-    <div>
-      <!-- Stats single -->
-      <div id="stats-single" class="flex flex-wrap gap-x-5 gap-y-2 mb-4 text-[12px]" style="font-family: var(--font-mono);">
-        <div><span class="opacity-60">DIST </span><span id="stat-distance" class="text-[color:var(--color-accent)]">—</span></div>
-        <div><span class="opacity-60">D+ </span><span id="stat-ascent" class="text-[color:var(--color-accent)]">—</span></div>
-        <div><span class="opacity-60">D− </span><span id="stat-descent" class="text-[color:var(--color-accent)]">—</span></div>
-        <div><span class="opacity-60">ALT MIN </span><span id="stat-min-ele" class="text-[color:var(--color-accent)]">—</span></div>
-        <div><span class="opacity-60">ALT MAX </span><span id="stat-max-ele" class="text-[color:var(--color-accent)]">—</span></div>
-      </div>
 
-      <!-- Stats multi -->
-      <div id="stats-multi" class="hidden mb-4">
-        <div class="flex flex-wrap gap-x-5 gap-y-2 mb-3 text-[12px]" style="font-family: var(--font-mono);">
-          <div><span class="opacity-60">TOTAL </span><span id="stat-total-distance" class="text-[color:var(--color-accent)]">—</span></div>
-          <div><span class="opacity-60">D+ </span><span id="stat-total-ascent" class="text-[color:var(--color-accent)]">—</span></div>
-          <div><span class="opacity-60">D− </span><span id="stat-total-descent" class="text-[color:var(--color-accent)]">—</span></div>
-          <div><span class="opacity-60">ALT MIN </span><span id="stat-total-min-ele" class="text-[color:var(--color-accent)]">—</span></div>
-          <div><span class="opacity-60">ALT MAX </span><span id="stat-total-max-ele" class="text-[color:var(--color-accent)]">—</span></div>
+    <!-- Left: segment selector + map + elevation -->
+    <div class="border border-[color:var(--color-line)]" style="background: var(--color-bg);">
+      <!-- Segment selector (multi-loop only) -->
+      <div id="segment-selector" class="hidden"></div>
+
+      <!-- Map + overlays -->
+      <div class="relative">
+        <div id="race-map" class="map-container" style="height: 52vh; min-height: 320px; max-height: 540px; border: none;"></div>
+
+        <!-- Stats overlay (top-left) -->
+        <div id="map-stats" class="pointer-events-none"
+             style="position: absolute; top: 14px; left: 14px; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.18em; color: var(--color-ink); opacity: 0.85; line-height: 1.8; text-shadow: 0 1px 3px rgba(0,0,0,0.8);">
+          <div id="stats-label">TRACÉ COMPLET</div>
+          <div id="stats-distance">—</div>
+          <div id="stats-alt">—</div>
         </div>
-        <div id="loop-chips" class="flex flex-wrap gap-2"></div>
-      </div>
 
-      <!-- Map -->
-      <div class="overflow-hidden border border-[color:var(--color-line)]">
-        <div id="race-map" class="map-container"></div>
-      </div>
-
-      <!-- Elevation -->
-      <div class="mt-4 border border-[color:var(--color-line)] p-4 sm:p-5" style="background: var(--color-bg-elev);">
-        <p class="text-[10px] tracking-[0.22em] opacity-60 mb-3" style="font-family: var(--font-mono);">PROFIL ALTIMÉTRIQUE</p>
-        <div class="elevation-container">
-          <canvas id="elevation-chart"></canvas>
+        <!-- Compass (top-right) -->
+        <div class="pointer-events-none"
+             style="position: absolute; top: 14px; right: 14px; font-family: var(--font-mono); color: var(--color-ink); opacity: 0.6; text-align: center;">
+          <div style="font-size: 11px; font-weight: 600; letter-spacing: 0.1em; line-height: 1;">N</div>
+          <svg width="6" height="22" viewBox="0 0 6 22" style="margin-top: 4px; display: inline-block;">
+            <line x1="3" y1="4" x2="3" y2="22" stroke="currentColor" stroke-width="1"/>
+            <polygon points="3,2 0,9 6,9" fill="currentColor"/>
+          </svg>
         </div>
+
+        <!-- Hover tooltip (bottom-right) -->
+        <div id="map-tooltip" class="pointer-events-none"
+             style="position: absolute; bottom: 12px; right: 12px; display: none; background: var(--color-ink); color: var(--color-bg); padding: 8px 12px; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.14em; line-height: 1.6;"></div>
       </div>
+
+      <!-- Elevation (SVG injected via script) -->
+      <div id="elevation-chart"></div>
     </div>
 
     <!-- Right: race info (one panel per race, toggled) -->
@@ -129,40 +129,72 @@ import { races } from '../data/races';
   </div>
 </section>
 
-<style>
+<style is:global>
   .race-card .race-diff-bar[data-filled="1"] { background: var(--color-accent); }
   .race-card .race-diff-bar[data-filled="0"] { background: rgba(232,227,211,0.15); }
-  /* When card is active (gold bg), flip diff bars */
   .race-card.is-active .race-diff-bar[data-filled="1"] { background: var(--color-bg); }
   .race-card.is-active .race-diff-bar[data-filled="0"] { background: rgba(15,20,18,0.2); }
-  .race-card:not(.is-active):hover {
-    background: rgba(212,165,116,0.05) !important;
+  .race-card:not(.is-active):hover { background: rgba(212,165,116,0.05) !important; }
+
+  #segment-selector {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--color-line);
+    border-bottom: 1px solid var(--color-line);
+  }
+  #segment-selector.hidden { display: none; }
+  #segment-selector > button:first-child { grid-column: 1 / -1; }
+  @media (min-width: 720px) {
+    #segment-selector { grid-template-columns: repeat(5, 1fr); }
+    #segment-selector > button:first-child { grid-column: auto; }
+  }
+  #segment-selector button {
+    padding: 12px 8px; min-width: 0;
+    background: var(--color-bg); color: var(--color-ink);
+    border: none; cursor: pointer;
+    font-family: var(--font-mono);
+    font-size: 10px; letter-spacing: 0.18em; font-weight: 600; line-height: 1.3;
+    transition: background-color .2s ease;
+    text-align: center;
+  }
+  #segment-selector button:hover { background: rgba(212, 165, 116, 0.06); }
+  #segment-selector button.is-active {
+    color: var(--color-bg);
+  }
+  #segment-selector .seg-sub {
+    display: block;
+    opacity: 0.7; font-size: 9px; margin-top: 3px; letter-spacing: 0.12em;
   }
 </style>
 
 <script>
   import { parseGPX, parseMultiTrackGPX, type TrackData } from '../scripts/gpx-parser';
-  import { initMap, initMultiLoopMap, type MultiLoopMapResult } from '../scripts/map';
-  import { initElevationChart, updateElevationChart } from '../scripts/elevation';
+  import { initMap, initMultiLoopMap, type MultiLoopMapResult, type SingleMapResult } from '../scripts/map';
+  import { renderElevation, type ElevationHandle } from '../scripts/elevation';
   import { races as racesData } from '../data/races';
+
+  const ROMAN = ['I', 'II', 'III', 'IV', 'V'];
 
   const cards = document.querySelectorAll('.race-card');
   const carousel = document.getElementById('race-carousel')!;
   const infoPanels = document.querySelectorAll('.race-info');
   const mapContainer = document.getElementById('race-map')!;
-  const canvas = document.getElementById('elevation-chart') as HTMLCanvasElement;
-  const statsSingle = document.getElementById('stats-single')!;
-  const statsMulti = document.getElementById('stats-multi')!;
-  const loopChips = document.getElementById('loop-chips')!;
+  const elevContainer = document.getElementById('elevation-chart')!;
+  const segmentSelector = document.getElementById('segment-selector')!;
+  const statsLabel = document.getElementById('stats-label')!;
+  const statsDistance = document.getElementById('stats-distance')!;
+  const statsAlt = document.getElementById('stats-alt')!;
+  const mapTooltip = document.getElementById('map-tooltip')!;
 
-  // Mark initial active card
   (cards[0] as HTMLElement).classList.add('is-active');
 
-  let currentMap: ReturnType<typeof initMap> | null = null;
-  let currentMultiMap: MultiLoopMapResult | null = null;
-  let currentChart: any = null;
+  let currentMap: SingleMapResult | MultiLoopMapResult | null = null;
+  let currentElev: ElevationHandle | null = null;
   let activeIndex = 0;
-  let activeLoopIndex = 0;
+  let currentLoopData: TrackData[] = [];
+  let activeSeg: number | null = null;
+
   const loopTrackDataCache: Record<number, TrackData[]> = {};
   const allTrackData: TrackData[] = [];
 
@@ -171,67 +203,14 @@ import { races } from '../data/races';
     return base.endsWith('/') ? base + path.replace(/^\//, '') : base + path;
   }
 
+  function fmt1(v: number) { return v.toFixed(1); }
+  function fmtI(v: number) { return String(Math.round(v)); }
+
   async function preloadAll() {
     const gpxUrls = Array.from(cards).map(card => (card as HTMLElement).dataset.gpx!);
     const results = await Promise.all(gpxUrls.map(url => parseGPX(resolveUrl(url))));
     results.forEach((data, i) => { allTrackData[i] = data; });
     showRace(0);
-  }
-
-  function fmtKm(v: number) { return `${v.toFixed(1)} km`; }
-  function fmtM(v: number) { return `${Math.round(v)} m`; }
-
-  function showStatsSingle(data: TrackData) {
-    document.getElementById('stat-distance')!.textContent = fmtKm(data.totalDistance);
-    document.getElementById('stat-ascent')!.textContent = fmtM(data.totalAscent);
-    document.getElementById('stat-descent')!.textContent = fmtM(data.totalDescent);
-    document.getElementById('stat-min-ele')!.textContent = fmtM(data.minEle);
-    document.getElementById('stat-max-ele')!.textContent = fmtM(data.maxEle);
-  }
-
-  function showStatsMultiTotal(loopData: TrackData[]) {
-    const totalDist = loopData.reduce((s, d) => s + d.totalDistance, 0);
-    const totalAsc = loopData.reduce((s, d) => s + d.totalAscent, 0);
-    const totalDesc = loopData.reduce((s, d) => s + d.totalDescent, 0);
-    const minEle = Math.min(...loopData.map(d => d.minEle));
-    const maxEle = Math.max(...loopData.map(d => d.maxEle));
-    document.getElementById('stat-total-distance')!.textContent = fmtKm(totalDist);
-    document.getElementById('stat-total-ascent')!.textContent = fmtM(totalAsc);
-    document.getElementById('stat-total-descent')!.textContent = fmtM(totalDesc);
-    document.getElementById('stat-total-min-ele')!.textContent = fmtM(minEle);
-    document.getElementById('stat-total-max-ele')!.textContent = fmtM(maxEle);
-  }
-
-  function buildLoopChips(raceIndex: number, loopTrackData: TrackData[]) {
-    const race = racesData[raceIndex];
-    if (!race.loops) return;
-    loopChips.innerHTML = '';
-    race.loops.forEach((loop, i) => {
-      const data = loopTrackData[i];
-      const chip = document.createElement('button');
-      chip.className = 'loop-chip flex items-center gap-2 px-3 py-2 border text-[11px] cursor-pointer transition-colors';
-      chip.dataset.loopIndex = String(i);
-      chip.style.fontFamily = 'var(--font-mono)';
-      chip.style.background = i === 0 ? 'rgba(212,165,116,0.08)' : 'var(--color-bg-elev)';
-      chip.style.borderColor = i === 0 ? 'var(--color-accent)' : 'var(--color-line)';
-      chip.style.color = 'var(--color-ink)';
-      chip.innerHTML = `
-        <span style="width: 18px; height: 18px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700; color: #0f1412; background: ${loop.color};">${i + 1}</span>
-        <span>${fmtKm(data.totalDistance)}</span>
-        <span style="color: var(--color-accent);">↗ ${Math.round(data.totalAscent)}</span>
-        <span class="hidden sm:inline opacity-60">lim. ${loop.timeLimit}</span>
-      `;
-      chip.addEventListener('click', () => selectLoop(raceIndex, i, loopTrackData));
-      loopChips.appendChild(chip);
-    });
-  }
-
-  function updateChipStyles(activeLoop: number) {
-    loopChips.querySelectorAll('.loop-chip').forEach((chip, i) => {
-      const el = chip as HTMLElement;
-      el.style.background = i === activeLoop ? 'rgba(212,165,116,0.08)' : 'var(--color-bg-elev)';
-      el.style.borderColor = i === activeLoop ? 'var(--color-accent)' : 'var(--color-line)';
-    });
   }
 
   function updateCardStyles(selectedIndex: number) {
@@ -247,54 +226,186 @@ import { races } from '../data/races';
     });
   }
 
-  function selectLoop(raceIndex: number, loopIndex: number, loopTrackData: TrackData[]) {
-    activeLoopIndex = loopIndex;
-    updateChipStyles(loopIndex);
-    if (currentMultiMap) currentMultiMap.setActiveLoop(loopIndex);
-    if (currentChart) {
-      updateElevationChart(currentChart, loopTrackData[loopIndex], (index) => {
-        currentMultiMap?.setMarkerAt(index);
-      });
+  function updateStatsOverlay() {
+    const segs = currentLoopData;
+    if (segs.length === 0) return;
+
+    if (segs.length === 1) {
+      const d = segs[0];
+      statsLabel.textContent = 'TRACÉ';
+      statsDistance.textContent = `${fmt1(d.totalDistance)} KM · +${fmtI(d.totalAscent)}M`;
+      statsAlt.textContent = `ALT. ${fmtI(d.minEle)}–${fmtI(d.maxEle)} M`;
+    } else if (activeSeg == null) {
+      const totalDist = segs.reduce((s, d) => s + d.totalDistance, 0);
+      const totalAsc = segs.reduce((s, d) => s + d.totalAscent, 0);
+      const minEle = Math.min(...segs.map(d => d.minEle));
+      const maxEle = Math.max(...segs.map(d => d.maxEle));
+      statsLabel.textContent = 'TRACÉ COMPLET';
+      statsDistance.textContent = `${fmt1(totalDist)} KM · +${fmtI(totalAsc)}M`;
+      statsAlt.textContent = `ALT. ${fmtI(minEle)}–${fmtI(maxEle)} M`;
+    } else {
+      const d = segs[activeSeg];
+      statsLabel.textContent = `BOUCLE ${ROMAN[activeSeg]}`;
+      statsDistance.textContent = `${fmt1(d.totalDistance)} KM · +${fmtI(d.totalAscent)}M`;
+      statsAlt.textContent = `ALT. ${fmtI(d.minEle)}–${fmtI(d.maxEle)} M`;
     }
   }
 
-  function cleanupMap() {
+  function updateSegmentSelectorActive() {
+    segmentSelector.querySelectorAll<HTMLButtonElement>('button').forEach((btn) => {
+      const raw = btn.dataset.seg!;
+      const segIdx = raw === 'all' ? null : parseInt(raw);
+      const isActive = segIdx === activeSeg;
+      btn.classList.toggle('is-active', isActive);
+      if (isActive) {
+        const color = btn.dataset.color || 'var(--color-ink)';
+        btn.style.background = color;
+      } else {
+        btn.style.background = 'var(--color-bg)';
+      }
+    });
+  }
+
+  function buildSegmentSelector(raceIndex: number) {
+    const race = racesData[raceIndex];
+    segmentSelector.innerHTML = '';
+
+    if (!race.loops) {
+      segmentSelector.classList.add('hidden');
+      return;
+    }
+    segmentSelector.classList.remove('hidden');
+
+    // "Vue complète"
+    const allBtn = document.createElement('button');
+    allBtn.dataset.seg = 'all';
+    allBtn.dataset.color = 'var(--color-ink)';
+    allBtn.innerHTML = 'VUE COMPLÈTE';
+    allBtn.style.color = 'var(--color-ink)'; // will be overridden by active state below
+    allBtn.addEventListener('click', () => selectSeg(null));
+    segmentSelector.appendChild(allBtn);
+
+    // Per-loop buttons
+    race.loops.forEach((loop, i) => {
+      const btn = document.createElement('button');
+      btn.dataset.seg = String(i);
+      btn.dataset.color = loop.color;
+      const distTxt = loop.distance.replace(/\s*km\s*$/i, '').trim();
+      const ascTxt = loop.ascent.replace(/\s*m\s*$/i, '').trim();
+      const sub = `${distTxt} KM · ${ascTxt}M`;
+      btn.innerHTML = `BOUCLE ${ROMAN[i]}<span class="seg-sub">${sub}</span>`;
+      btn.addEventListener('click', () => selectSeg(i));
+      segmentSelector.appendChild(btn);
+    });
+
+    // Active color/text colors: when active, the text should be bg-colored (dark on gold/ink bg)
+    segmentSelector.querySelectorAll<HTMLButtonElement>('button.is-active, button').forEach(btn => {
+      // leave default; updateSegmentSelectorActive will handle it
+    });
+
+    // Inject the :is-active color rule via inline style — handled by update fn below
+    const style = document.createElement('style');
+    style.textContent = `#segment-selector button.is-active { color: var(--color-bg) !important; }`;
+    if (!document.getElementById('seg-active-style')) {
+      style.id = 'seg-active-style';
+      document.head.appendChild(style);
+    }
+  }
+
+  function selectSeg(i: number | null) {
+    activeSeg = i;
+    updateSegmentSelectorActive();
+    updateStatsOverlay();
+
+    if (currentMap && 'setActiveSeg' in currentMap) {
+      (currentMap as MultiLoopMapResult).setActiveSeg(i);
+    }
+    if (currentElev) {
+      currentElev.setActiveSeg(i);
+    }
+  }
+
+  function onElevationHover(segIdx: number, ptIdx: number) {
+    const seg = currentLoopData[segIdx];
+    if (!seg) return;
+    const pt = seg.points[ptIdx];
+    if (!pt) return;
+
+    mapTooltip.style.display = 'block';
+    mapTooltip.textContent = `KM ${fmt1(pt.dist + segStartKmOffset(segIdx))} · ALT ${fmtI(pt.ele)} M`;
+
+    if (currentMap) {
+      if ('setMarkerAt' in currentMap) {
+        if (currentLoopData.length > 1) {
+          (currentMap as MultiLoopMapResult).setMarkerAt(segIdx, ptIdx);
+        } else {
+          (currentMap as SingleMapResult).setMarkerAt(ptIdx);
+        }
+      }
+    }
+  }
+
+  function onElevationLeave() {
+    mapTooltip.style.display = 'none';
+    currentMap?.clearMarker?.();
+  }
+
+  function segStartKmOffset(segIdx: number): number {
+    let acc = 0;
+    for (let i = 0; i < segIdx; i++) acc += currentLoopData[i].totalDistance;
+    return acc;
+  }
+
+  function cleanup() {
     if (currentMap) { currentMap.map.remove(); currentMap = null; }
-    if (currentMultiMap) { currentMultiMap.map.remove(); currentMultiMap = null; }
-    if (currentChart) { currentChart.destroy(); currentChart = null; }
+    if (currentElev) { currentElev.destroy(); currentElev = null; }
+    mapTooltip.style.display = 'none';
   }
 
   async function showRace(raceIndex: number) {
-    cleanupMap();
+    cleanup();
     updateCardStyles(raceIndex);
     const race = racesData[raceIndex];
 
     if (race.loops) {
-      statsSingle.classList.add('hidden');
-      statsMulti.classList.remove('hidden');
       if (!loopTrackDataCache[raceIndex]) {
         loopTrackDataCache[raceIndex] = await parseMultiTrackGPX(resolveUrl(race.gpx));
       }
-      const loopTrackData = loopTrackDataCache[raceIndex];
+      currentLoopData = loopTrackDataCache[raceIndex];
       const colors = race.loops.map(l => l.color);
-      showStatsMultiTotal(loopTrackData);
-      buildLoopChips(raceIndex, loopTrackData);
-      activeLoopIndex = 0;
-      currentMultiMap = initMultiLoopMap(mapContainer, loopTrackData, colors, 0);
-      currentChart = initElevationChart(canvas, loopTrackData[0], (index) => {
-        currentMultiMap?.setMarkerAt(index);
+
+      activeSeg = null;
+      buildSegmentSelector(raceIndex);
+      updateSegmentSelectorActive();
+      updateStatsOverlay();
+
+      currentMap = initMultiLoopMap(mapContainer, currentLoopData, colors, null);
+
+      currentElev = renderElevation({
+        container: elevContainer,
+        segments: currentLoopData,
+        segmentColors: colors,
+        gpxHref: resolveUrl(race.gpx),
+        activeSeg: null,
+        onHover: onElevationHover,
+        onLeave: onElevationLeave,
       });
-      mapContainer.addEventListener('loopchange', ((e: CustomEvent) => {
-        selectLoop(raceIndex, e.detail.index, loopTrackData);
-      }) as EventListener);
     } else {
-      statsSingle.classList.remove('hidden');
-      statsMulti.classList.add('hidden');
-      const trackData = allTrackData[raceIndex];
-      showStatsSingle(trackData);
-      currentMap = initMap(mapContainer, trackData);
-      currentChart = initElevationChart(canvas, trackData, (index) => {
-        currentMap?.setMarkerAt(index);
+      currentLoopData = [allTrackData[raceIndex]];
+      segmentSelector.classList.add('hidden');
+      activeSeg = null;
+      updateStatsOverlay();
+
+      currentMap = initMap(mapContainer, currentLoopData[0]);
+
+      currentElev = renderElevation({
+        container: elevContainer,
+        segments: currentLoopData,
+        segmentColors: ['#d4a574'],
+        gpxHref: resolveUrl(race.gpx),
+        activeSeg: null,
+        onHover: onElevationHover,
+        onLeave: onElevationLeave,
       });
     }
   }
