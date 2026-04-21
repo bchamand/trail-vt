@@ -1,20 +1,23 @@
 ---
 ---
-<section id="banquet" class="relative py-20 sm:py-28 bg-charcoal-deep grain-overlay overflow-hidden">
+<section id="banquet" class="relative py-20 sm:py-28 bg-moss-dark text-cream overflow-hidden">
+  <!-- Grain texture -->
+  <div class="absolute inset-0 grain-overlay opacity-[0.5]"></div>
+
   <!-- Decorative circles -->
   <div class="absolute inset-0 pointer-events-none overflow-hidden">
-    <div class="absolute top-0 right-0 w-96 h-96 rounded-full border border-gold/10"></div>
-    <div class="absolute bottom-0 left-0 w-64 h-64 rounded-full border border-terracotta/10"></div>
+    <div class="absolute top-0 right-0 w-96 h-96 rounded-full border border-cream/5"></div>
+    <div class="absolute bottom-0 left-0 w-64 h-64 rounded-full border border-gold/10"></div>
   </div>
 
   <div class="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
     <!-- Section header -->
     <div class="text-center mb-16">
-      <p class="text-gold uppercase tracking-[0.25em] text-xs font-medium mb-4">Après l'effort</p>
+      <p class="text-tile uppercase tracking-[0.25em] text-xs font-medium mb-4">Après l'effort</p>
       <h2 class="font-serif text-3xl sm:text-4xl md:text-5xl font-bold text-cream mb-6">
         Le Banquet des Chefs
       </h2>
-      <p class="text-cream/60 max-w-2xl mx-auto text-sm sm:text-base leading-relaxed">
+      <p class="text-cream/75 max-w-2xl mx-auto text-sm sm:text-base leading-relaxed">
         La journée se prolonge autour d'un banquet convivial organisé par le
         Comité des Fêtes de Vieille-Toulouse. L'occasion de célébrer les héritiers
         de Copilos et de partager un moment chaleureux entre coureurs, familles et bénévoles.
@@ -23,30 +26,30 @@
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 max-w-4xl mx-auto">
       <!-- Banquet card -->
-      <div class="bg-forest/20 border border-gold/20 rounded-xl p-6 sm:p-8">
+      <div class="bg-cream/5 backdrop-blur border border-cream/15 rounded-xl p-6 sm:p-8 hover:border-cream/30 hover:-translate-y-1 transition-all duration-300">
         <div class="text-4xl mb-4">🍷</div>
-        <h3 class="font-serif text-2xl font-bold text-gold mb-3">Le Banquet des Chefs</h3>
-        <p class="text-cream/70 text-sm leading-relaxed mb-4">
+        <h3 class="font-serif text-2xl font-bold text-cream mb-3">Le Banquet des Chefs</h3>
+        <p class="text-cream/75 text-sm leading-relaxed mb-4">
           Un repas traditionnel pour clôturer la journée en beauté. Sur inscription séparée
           et dans la limite des places disponibles.
         </p>
-        <p class="text-cream/40 text-xs italic">
+        <p class="text-cream/50 text-xs italic">
           Organisé par le Comité des Fêtes de Vieille-Toulouse &mdash; payant
         </p>
       </div>
 
       <!-- Fondation card (opens modal) -->
-      <button id="fondation-open" class="group text-left bg-terracotta/10 border border-terracotta/30 rounded-xl p-6 sm:p-8 cursor-pointer transition-all duration-300 hover:border-terracotta/60 hover:-translate-y-1">
+      <button id="fondation-open" class="group text-left bg-cream/5 backdrop-blur border border-tile/40 rounded-xl p-6 sm:p-8 cursor-pointer transition-all duration-300 hover:border-tile/70 hover:-translate-y-1">
         <div class="text-4xl mb-4">💛</div>
-        <h3 class="font-serif text-2xl font-bold text-terracotta mb-3">Fondation Marie-Louise</h3>
-        <p class="text-cream/70 text-sm leading-relaxed mb-4">
+        <h3 class="font-serif text-2xl font-bold text-tile mb-3">Fondation Marie-Louise</h3>
+        <p class="text-cream/80 text-sm leading-relaxed mb-4">
           Une partie des droits d'inscription est reversée à la Fondation Marie-Louise.
           Courir pour soi, courir pour les autres&nbsp;: l'esprit de communauté des Tectosages.
         </p>
-        <p class="text-cream/40 text-xs italic mb-4">
+        <p class="text-cream/50 text-xs italic mb-4">
           Association caritative partenaire &mdash; reconnue d'utilité publique
         </p>
-        <span class="inline-flex items-center gap-2 text-terracotta text-xs font-medium uppercase tracking-wider group-hover:gap-3 transition-all">
+        <span class="inline-flex items-center gap-2 text-tile text-xs font-medium uppercase tracking-wider group-hover:gap-3 transition-all">
           En savoir plus
           <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
@@ -59,21 +62,21 @@
   <!-- Modal -->
   <div id="fondation-modal" class="fixed inset-0 z-50 hidden">
     <!-- Backdrop -->
-    <div id="fondation-backdrop" class="absolute inset-0 bg-charcoal/90 backdrop-blur-sm"></div>
+    <div id="fondation-backdrop" class="absolute inset-0 bg-charcoal/60 backdrop-blur-sm"></div>
 
     <!-- Modal content -->
     <div id="fondation-outer" class="relative z-10 h-full flex md:items-center md:justify-center p-0 md:p-6">
-      <div class="bg-charcoal border border-terracotta/30 md:rounded-2xl w-full md:max-w-3xl h-full md:h-auto md:max-h-[90vh] overflow-y-auto shadow-2xl shadow-terracotta/10">
+      <div class="bg-cream border border-terracotta/30 md:rounded-2xl w-full md:max-w-3xl h-full md:h-auto md:max-h-[90vh] overflow-y-auto shadow-2xl shadow-charcoal/20">
         <!-- Header -->
-        <div class="sticky top-0 z-10 bg-charcoal/95 backdrop-blur border-b border-cream/10 px-5 sm:px-8 py-4 flex items-center justify-between">
+        <div class="sticky top-0 z-10 bg-cream/95 backdrop-blur border-b border-charcoal/10 px-5 sm:px-8 py-4 flex items-center justify-between">
           <div class="flex items-center gap-3">
             <span class="text-2xl">💛</span>
             <div>
-              <p class="text-terracotta/70 text-xs uppercase tracking-wider">Partenaire caritatif</p>
-              <h3 class="font-serif text-xl sm:text-2xl font-bold text-cream">Fondation Marie-Louise</h3>
+              <p class="text-terracotta text-xs uppercase tracking-wider">Partenaire caritatif</p>
+              <h3 class="font-serif text-xl sm:text-2xl font-bold text-charcoal">Fondation Marie-Louise</h3>
             </div>
           </div>
-          <button id="fondation-close" class="text-cream/50 hover:text-cream p-2 transition-colors cursor-pointer" aria-label="Fermer">
+          <button id="fondation-close" class="text-clay hover:text-charcoal p-2 transition-colors cursor-pointer" aria-label="Fermer">
             <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -84,29 +87,29 @@
         <div class="px-5 sm:px-8 py-6 space-y-6">
           <!-- Key facts -->
           <div class="grid grid-cols-3 gap-4">
-            <div class="text-center bg-terracotta/5 border border-terracotta/20 rounded-lg py-4">
-              <p class="text-terracotta font-serif text-2xl sm:text-3xl font-bold">1982</p>
-              <p class="text-cream/50 text-xs mt-1">Création</p>
+            <div class="text-center bg-gold/10 border border-gold/30 rounded-lg py-4">
+              <p class="text-gold font-serif text-2xl sm:text-3xl font-bold">1982</p>
+              <p class="text-clay text-xs mt-1">Création</p>
             </div>
-            <div class="text-center bg-terracotta/5 border border-terracotta/20 rounded-lg py-4">
-              <p class="text-terracotta font-serif text-2xl sm:text-3xl font-bold">1998</p>
-              <p class="text-cream/50 text-xs mt-1">Utilité publique</p>
+            <div class="text-center bg-gold/10 border border-gold/30 rounded-lg py-4">
+              <p class="text-gold font-serif text-2xl sm:text-3xl font-bold">1998</p>
+              <p class="text-clay text-xs mt-1">Utilité publique</p>
             </div>
-            <div class="text-center bg-terracotta/5 border border-terracotta/20 rounded-lg py-4">
-              <p class="text-terracotta font-serif text-2xl sm:text-3xl font-bold">275</p>
-              <p class="text-cream/50 text-xs mt-1">Résidents</p>
+            <div class="text-center bg-gold/10 border border-gold/30 rounded-lg py-4">
+              <p class="text-gold font-serif text-2xl sm:text-3xl font-bold">275</p>
+              <p class="text-clay text-xs mt-1">Résidents</p>
             </div>
           </div>
 
           <!-- Description -->
-          <div class="space-y-3 text-cream/70 text-sm sm:text-base leading-relaxed">
+          <div class="space-y-3 text-clay text-sm sm:text-base leading-relaxed">
             <p>
               Créée en 1982 au nord de Toulouse par un groupe de parents d'enfants atteints
               de handicap sévère, la Fondation Marie-Louise est reconnue
-              <strong class="text-cream">d'utilité publique</strong> depuis le 23 juin 1998.
+              <strong class="text-charcoal">d'utilité publique</strong> depuis le 23 juin 1998.
             </p>
             <p>
-              À travers ses <strong class="text-cream">6 Maisons de Marie-Louise</strong>,
+              À travers ses <strong class="text-charcoal">6 Maisons de Marie-Louise</strong>,
               elle accompagne près de 275 résidents adultes en situation de handicap sévère&nbsp;:
               polyhandicap, handicap mental, handicap psychique, autisme, maladie d'Alzheimer.
             </p>
@@ -118,18 +121,15 @@
 
           <!-- Video (lite YouTube facade) -->
           <div>
-            <p class="text-cream/40 text-xs uppercase tracking-wider mb-3">Vidéo de présentation</p>
-            <div id="fondation-video-wrapper" class="relative w-full aspect-video rounded-lg overflow-hidden border border-cream/10 bg-charcoal cursor-pointer group">
-              <!-- HD thumbnail -->
+            <p class="text-clay text-xs uppercase tracking-wider mb-3 font-medium">Vidéo de présentation</p>
+            <div id="fondation-video-wrapper" class="relative w-full aspect-video rounded-lg overflow-hidden border border-charcoal/10 bg-charcoal cursor-pointer group">
               <img
                 src="https://i.ytimg.com/vi_webp/C9SEi37yygU/maxresdefault.webp"
                 alt="Vidéo de présentation de la Fondation Marie-Louise"
                 class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                 loading="lazy"
               />
-              <!-- Overlay -->
               <div class="absolute inset-0 bg-gradient-to-t from-charcoal/60 via-transparent to-transparent"></div>
-              <!-- Play button -->
               <div class="absolute inset-0 flex items-center justify-center">
                 <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-terracotta/90 backdrop-blur flex items-center justify-center group-hover:bg-terracotta group-hover:scale-110 transition-all duration-300 shadow-2xl">
                   <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 sm:w-8 sm:h-8 text-cream ml-1" viewBox="0 0 24 24" fill="currentColor">
@@ -178,7 +178,6 @@
   function close() {
     modal.classList.add('hidden');
     document.body.style.overflow = '';
-    // Restore the facade (stops the video and resets state)
     videoWrapper.innerHTML = originalVideoHTML;
   }
 
@@ -195,20 +194,18 @@
     `;
   });
 
-  // Preconnect to speed up eventual iframe loading
-  const link = document.createElement('link');
-  link.rel = 'preconnect';
-  link.href = 'https://www.youtube-nocookie.com';
-  document.head.appendChild(link);
-
   openBtn.addEventListener('click', open);
   closeBtn.addEventListener('click', close);
   backdrop.addEventListener('click', close);
-  // Also close when clicking on the padding area around the modal
   outer.addEventListener('click', (e) => {
     if (e.target === outer) close();
   });
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && !modal.classList.contains('hidden')) close();
   });
+
+  const link = document.createElement('link');
+  link.rel = 'preconnect';
+  link.href = 'https://www.youtube-nocookie.com';
+  document.head.appendChild(link);
 </script>

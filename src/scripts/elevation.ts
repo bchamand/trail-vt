@@ -3,8 +3,11 @@ import type { TrackData } from './gpx-parser';
 
 Chart.register(...registerables);
 
-const GOLD = '#D4A843';
-const TERRACOTTA = '#C4533A';
+const BRIQUE = '#B85A3E';
+const TEXT = '#3B2F26';
+const TEXT_MUTED = 'rgba(59, 47, 38, 0.5)';
+const GRID = 'rgba(59, 47, 38, 0.08)';
+const BORDER = 'rgba(59, 47, 38, 0.15)';
 
 export function initElevationChart(
   canvas: HTMLCanvasElement,
@@ -13,32 +16,29 @@ export function initElevationChart(
 ): Chart {
   const ctx = canvas.getContext('2d')!;
 
-  // Gradient fill
+  // Gradient fill — brique toulousaine warm wash
   const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-  gradient.addColorStop(0, 'rgba(196, 83, 58, 0.4)');
-  gradient.addColorStop(1, 'rgba(196, 83, 58, 0.02)');
+  gradient.addColorStop(0, 'rgba(184, 90, 62, 0.35)');
+  gradient.addColorStop(1, 'rgba(184, 90, 62, 0.03)');
 
-  // Build data as {x, y} points so X axis is linear (true distance)
   const dataPoints = trackData.distances.map((d, i) => ({
     x: d,
     y: trackData.elevations[i],
   }));
-
-  const totalKm = Math.ceil(trackData.totalDistance);
 
   const chart = new Chart(ctx, {
     type: 'line',
     data: {
       datasets: [{
         data: dataPoints,
-        borderColor: GOLD,
+        borderColor: BRIQUE,
         borderWidth: 2,
         backgroundColor: gradient,
         fill: true,
         pointRadius: 0,
         pointHoverRadius: 5,
-        pointHoverBackgroundColor: GOLD,
-        pointHoverBorderColor: '#fff',
+        pointHoverBackgroundColor: BRIQUE,
+        pointHoverBorderColor: '#FAF5EB',
         pointHoverBorderWidth: 2,
         tension: 0.3,
       }],
@@ -46,6 +46,15 @@ export function initElevationChart(
     options: {
       responsive: true,
       maintainAspectRatio: false,
+      animation: {
+        duration: 600,
+        easing: 'easeInOutCubic',
+      },
+      transitions: {
+        active: {
+          animation: { duration: 200 },
+        },
+      },
       interaction: {
         mode: 'index',
         intersect: false,
@@ -53,10 +62,10 @@ export function initElevationChart(
       plugins: {
         legend: { display: false },
         tooltip: {
-          backgroundColor: 'rgba(26, 24, 20, 0.95)',
-          titleColor: GOLD,
-          bodyColor: '#F5F0E8',
-          borderColor: 'rgba(212, 168, 67, 0.3)',
+          backgroundColor: 'rgba(250, 245, 235, 0.98)',
+          titleColor: BRIQUE,
+          bodyColor: TEXT,
+          borderColor: 'rgba(184, 90, 62, 0.3)',
           borderWidth: 1,
           cornerRadius: 8,
           padding: 12,
@@ -80,21 +89,21 @@ export function initElevationChart(
             }
           },
           ticks: {
-            color: 'rgba(245, 240, 232, 0.4)',
+            color: TEXT_MUTED,
             font: { size: 10 },
             callback: (val) => `${val} km`,
           },
-          grid: { color: 'rgba(245, 240, 232, 0.05)' },
-          border: { color: 'rgba(245, 240, 232, 0.1)' },
+          grid: { color: GRID },
+          border: { color: BORDER },
         },
         y: {
           ticks: {
-            color: 'rgba(245, 240, 232, 0.4)',
+            color: TEXT_MUTED,
             font: { size: 10 },
             callback: (val) => `${val} m`,
           },
-          grid: { color: 'rgba(245, 240, 232, 0.05)' },
-          border: { color: 'rgba(245, 240, 232, 0.1)' },
+          grid: { color: GRID },
+          border: { color: BORDER },
         },
       },
       onHover: (_event, elements) => {
@@ -106,4 +115,37 @@ export function initElevationChart(
   });
 
   return chart;
+}
+
+/** Update an existing chart with new track data (animated transition) */
+export function updateElevationChart(
+  chart: Chart,
+  trackData: TrackData,
+  onHover?: (index: number) => void,
+): void {
+  const dataPoints = trackData.distances.map((d, i) => ({
+    x: d,
+    y: trackData.elevations[i],
+  }));
+
+  chart.data.datasets[0].data = dataPoints;
+
+  const xScale = chart.options.scales!.x!;
+  (xScale as any).min = 0;
+  (xScale as any).max = trackData.totalDistance;
+  (xScale as any).afterBuildTicks = (axis: any) => {
+    const last = Math.floor(trackData.totalDistance);
+    axis.ticks = [];
+    for (let km = 0; km <= last; km++) {
+      axis.ticks.push({ value: km });
+    }
+  };
+
+  chart.options.onHover = (_event: any, elements: any[]) => {
+    if (elements.length > 0 && onHover) {
+      onHover(elements[0].index);
+    }
+  };
+
+  chart.update('default');
 }

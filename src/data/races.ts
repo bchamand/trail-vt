@@ -44,7 +44,7 @@ export const races: Race[] = [
         timeLimit: '1h45',
         value: 'L\'esprit de conquête',
         status: 'Qualificative',
-        color: '#D4A843',
+        color: '#B85A3E',
       },
       {
         label: 'Boucle 2',
@@ -53,7 +53,7 @@ export const races: Race[] = [
         timeLimit: '1h00',
         value: 'Le courage',
         status: 'Qualificative',
-        color: '#C4533A',
+        color: '#8B9D7A',
       },
       {
         label: 'Boucle 3',
@@ -62,7 +62,7 @@ export const races: Race[] = [
         timeLimit: '1h00',
         value: 'La bravoure',
         status: 'Qualificative',
-        color: '#4A8C6F',
+        color: '#5D6B4F',
       },
       {
         label: 'Boucle 4',
@@ -71,7 +71,7 @@ export const races: Race[] = [
         timeLimit: '1h00',
         value: 'L\'honneur',
         status: 'Classement final',
-        color: '#E8D5CC',
+        color: '#C8A555',
       },
     ],
   },

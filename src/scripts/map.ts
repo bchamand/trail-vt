@@ -1,10 +1,11 @@
 import maplibregl from 'maplibre-gl';
 import type { TrackData } from './gpx-parser';
 
-const GOLD = '#D4A843';
-const GOLD_GLOW = 'rgba(212, 168, 67, 0.3)';
-const TERRACOTTA = '#C4533A';
+const BRIQUE = '#B85A3E';
+const BRIQUE_GLOW = 'rgba(184, 90, 62, 0.3)';
+const MOSS = '#5D6B4F';
 const PADDING = 50;
+const MAP_STYLE = 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json';
 
 export function initMap(
   container: HTMLElement,
@@ -18,7 +19,7 @@ export function initMap(
   // Create map without maxBounds first — we'll set them after fitBounds
   const map = new maplibregl.Map({
     container,
-    style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
+    style: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
     bounds: trackBounds,
     fitBoundsOptions: { padding: PADDING },
     maxZoom: 15,
@@ -57,10 +58,10 @@ export function initMap(
   markerEl.className = 'track-marker';
   markerEl.style.cssText = `
     width: 14px; height: 14px;
-    background: ${GOLD};
-    border: 2px solid ${GOLD};
+    background: ${BRIQUE};
+    border: 2px solid ${BRIQUE};
     border-radius: 50%;
-    box-shadow: 0 0 12px ${GOLD_GLOW};
+    box-shadow: 0 0 12px ${BRIQUE_GLOW};
     display: none;
   `;
   const marker = new maplibregl.Marker({ element: markerEl })
@@ -89,7 +90,7 @@ export function initMap(
       type: 'line',
       source: 'track-bg',
       paint: {
-        'line-color': GOLD_GLOW,
+        'line-color': BRIQUE_GLOW,
         'line-width': 8,
         'line-blur': 4,
       },
@@ -99,7 +100,7 @@ export function initMap(
       type: 'line',
       source: 'track-bg',
       paint: {
-        'line-color': GOLD,
+        'line-color': BRIQUE,
         'line-width': 3,
         'line-opacity': 0.2,
       },
@@ -119,7 +120,7 @@ export function initMap(
       type: 'line',
       source: 'track-animated',
       paint: {
-        'line-color': GOLD_GLOW,
+        'line-color': BRIQUE_GLOW,
         'line-width': 10,
         'line-blur': 6,
       },
@@ -129,7 +130,7 @@ export function initMap(
       type: 'line',
       source: 'track-animated',
       paint: {
-        'line-color': GOLD,
+        'line-color': BRIQUE,
         'line-width': 3.5,
       },
     });
@@ -137,7 +138,7 @@ export function initMap(
     // Start/End markers
     const startEnd = [
       { coord: trackData.coords[0], color: '#22c55e', label: 'D' },
-      { coord: trackData.coords[trackData.coords.length - 1], color: TERRACOTTA, label: 'A' },
+      { coord: trackData.coords[trackData.coords.length - 1], color: BRIQUE, label: 'A' },
     ];
     startEnd.forEach(({ coord, color, label }) => {
       const el = document.createElement('div');
@@ -162,11 +163,11 @@ export function initMap(
         const el = document.createElement('div');
         el.style.cssText = `
           width: 22px; height: 22px;
-          background: rgba(26, 24, 20, 0.85);
-          border: 2px solid ${GOLD};
+          background: rgba(250, 245, 235, 0.95);
+          border: 2px solid ${BRIQUE};
           border-radius: 50%;
           display: flex; align-items: center; justify-content: center;
-          font-size: 9px; font-weight: 700; color: ${GOLD};
+          font-size: 9px; font-weight: 700; color: ${BRIQUE};
           font-family: 'DM Sans', sans-serif;
         `;
         el.textContent = `${nextKm}`;
@@ -225,7 +226,7 @@ export function initMultiLoopMap(
 
   const map = new maplibregl.Map({
     container,
-    style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
+    style: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
     bounds: allBounds,
     fitBoundsOptions: { padding: PADDING },
     maxZoom: 15,
@@ -256,9 +257,9 @@ export function initMultiLoopMap(
       font-family: 'DM Sans', sans-serif;
       font-size: 13px; font-weight: 700;
       transition: all 0.2s;
-      background: ${isActive ? colors[i] : 'rgba(26, 24, 20, 0.9)'};
-      color: ${isActive ? '#fff' : 'rgba(245, 240, 232, 0.5)'};
-      border-bottom: ${i > 0 ? '1px solid rgba(245, 240, 232, 0.1)' : 'none'};
+      background: ${isActive ? colors[i] : 'rgba(250, 245, 235, 0.95)'};
+      color: ${isActive ? '#fff' : 'rgba(59, 47, 38, 0.5)'};
+      border-bottom: ${i > 0 ? '1px solid rgba(59, 47, 38, 0.1)' : 'none'};
     `;
     btn.addEventListener('click', () => {
       setActiveLoop(i);
@@ -283,8 +284,8 @@ export function initMultiLoopMap(
   function updateFloorButtons(activeIdx: number) {
     floorButtons.forEach((btn, i) => {
       const isActive = i === activeIdx;
-      btn.style.background = isActive ? colors[i] : 'rgba(26, 24, 20, 0.9)';
-      btn.style.color = isActive ? '#fff' : 'rgba(245, 240, 232, 0.5)';
+      btn.style.background = isActive ? colors[i] : 'rgba(250, 245, 235, 0.95)';
+      btn.style.color = isActive ? '#fff' : 'rgba(59, 47, 38, 0.5)';
     });
   }
 
@@ -412,7 +413,7 @@ export function initMultiLoopMap(
         const el = document.createElement('div');
         el.style.cssText = `
           width: 22px; height: 22px;
-          background: rgba(26, 24, 20, 0.85);
+          background: rgba(250, 245, 235, 0.95);
           border: 2px solid ${color};
           border-radius: 50%;
           display: flex; align-items: center; justify-content: center;

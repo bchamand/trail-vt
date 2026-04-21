@@ -1,0 +1,67 @@
+---
+---
+<nav id="main-nav" class="fixed top-0 left-0 right-0 z-40 transition-all duration-300">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4 flex items-center justify-between">
+    <!-- Brand -->
+    <a href="#hero" class="font-serif text-base sm:text-lg font-bold text-cream transition-colors">
+      <span id="nav-brand-1">Trail des </span><span id="nav-brand-2" class="text-tile">Tectosages</span>
+    </a>
+
+    <!-- Desktop links -->
+    <div class="hidden md:flex items-center gap-6 text-sm">
+      <a href="#epreuves" class="nav-link text-cream/85 hover:text-tile transition-colors">Épreuves</a>
+      <a href="#banquet" class="nav-link text-cream/85 hover:text-tile transition-colors">Banquet</a>
+      <a href="#infos" class="nav-link text-cream/85 hover:text-tile transition-colors">Infos</a>
+      <a
+        href="https://chrono-start.com/"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="inline-flex items-center gap-1.5 bg-terracotta hover:bg-terracotta-dark text-cream px-4 py-2 rounded-full text-xs font-semibold tracking-wide transition-all hover:scale-105"
+      >
+        S'inscrire
+      </a>
+    </div>
+
+    <!-- Mobile CTA only -->
+    <a
+      href="https://chrono-start.com/"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="md:hidden inline-flex items-center gap-1.5 bg-terracotta text-cream px-3 py-1.5 rounded-full text-xs font-semibold transition-all"
+    >
+      S'inscrire
+    </a>
+  </div>
+</nav>
+
+<script>
+  const nav = document.getElementById('main-nav')!;
+  const brand1 = document.getElementById('nav-brand-1')!;
+  const links = nav.querySelectorAll('.nav-link');
+  const threshold = 80;
+
+  function onScroll() {
+    if (window.scrollY > threshold) {
+      nav.classList.add('bg-cream/95', 'backdrop-blur-md', 'shadow-sm', 'border-b', 'border-charcoal/5');
+      nav.classList.remove('bg-transparent');
+      brand1.classList.remove('text-cream');
+      brand1.classList.add('text-charcoal');
+      links.forEach((l) => {
+        l.classList.remove('text-cream/85');
+        l.classList.add('text-charcoal/80');
+      });
+    } else {
+      nav.classList.remove('bg-cream/95', 'backdrop-blur-md', 'shadow-sm', 'border-b', 'border-charcoal/5');
+      nav.classList.add('bg-transparent');
+      brand1.classList.add('text-cream');
+      brand1.classList.remove('text-charcoal');
+      links.forEach((l) => {
+        l.classList.add('text-cream/85');
+        l.classList.remove('text-charcoal/80');
+      });
+    }
+  }
+
+  onScroll();
+  window.addEventListener('scroll', onScroll, { passive: true });
+</script>

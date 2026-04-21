@@ -1,26 +1,33 @@
 ---
 ---
-<footer class="bg-charcoal border-t border-cream/10 py-10 sm:py-14">
-  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+<footer class="relative bg-moss-dark text-cream/90 py-12 sm:py-16 overflow-hidden">
+  <!-- Subtle decorative pattern -->
+  <div class="absolute inset-0 pointer-events-none opacity-30">
+    <div class="absolute -top-32 -right-32 w-96 h-96 rounded-full border border-cream/5"></div>
+    <div class="absolute -bottom-24 -left-24 w-72 h-72 rounded-full border border-gold/10"></div>
+  </div>
+  <div class="absolute inset-0 grain-overlay"></div>
+
+  <div class="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex flex-col sm:flex-row items-center justify-between gap-6">
       <!-- Logo/Name -->
       <div class="text-center sm:text-left">
-        <p class="font-serif text-xl font-bold text-cream">Trail des <span class="text-gold">Tectosages</span></p>
-        <p class="text-cream/40 text-xs mt-1">Vieille-Toulouse, Haute-Garonne</p>
+        <p class="font-serif text-xl font-bold text-cream">Trail des <span class="text-tile">Tectosages</span></p>
+        <p class="text-cream/60 text-xs mt-1">Vieille-Toulouse &bull; Haute-Garonne</p>
       </div>
 
       <!-- Links -->
-      <div class="flex flex-wrap gap-4 sm:gap-6 text-sm text-cream/50 justify-center">
-        <a href="#epreuves" class="hover:text-gold transition-colors">Épreuves</a>
-        <a href="#infos" class="hover:text-gold transition-colors">Infos</a>
-        <a href="#banquet" class="hover:text-gold transition-colors">Banquet</a>
-        <a href="#inscription" class="hover:text-gold transition-colors">Inscription</a>
+      <div class="flex flex-wrap gap-4 sm:gap-6 text-sm text-cream/80 justify-center">
+        <a href="#epreuves" class="hover:text-tile transition-colors">Épreuves</a>
+        <a href="#banquet" class="hover:text-tile transition-colors">Banquet</a>
+        <a href="#infos" class="hover:text-tile transition-colors">Infos</a>
+        <a href="#inscription" class="hover:text-tile transition-colors">Inscription</a>
       </div>
     </div>
 
-    <div class="celtic-separator my-8">◆</div>
+    <div class="celtic-separator celtic-separator-light my-8">◆</div>
 
-    <p class="text-center text-cream/30 text-xs">
+    <p class="text-center text-cream/60 text-xs">
       &copy; 2026 Association Trail des Tectosages &mdash; Vieille-Toulouse. Tous droits réservés.
     </p>
   </div>

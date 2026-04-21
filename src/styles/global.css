@@ -2,17 +2,31 @@
 @import "maplibre-gl/dist/maplibre-gl.css";
 
 @theme {
-  --color-terracotta: #C4533A;
-  --color-terracotta-dark: #9E3F2C;
-  --color-gold: #D4A843;
-  --color-gold-light: #E8C96A;
-  --color-forest: #2D4A3E;
-  --color-forest-deep: #1E332B;
-  --color-cream: #F5F0E8;
-  --color-charcoal: #1A1814;
-  --color-charcoal-light: #232019;
-  --color-charcoal-deep: #0E0D0A;
-  --color-blush: #E8D5CC;
+  /* ─── Patrimoine : brique toulousaine ─── */
+  --color-terracotta: #B85A3E;
+  --color-terracotta-dark: #8F3F2A;
+  --color-tile: #D98A66;
+
+  /* ─── L'or de Tolosa (accent rare — chiffres clés uniquement) ─── */
+  --color-gold: #B8923E;
+  --color-gold-light: #D4B878;
+
+  /* ─── Nature : vert des collines ─── */
+  --color-sage: #9FB091;
+  --color-moss: #4E6345;
+  --color-moss-dark: #1F2A1B;
+
+  /* ─── Fonds : off-whites cool + greiges sage ─── */
+  --color-cream: #F7F5F0;        /* off-white léger, peu saturé */
+  --color-linen: #DFE4DA;        /* greige sage frais pour sections alt */
+  --color-stone: #C7CDBF;        /* sage-grey moyen (plus de profondeur) */
+
+  /* ─── Textes : tons terre ─── */
+  --color-charcoal: #2B2620;
+  --color-clay: #5A5349;
+  --color-sand: #8A877E;
+
+  --color-blush: #EFD9CB;
 
   --font-serif: 'Cormorant Garamond', Georgia, serif;
   --font-sans: 'DM Sans', system-ui, sans-serif;
@@ -24,8 +38,8 @@
   }
   body {
     font-family: var(--font-sans);
-    background-color: var(--color-charcoal);
-    color: var(--color-cream);
+    background-color: var(--color-cream);
+    color: var(--color-charcoal);
     overflow-x: hidden;
   }
   h1, h2, h3, h4 {
@@ -41,7 +55,7 @@
   gap: 0.75rem;
   margin: 3rem auto;
   max-width: 300px;
-  color: var(--color-gold);
+  color: var(--color-terracotta);
   font-size: 0.75rem;
   line-height: 1;
 }
@@ -49,13 +63,24 @@
 .celtic-separator::after {
   content: '';
   flex: 1;
-  height: 2px;
+  height: 1px;
 }
 .celtic-separator::before {
-  background: linear-gradient(90deg, transparent, var(--color-gold));
+  background: linear-gradient(90deg, transparent, var(--color-terracotta));
 }
 .celtic-separator::after {
-  background: linear-gradient(90deg, var(--color-gold), transparent);
+  background: linear-gradient(90deg, var(--color-terracotta), transparent);
+}
+
+.celtic-separator-light {
+  color: var(--color-cream);
+  opacity: 0.6;
+}
+.celtic-separator-light::before {
+  background: linear-gradient(90deg, transparent, var(--color-cream));
+}
+.celtic-separator-light::after {
+  background: linear-gradient(90deg, var(--color-cream), transparent);
 }
 
 /* Map container */
@@ -81,9 +106,17 @@
   content: '';
   position: absolute;
   inset: 0;
-  opacity: 0.03;
+  opacity: 0.025;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
   pointer-events: none;
+}
+
+/* Hero aerial background */
+.hero-bg {
+  background-image: url('/images/hero-bg.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
 
 /* Scrollbar styling */
@@ -91,11 +124,14 @@
   width: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--color-charcoal);
+  background: var(--color-linen);
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--color-terracotta);
+  background: var(--color-moss);
   border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-terracotta);
 }
 
 /* Hide scrollbar on horizontal carousels */
