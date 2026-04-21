@@ -1,0 +1,25 @@
+---
+const stats = [
+  { big: 'V', small: 'ÉPREUVES' },
+  { big: '30KM', small: 'DÉFI MAX' },
+  { big: '1100', small: 'D+ MÈTRES' },
+  { big: '19:32', small: 'COUCHER SOLEIL' },
+];
+---
+<section class="grid grid-cols-2 lg:grid-cols-4 border-y border-[color:var(--color-line)]">
+  {stats.map((s, i) => (
+    <div
+      class:list={[
+        'py-6 px-5 sm:py-10 sm:px-8',
+        // desktop: right border except last
+        i < 3 ? 'lg:border-r lg:border-[color:var(--color-line)]' : '',
+        // mobile 2-col: right border on left column + bottom border on top row
+        i % 2 === 0 ? 'border-r border-[color:var(--color-line)] lg:border-r' : 'lg:border-r',
+        i < 2 ? 'border-b border-[color:var(--color-line)] lg:border-b-0' : '',
+      ]}
+    >
+      <div style="font-family: var(--font-serif); font-weight: 400; line-height: 0.95; color: var(--color-accent); font-size: clamp(36px, 4.5vw, 56px);">{s.big}</div>
+      <div class="mt-2 sm:mt-3 opacity-60 text-[9px] sm:text-[10px] tracking-[0.22em]" style="font-family: var(--font-mono);">{s.small}</div>
+    </div>
+  ))}
+</section>

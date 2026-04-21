@@ -1,24 +1,26 @@
 export interface RaceLoop {
-  label: string;
-  distance: string;
-  ascent: string;
-  timeLimit: string;
-  value: string;
-  status: string;
+  roman: string;      // I, II, III, IV
+  label: string;      // « Conquête »
+  distance: string;   // "12 km"
+  ascent: string;     // "+400 m"
+  timeLimit: string;  // "1h45"
+  value: string;      // "L'esprit de conquête"
+  status: string;     // "Qualificative"
   color: string;
 }
 
 export interface Race {
   id: string;
-  title: string;
-  type: string;
-  desc: string;
+  roman: string;          // I, II, III, IV, V
+  title: string;          // e.g. "DÉFI DE COPILOS"
+  type: string;           // short pill label ("L'épreuve reine")
+  desc: string;           // paragraph description
   gpx: string;
-  icon: string;
-  distance: string;
-  ascent: string;
-  startTime: string;
-  duration?: string;
+  dist: string;           // "30"
+  unit: string;           // "KM"
+  dplus: string;          // "1100" or "—"
+  startTime: string;      // "15h45"
+  diff: number;           // 1..5
   timed?: boolean;
   loops?: RaceLoop[];
 }
@@ -26,105 +28,78 @@ export interface Race {
 export const races: Race[] = [
   {
     id: 'defi-copilos',
-    title: 'Le Défi de Copilos',
-    type: 'Course par élimination',
-    desc: 'Sur les pas du dernier chef gaulois des Tectosages. 1 boucle de 12 km puis 3 boucles de 6 km, chaque boucle dans un temps imparti. Seuls les dignes héritiers iront au bout et décrocheront le statut d\'« Héritier de Copilos ».',
+    roman: 'I',
+    title: 'DÉFI DE COPILOS',
+    type: "L'épreuve reine",
+    desc: "4 boucles (12+6+6+6 km), qualification ou élimination à chaque passage. Seuls les Héritiers franchiront la ligne.",
     gpx: '/traces/defi-copilos.gpx',
-    icon: '🔥',
-    distance: '32 km',
-    ascent: 'D+ 1100 m',
+    dist: '30',
+    unit: 'KM',
+    dplus: '1100',
     startTime: '15h45',
-    duration: 'Fin 20h45',
+    diff: 5,
     timed: true,
     loops: [
-      {
-        label: 'Boucle 1',
-        distance: '12 km',
-        ascent: 'D+ 400 m',
-        timeLimit: '1h45',
-        value: 'L\'esprit de conquête',
-        status: 'Qualificative',
-        color: '#B85A3E',
-      },
-      {
-        label: 'Boucle 2',
-        distance: '6 km',
-        ascent: 'D+ 220 m',
-        timeLimit: '1h00',
-        value: 'Le courage',
-        status: 'Qualificative',
-        color: '#8B9D7A',
-      },
-      {
-        label: 'Boucle 3',
-        distance: '6 km',
-        ascent: 'D+ 220 m',
-        timeLimit: '1h00',
-        value: 'La bravoure',
-        status: 'Qualificative',
-        color: '#5D6B4F',
-      },
-      {
-        label: 'Boucle 4',
-        distance: '6 km',
-        ascent: 'D+ 220 m',
-        timeLimit: '1h00',
-        value: 'L\'honneur',
-        status: 'Classement final',
-        color: '#C8A555',
-      },
+      { roman: 'I',   label: 'Conquête', distance: '12 km', ascent: '+400 m', timeLimit: '1h45', value: "L'esprit de conquête", status: 'Qualificative',     color: '#d4a574' },
+      { roman: 'II',  label: 'Courage',  distance: '6 km',  ascent: '+220 m', timeLimit: '1h00', value: 'Le courage',            status: 'Qualificative',     color: '#a67a4a' },
+      { roman: 'III', label: 'Bravoure', distance: '6 km',  ascent: '+220 m', timeLimit: '1h00', value: 'La bravoure',           status: 'Qualificative',     color: '#7a5a6b' },
+      { roman: 'IV',  label: 'Honneur',  distance: '6 km',  ascent: '+220 m', timeLimit: '1h00', value: "L'honneur",             status: 'Classement final', color: '#5a7a5a' },
     ],
   },
   {
     id: 'oppidum',
-    title: 'La Boucle de l\'Oppidum',
-    type: 'Trail chronométré',
-    desc: 'Une boucle de 12 km à travers les coteaux de l\'ancienne capitale des Volques Tectosages. Chronométrée, avec classement final.',
+    roman: 'II',
+    title: "L'OPPIDUM",
+    type: 'Chronométrée · classée',
+    desc: "Boucle unique sur les traces de l'oppidum tectosage. Sous-bois, coteaux, crêtes au-dessus de la Garonne.",
     gpx: '/traces/oppidum.gpx',
-    icon: '🏃',
-    distance: '12 km',
-    ascent: 'D+ 400 m',
+    dist: '12',
+    unit: 'KM',
+    dplus: '400',
     startTime: '16h15',
-    duration: 'Fin 18h30',
+    diff: 4,
     timed: true,
   },
   {
     id: 'oppi-dog',
-    title: 'La Boucle de l\'Oppi-dog',
-    type: 'Canicross',
-    desc: 'Le format court du Trail des Tectosages en duo avec votre compagnon à quatre pattes. 6 km chronométrés sur les sentiers de Vieille-Toulouse.',
+    roman: 'III',
+    title: 'OPPI-DOG',
+    type: 'Canicross chronométré',
+    desc: "Sol forestier, points d'eau pour les chiens, équipement canicross réglementaire.",
     gpx: '/traces/oppi-dog.gpx',
-    icon: '🐕',
-    distance: '6 km',
-    ascent: 'D+ 180 m',
+    dist: '6',
+    unit: 'KM',
+    dplus: '180',
     startTime: '16h30',
-    duration: 'Fin 17h30',
+    diff: 3,
     timed: true,
   },
   {
     id: 'randonnee-sages',
-    title: 'La Randonnée des Sages',
-    type: 'Marche / Randonnée',
-    desc: 'Un parcours non chronométré pour découvrir les paysages et le patrimoine des coteaux à son propre rythme.',
+    roman: 'IV',
+    title: 'RANDO DES SAGES',
+    type: 'Marche libre',
+    desc: 'Non chronométrée. Une marche contemplative sur les sentiers historiques du village.',
     gpx: '/traces/randonnee-sages.gpx',
-    icon: '🚶',
-    distance: '6 km',
-    ascent: 'D+ 180 m',
+    dist: '6',
+    unit: 'KM',
+    dplus: '180',
     startTime: '16h30',
-    duration: 'Fin 18h00',
+    diff: 2,
     timed: false,
   },
   {
     id: 'tectokids',
-    title: 'La Tectokids',
-    type: 'Course enfants',
-    desc: 'Les futurs guerriers tectosages se lancent sur un parcours adapté. Des boucles de 1 à 3 km avec classement pour vivre l\'aventure en famille.',
+    roman: 'V',
+    title: 'TECTOKIDS',
+    type: 'La relève',
+    desc: 'Boucles courtes, dossard, médaille en terre cuite. La relève des Tectosages.',
     gpx: '/traces/tectokids.gpx',
-    icon: '🌟',
-    distance: '1 à 3 km',
-    ascent: '',
+    dist: '1–3',
+    unit: 'KM',
+    dplus: '—',
     startTime: '18h00',
-    duration: 'Fin 19h00',
+    diff: 1,
     timed: true,
   },
 ];

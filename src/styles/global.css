@@ -2,143 +2,176 @@
 @import "maplibre-gl/dist/maplibre-gl.css";
 
 @theme {
-  /* ─── Patrimoine : brique toulousaine ─── */
-  --color-terracotta: #B85A3E;
-  --color-terracotta-dark: #8F3F2A;
-  --color-tile: #D98A66;
+  /* ─── Outdoor premium (dark) ─── */
+  --color-bg: #0f1412;         /* base dark */
+  --color-bg-elev: #151c18;    /* elevated surface */
+  --color-bg-deep: #0a0e0c;    /* deepest sections */
+  --color-ink: #e8e3d3;        /* cream ink */
+  --color-accent: #d4a574;     /* tan / gold accent */
+  --color-accent-dim: #a67a4a;
 
-  /* ─── L'or de Tolosa (accent rare — chiffres clés uniquement) ─── */
-  --color-gold: #B8923E;
-  --color-gold-light: #D4B878;
+  /* Borders / hairlines */
+  --color-line: rgba(232, 227, 211, 0.12);
+  --color-line-soft: rgba(232, 227, 211, 0.08);
 
-  /* ─── Nature : vert des collines ─── */
-  --color-sage: #9FB091;
-  --color-moss: #4E6345;
-  --color-moss-dark: #1F2A1B;
-
-  /* ─── Fonds : off-whites cool + greiges sage ─── */
-  --color-cream: #F7F5F0;        /* off-white léger, peu saturé */
-  --color-linen: #DFE4DA;        /* greige sage frais pour sections alt */
-  --color-stone: #C7CDBF;        /* sage-grey moyen (plus de profondeur) */
-
-  /* ─── Textes : tons terre ─── */
-  --color-charcoal: #2B2620;
-  --color-clay: #5A5349;
-  --color-sand: #8A877E;
-
-  --color-blush: #EFD9CB;
-
-  --font-serif: 'Cormorant Garamond', Georgia, serif;
-  --font-sans: 'DM Sans', system-ui, sans-serif;
+  /* Fonts */
+  --font-sans: 'Geist', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --font-serif: 'Instrument Serif', Georgia, serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
 }
 
 @layer base {
   html {
     scroll-behavior: smooth;
+    background: var(--color-bg);
   }
   body {
     font-family: var(--font-sans);
-    background-color: var(--color-cream);
-    color: var(--color-charcoal);
+    background-color: var(--color-bg);
+    color: var(--color-ink);
     overflow-x: hidden;
+    -webkit-text-size-adjust: 100%;
   }
-  h1, h2, h3, h4 {
-    font-family: var(--font-serif);
+  * {
+    -webkit-tap-highlight-color: transparent;
   }
+  img { max-width: 100%; }
 }
 
-/* Celtic knot separator */
-.celtic-separator {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.75rem;
-  margin: 3rem auto;
-  max-width: 300px;
-  color: var(--color-terracotta);
-  font-size: 0.75rem;
-  line-height: 1;
+/* Mono label (e.g. "— §01 / LES ÉPREUVES") */
+.mono-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.3em;
+  color: var(--color-accent);
 }
-.celtic-separator::before,
-.celtic-separator::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-}
-.celtic-separator::before {
-  background: linear-gradient(90deg, transparent, var(--color-terracotta));
-}
-.celtic-separator::after {
-  background: linear-gradient(90deg, var(--color-terracotta), transparent);
+@media (max-width: 720px) {
+  .mono-label { font-size: 10px; }
 }
 
-.celtic-separator-light {
-  color: var(--color-cream);
-  opacity: 0.6;
-}
-.celtic-separator-light::before {
-  background: linear-gradient(90deg, transparent, var(--color-cream));
-}
-.celtic-separator-light::after {
-  background: linear-gradient(90deg, var(--color-cream), transparent);
+/* Grain / noise overlay */
+.grain {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.08;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
+  mix-blend-mode: overlay;
 }
 
-/* Map container */
+/* Map — dark theming */
 .map-container {
   width: 100%;
   height: 50vh;
   min-height: 280px;
   max-height: 600px;
-  border-radius: 0.5rem;
-  overflow: hidden;
+  background: var(--color-bg-elev);
 }
+.maplibregl-ctrl-group {
+  background: rgba(21, 28, 24, 0.92) !important;
+  border: 1px solid var(--color-line) !important;
+  box-shadow: none !important;
+}
+.maplibregl-ctrl-group button {
+  background-color: transparent !important;
+}
+.maplibregl-ctrl-group button + button {
+  border-top: 1px solid var(--color-line) !important;
+}
+.maplibregl-ctrl-group button span {
+  filter: invert(0.85) hue-rotate(180deg);
+}
+.maplibregl-ctrl-attrib {
+  background: rgba(10, 14, 12, 0.7) !important;
+  color: rgba(232, 227, 211, 0.5) !important;
+}
+.maplibregl-ctrl-attrib a { color: var(--color-accent) !important; }
 
 /* Elevation chart */
 .elevation-container {
   width: 100%;
-  height: 20vh;
-  min-height: 140px;
-  max-height: 250px;
+  height: 22vh;
+  min-height: 160px;
+  max-height: 260px;
 }
 
-/* Subtle grain texture overlay */
-.grain-overlay::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  opacity: 0.025;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-  pointer-events: none;
-}
-
-/* Hero aerial background */
-.hero-bg {
-  background-image: url('/images/hero-bg.jpg');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-}
-
-/* Scrollbar styling */
-::-webkit-scrollbar {
-  width: 8px;
-}
-::-webkit-scrollbar-track {
-  background: var(--color-linen);
-}
+/* Scrollbar */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: var(--color-bg-deep); }
 ::-webkit-scrollbar-thumb {
-  background: var(--color-moss);
+  background: rgba(212, 165, 116, 0.35);
   border-radius: 4px;
 }
-::-webkit-scrollbar-thumb:hover {
-  background: var(--color-terracotta);
-}
+::-webkit-scrollbar-thumb:hover { background: var(--color-accent); }
 
-/* Hide scrollbar on horizontal carousels */
 .scrollbar-hide {
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+
+/* Subtle vertical side text (desktop decoration) */
+.side-rail {
+  writing-mode: vertical-rl;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  color: rgba(232, 227, 211, 0.55);
+}
+
+/* Fluid hero title — responsive with clamp */
+.hero-title {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  line-height: 0.88;
+  letter-spacing: -0.035em;
+  font-size: clamp(56px, 12vw, 148px);
+  margin: 0;
+}
+
+/* Big section title */
+.h2-big {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  line-height: 0.92;
+  letter-spacing: -0.03em;
+  font-size: clamp(44px, 7vw, 96px);
+  margin: 0;
+}
+.h2-med {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  line-height: 0.9;
+  letter-spacing: -0.025em;
+  font-size: clamp(44px, 6vw, 88px);
+  margin: 0;
+}
+
+/* Primary button (gold) */
+.btn-gold {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: var(--color-accent);
+  color: var(--color-bg);
+  border: none;
+  padding: 16px 28px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  cursor: pointer;
+  transition: filter 0.25s ease;
+  text-decoration: none;
+}
+.btn-gold:hover { filter: brightness(1.08); }
+
+/* Light logo tile (dark site -> invert background to cream) */
+.logo-tile {
+  background: var(--color-ink);
+  padding: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }

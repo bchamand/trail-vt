@@ -1,11 +1,11 @@
 import maplibregl from 'maplibre-gl';
 import type { TrackData } from './gpx-parser';
 
-const BRIQUE = '#B85A3E';
-const BRIQUE_GLOW = 'rgba(184, 90, 62, 0.3)';
+const BRIQUE = '#d4a574';
+const BRIQUE_GLOW = 'rgba(212, 165, 116, 0.3)';
 const MOSS = '#5D6B4F';
 const PADDING = 50;
-const MAP_STYLE = 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json';
+const MAP_STYLE = 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json';
 
 export function initMap(
   container: HTMLElement,
@@ -19,7 +19,7 @@ export function initMap(
   // Create map without maxBounds first — we'll set them after fitBounds
   const map = new maplibregl.Map({
     container,
-    style: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
+    style: MAP_STYLE,
     bounds: trackBounds,
     fitBoundsOptions: { padding: PADDING },
     maxZoom: 15,
@@ -163,7 +163,7 @@ export function initMap(
         const el = document.createElement('div');
         el.style.cssText = `
           width: 22px; height: 22px;
-          background: rgba(250, 245, 235, 0.95);
+          background: rgba(21, 28, 24, 0.95);
           border: 2px solid ${BRIQUE};
           border-radius: 50%;
           display: flex; align-items: center; justify-content: center;
@@ -226,7 +226,7 @@ export function initMultiLoopMap(
 
   const map = new maplibregl.Map({
     container,
-    style: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
+    style: MAP_STYLE,
     bounds: allBounds,
     fitBoundsOptions: { padding: PADDING },
     maxZoom: 15,
@@ -413,7 +413,7 @@ export function initMultiLoopMap(
         const el = document.createElement('div');
         el.style.cssText = `
           width: 22px; height: 22px;
-          background: rgba(250, 245, 235, 0.95);
+          background: rgba(21, 28, 24, 0.95);
           border: 2px solid ${color};
           border-radius: 50%;
           display: flex; align-items: center; justify-content: center;

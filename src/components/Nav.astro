@@ -1,67 +1,100 @@
 ---
 ---
-<nav id="main-nav" class="fixed top-0 left-0 right-0 z-40 transition-all duration-300">
-  <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4 flex items-center justify-between">
+<header id="site-nav" class="fixed top-0 left-0 right-0 z-40 transition-[background,border,backdrop-filter] duration-300 border-b border-transparent bg-transparent">
+  <div class="flex items-center justify-between px-4 sm:px-6 lg:px-8 py-3 lg:py-4">
     <!-- Brand -->
-    <a href="#hero" class="font-serif text-base sm:text-lg font-bold text-cream transition-colors">
-      <span id="nav-brand-1">Trail des </span><span id="nav-brand-2" class="text-tile">Tectosages</span>
+    <a href="#top" class="flex items-center gap-3 lg:gap-3.5">
+      <span class="flex items-center justify-center rounded-full border shrink-0"
+            style="width: 34px; height: 34px; border-color: var(--color-accent); border-width: 1.5px; color: var(--color-accent); font-family: var(--font-serif); font-size: 14px; font-style: italic;">T</span>
+      <span class="flex flex-col leading-none">
+        <span class="text-[12px] sm:text-[13px] font-semibold tracking-wide">TRAIL DES TECTOSAGES</span>
+        <span class="hidden sm:inline text-[10px] mt-[3px] opacity-50 tracking-[0.22em]" style="font-family: var(--font-mono);">VIEILLE-TOULOUSE · MMXXVI</span>
+      </span>
     </a>
 
     <!-- Desktop links -->
-    <div class="hidden md:flex items-center gap-6 text-sm">
-      <a href="#epreuves" class="nav-link text-cream/85 hover:text-tile transition-colors">Épreuves</a>
-      <a href="#banquet" class="nav-link text-cream/85 hover:text-tile transition-colors">Banquet</a>
-      <a href="#infos" class="nav-link text-cream/85 hover:text-tile transition-colors">Infos</a>
-      <a
-        href="https://chrono-start.com/"
-        target="_blank"
-        rel="noopener noreferrer"
-        class="inline-flex items-center gap-1.5 bg-terracotta hover:bg-terracotta-dark text-cream px-4 py-2 rounded-full text-xs font-semibold tracking-wide transition-all hover:scale-105"
-      >
-        S'inscrire
-      </a>
-    </div>
+    <nav class="hidden md:flex items-center gap-6 lg:gap-8 text-[12px] font-medium tracking-[0.08em]">
+      <a href="#epreuves" class="hover:text-[color:var(--color-accent)] transition-colors">ÉPREUVES</a>
+      <a href="#histoire" class="hover:text-[color:var(--color-accent)] transition-colors">HISTOIRE</a>
+      <a href="#banquet" class="hover:text-[color:var(--color-accent)] transition-colors">BANQUET</a>
+      <a href="#engagement" class="hover:text-[color:var(--color-accent)] transition-colors">ENGAGEMENT</a>
+    </nav>
 
-    <!-- Mobile CTA only -->
-    <a
-      href="https://chrono-start.com/"
-      target="_blank"
-      rel="noopener noreferrer"
-      class="md:hidden inline-flex items-center gap-1.5 bg-terracotta text-cream px-3 py-1.5 rounded-full text-xs font-semibold transition-all"
-    >
-      S'inscrire
-    </a>
+    <!-- Desktop CTA -->
+    <a href="https://chrono-start.com/" target="_blank" rel="noopener noreferrer"
+       class="hidden md:inline-flex items-center bg-[color:var(--color-accent)] text-[color:var(--color-bg)] px-5 py-2.5 text-[12px] font-semibold tracking-[0.12em] hover:brightness-110 transition"
+       style="font-family: inherit;">S'INSCRIRE</a>
+
+    <!-- Mobile menu toggle -->
+    <button id="nav-toggle" aria-label="Menu" class="md:hidden p-1.5 bg-transparent border-0 cursor-pointer">
+      <svg id="nav-toggle-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+        <path d="M3 7h18"></path>
+        <path d="M3 17h18"></path>
+      </svg>
+    </button>
   </div>
-</nav>
+
+  <!-- Mobile drawer -->
+  <div id="nav-drawer" class="md:hidden hidden border-b"
+       style="background: rgba(10,14,12,0.97); backdrop-filter: blur(16px); border-color: rgba(232,227,211,0.1);">
+    <nav class="flex flex-col px-5 pt-4 pb-6">
+      <a href="#epreuves" class="nav-drawer-link">ÉPREUVES</a>
+      <a href="#histoire" class="nav-drawer-link">HISTOIRE</a>
+      <a href="#banquet" class="nav-drawer-link">BANQUET</a>
+      <a href="#engagement" class="nav-drawer-link">ENGAGEMENT</a>
+      <a href="https://chrono-start.com/" target="_blank" rel="noopener noreferrer"
+         class="mt-5 btn-gold w-full" style="padding: 16px; letter-spacing: 0.16em; font-size: 13px;">S'INSCRIRE</a>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .nav-drawer-link {
+    color: var(--color-ink);
+    text-decoration: none;
+    padding: 14px 0;
+    font-size: 14px;
+    letter-spacing: 0.1em;
+    font-weight: 500;
+    border-bottom: 1px solid rgba(232,227,211,0.08);
+  }
+</style>
 
 <script>
-  const nav = document.getElementById('main-nav')!;
-  const brand1 = document.getElementById('nav-brand-1')!;
-  const links = nav.querySelectorAll('.nav-link');
-  const threshold = 80;
+  const nav = document.getElementById('site-nav')!;
+  const toggle = document.getElementById('nav-toggle')!;
+  const drawer = document.getElementById('nav-drawer')!;
+  const icon = document.getElementById('nav-toggle-icon')!;
 
+  const OPEN_ICON = '<path d="M3 7h18"></path><path d="M3 17h18"></path>';
+  const CLOSE_ICON = '<path d="M5 5l14 14M19 5L5 19"></path>';
+
+  toggle.addEventListener('click', () => {
+    const isOpen = !drawer.classList.contains('hidden');
+    drawer.classList.toggle('hidden');
+    icon.innerHTML = isOpen ? OPEN_ICON : CLOSE_ICON;
+  });
+
+  // Close drawer when a link is clicked
+  drawer.querySelectorAll('a').forEach((a) => {
+    a.addEventListener('click', () => {
+      drawer.classList.add('hidden');
+      icon.innerHTML = OPEN_ICON;
+    });
+  });
+
+  const threshold = 50;
   function onScroll() {
     if (window.scrollY > threshold) {
-      nav.classList.add('bg-cream/95', 'backdrop-blur-md', 'shadow-sm', 'border-b', 'border-charcoal/5');
-      nav.classList.remove('bg-transparent');
-      brand1.classList.remove('text-cream');
-      brand1.classList.add('text-charcoal');
-      links.forEach((l) => {
-        l.classList.remove('text-cream/85');
-        l.classList.add('text-charcoal/80');
-      });
+      nav.style.background = 'rgba(15,20,18,0.92)';
+      nav.style.backdropFilter = 'blur(16px)';
+      nav.style.borderBottomColor = 'rgba(232,227,211,0.08)';
     } else {
-      nav.classList.remove('bg-cream/95', 'backdrop-blur-md', 'shadow-sm', 'border-b', 'border-charcoal/5');
-      nav.classList.add('bg-transparent');
-      brand1.classList.add('text-cream');
-      brand1.classList.remove('text-charcoal');
-      links.forEach((l) => {
-        l.classList.add('text-cream/85');
-        l.classList.remove('text-charcoal/80');
-      });
+      nav.style.background = 'transparent';
+      nav.style.backdropFilter = 'none';
+      nav.style.borderBottomColor = 'transparent';
     }
   }
-
   onScroll();
   window.addEventListener('scroll', onScroll, { passive: true });
 </script>

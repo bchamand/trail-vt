@@ -1,0 +1,35 @@
+---
+const pillars = [
+  {
+    n: 'I',
+    title: "L'ESPRIT DE CONQUÊTE",
+    body: "Partir à la conquête du territoire de Tolosa — comme nos ancêtres gaulois, il y a 2300 ans.",
+  },
+  {
+    n: 'II',
+    title: 'COURAGE · BRAVOURE · HONNEUR',
+    body: 'Trois valeurs, trois boucles. Chaque passage qualifie ou élimine. Seuls les dignes franchiront.',
+  },
+  {
+    n: 'III',
+    title: 'LE DÉFI DE COPILOS',
+    body: 'Dernier chef gaulois des Tectosages. Son nom reste à celles et ceux qui complètent les quatre boucles.',
+  },
+];
+---
+<section id="histoire" class="py-18 px-5 sm:py-30 sm:px-10 lg:py-30 lg:px-20" style="padding-top: clamp(72px, 10vw, 120px); padding-bottom: clamp(72px, 10vw, 120px);">
+  <div class="mono-label mb-5">— §00 / L'HISTOIRE</div>
+  <h2 class="h2-big mb-10 sm:mb-15 max-w-[1000px]" style="margin-bottom: clamp(40px, 6vw, 60px);">
+    Les traileurs sont-ils les <em style="color: var(--color-accent); font-style: italic;">descendants</em> des Tectosages ?
+  </h2>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
+    {pillars.map((p) => (
+      <div>
+        <div class="mb-3" style="font-family: var(--font-serif); font-size: clamp(40px, 4vw, 48px); font-style: italic; color: var(--color-accent); line-height: 1;">{p.n}</div>
+        <div class="mb-3 text-[12px] font-semibold tracking-[0.2em]">{p.title}</div>
+        <p class="text-[15px] leading-[1.6] opacity-80 m-0" style="text-wrap: pretty;">{p.body}</p>
+      </div>
+    ))}
+  </div>
+</section>

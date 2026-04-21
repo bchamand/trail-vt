@@ -1,130 +1,144 @@
 ---
 import { races } from '../data/races';
 ---
-<section id="epreuves" class="relative py-20 sm:py-28 bg-cream grain-overlay">
-  <div class="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-    <!-- Storytelling header -->
-    <div class="text-center mb-16">
-      <p class="text-terracotta uppercase tracking-[0.25em] text-xs font-medium mb-4">L'héritage des Volques Tectosages</p>
-      <h2 class="font-serif text-3xl sm:text-4xl md:text-5xl font-bold text-charcoal mb-6">
-        Les traileurs sont-ils les<br/>descendants des Tectosages&nbsp;?
-      </h2>
-      <p class="text-clay max-w-2xl mx-auto text-sm sm:text-base leading-relaxed mb-4">
-        Il y a 2300 ans, Vieille-Toulouse était la capitale du peuple des Volques Tectosages.
-        Leurs valeurs — <span class="text-terracotta font-medium">l'esprit de conquête, le courage, la bravoure, l'honneur</span> —
-        résonnent encore aujourd'hui dans l'âme des coureurs.
-      </p>
-      <p class="text-moss text-sm italic">
-        Partez à la conquête du territoire de Tolosa — choisissez votre épreuve.
-      </p>
+<section id="epreuves" class="border-t border-[color:var(--color-line-soft)]"
+  style="padding: clamp(48px, 8vw, 80px) clamp(20px, 4vw, 80px) clamp(72px, 12vw, 120px);">
+
+  <!-- Header -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-7 lg:gap-15 items-baseline mb-10 lg:mb-15"
+       style="margin-bottom: clamp(40px, 6vw, 60px);">
+    <div>
+      <div class="mono-label mb-5">— §01 / LES ÉPREUVES</div>
+      <h2 class="h2-med">Cinq départs.<br/><span class="italic opacity-75">Un seul territoire.</span></h2>
+    </div>
+    <p class="max-w-[460px] text-[15px] sm:text-[17px] leading-[1.55] opacity-75 m-0" style="text-wrap: pretty;">
+      Du Défi de Copilos à la Tectokids, chacune et chacun trouve sa boucle. Tout se court en fin d'après-midi — arrivée avant la tombée de la nuit.
+    </p>
+  </div>
+
+  <!-- Selector — horizontal scroll mobile, 5-col grid desktop -->
+  <div id="race-carousel"
+       class="flex lg:grid lg:grid-cols-5 gap-3 lg:gap-px overflow-x-auto lg:overflow-visible snap-x snap-mandatory scrollbar-hide -mx-5 px-5 lg:mx-0 lg:px-0"
+       style="background: transparent;">
+    {races.map((race, i) => (
+      <button
+        class="race-card group text-left cursor-pointer flex-shrink-0 w-[220px] lg:w-auto snap-start transition-colors duration-200"
+        data-race-index={i}
+        data-gpx={race.gpx}
+        data-has-loops={race.loops ? 'true' : 'false'}
+        style={`padding: 24px 20px; border: 1px solid var(--color-line); background: ${i === 0 ? 'var(--color-accent)' : 'var(--color-bg)'}; color: ${i === 0 ? 'var(--color-bg)' : 'var(--color-ink)'}; font-family: inherit;`}
+      >
+        <div class="mb-5 text-[10px] sm:text-[11px] tracking-[0.22em] opacity-65" style="font-family: var(--font-mono);">
+          {race.roman} / {race.title}
+        </div>
+        <div class="flex items-baseline gap-1 mb-3">
+          <span style="font-family: var(--font-serif); font-size: clamp(36px, 4.5vw, 44px); line-height: 0.9;">{race.dist}</span>
+          <span class="text-[10px] sm:text-[11px] tracking-[0.15em] opacity-70" style="font-family: var(--font-mono);">{race.unit}</span>
+        </div>
+        <div class="flex gap-[3px] mt-3">
+          {Array.from({ length: 5 }).map((_, n) => (
+            <span class="race-diff-bar" data-filled={n < race.diff ? '1' : '0'} style="width: 14px; height: 3px; display: block;"></span>
+          ))}
+        </div>
+      </button>
+    ))}
+  </div>
+
+  <!-- Details area: map + details panel -->
+  <div class="grid grid-cols-1 lg:grid-cols-[1fr_1.2fr] gap-8 lg:gap-16 items-start"
+       style="margin-top: clamp(32px, 5vw, 64px);">
+    <!-- Left: map + stats + elevation -->
+    <div>
+      <!-- Stats single -->
+      <div id="stats-single" class="flex flex-wrap gap-x-5 gap-y-2 mb-4 text-[12px]" style="font-family: var(--font-mono);">
+        <div><span class="opacity-60">DIST </span><span id="stat-distance" class="text-[color:var(--color-accent)]">—</span></div>
+        <div><span class="opacity-60">D+ </span><span id="stat-ascent" class="text-[color:var(--color-accent)]">—</span></div>
+        <div><span class="opacity-60">D− </span><span id="stat-descent" class="text-[color:var(--color-accent)]">—</span></div>
+        <div><span class="opacity-60">ALT MIN </span><span id="stat-min-ele" class="text-[color:var(--color-accent)]">—</span></div>
+        <div><span class="opacity-60">ALT MAX </span><span id="stat-max-ele" class="text-[color:var(--color-accent)]">—</span></div>
+      </div>
+
+      <!-- Stats multi -->
+      <div id="stats-multi" class="hidden mb-4">
+        <div class="flex flex-wrap gap-x-5 gap-y-2 mb-3 text-[12px]" style="font-family: var(--font-mono);">
+          <div><span class="opacity-60">TOTAL </span><span id="stat-total-distance" class="text-[color:var(--color-accent)]">—</span></div>
+          <div><span class="opacity-60">D+ </span><span id="stat-total-ascent" class="text-[color:var(--color-accent)]">—</span></div>
+          <div><span class="opacity-60">D− </span><span id="stat-total-descent" class="text-[color:var(--color-accent)]">—</span></div>
+          <div><span class="opacity-60">ALT MIN </span><span id="stat-total-min-ele" class="text-[color:var(--color-accent)]">—</span></div>
+          <div><span class="opacity-60">ALT MAX </span><span id="stat-total-max-ele" class="text-[color:var(--color-accent)]">—</span></div>
+        </div>
+        <div id="loop-chips" class="flex flex-wrap gap-2"></div>
+      </div>
+
+      <!-- Map -->
+      <div class="overflow-hidden border border-[color:var(--color-line)]">
+        <div id="race-map" class="map-container"></div>
+      </div>
+
+      <!-- Elevation -->
+      <div class="mt-4 border border-[color:var(--color-line)] p-4 sm:p-5" style="background: var(--color-bg-elev);">
+        <p class="text-[10px] tracking-[0.22em] opacity-60 mb-3" style="font-family: var(--font-mono);">PROFIL ALTIMÉTRIQUE</p>
+        <div class="elevation-container">
+          <canvas id="elevation-chart"></canvas>
+        </div>
+      </div>
     </div>
 
-    <!-- Visual race selector -->
-    <div
-      id="race-carousel"
-      class="flex lg:grid lg:grid-cols-5 gap-3 sm:gap-4 mb-6 lg:mb-12 overflow-x-auto lg:overflow-visible snap-x snap-mandatory scroll-smooth scrollbar-hide px-4 lg:px-0 -mx-4 lg:mx-0"
-    >
+    <!-- Right: race info (one panel per race, toggled) -->
+    <div>
       {races.map((race, i) => (
-        <button
-          class:list={[
-            'race-card group relative text-left bg-linen border rounded-xl p-4 sm:p-5 transition-all duration-300 cursor-pointer lg:hover:-translate-y-1 snap-center lg:snap-align-none flex-shrink-0 w-[78%] sm:w-[55%] md:w-[38%] lg:w-auto',
-            i === 0
-              ? 'border-moss/60 shadow-md shadow-moss/15'
-              : 'border-charcoal/10 lg:hover:border-moss/40',
-          ]}
-          data-race-index={i}
-          data-gpx={race.gpx}
-          data-has-loops={race.loops ? 'true' : 'false'}
-        >
-          <div class="text-3xl sm:text-4xl mb-3">{race.icon}</div>
-          <p class="text-terracotta text-[10px] sm:text-xs uppercase tracking-wider mb-1 font-medium leading-tight">{race.type}</p>
-          <h3 class="font-serif text-base sm:text-lg font-bold text-charcoal mb-2 leading-tight">{race.title}</h3>
-          <p class="text-moss font-serif text-xl sm:text-2xl font-bold">{race.distance}</p>
-          {race.ascent && <p class="text-clay text-xs mt-1">↗ {race.ascent}</p>}
-        </button>
-      ))}
-    </div>
+        <div class:list={['race-info', i === 0 ? '' : 'hidden']} data-info-index={i}>
+          <div class="mono-label mb-5">{race.roman} / {race.title}</div>
+          <h3 class="mb-5" style="font-family: var(--font-serif); font-weight: 400; line-height: 0.95; letter-spacing: -0.025em; font-size: clamp(44px, 5vw, 68px); margin: 0 0 20px;">
+            <em style="font-style: italic;">{race.type}</em>
+          </h3>
+          <p class="text-[15px] sm:text-[17px] leading-[1.55] opacity-85 m-0" style="text-wrap: pretty;">{race.desc}</p>
 
-    <!-- Pagination dots -->
-    <div id="race-dots" class="flex justify-center gap-2 mb-10 lg:hidden">
-      {races.map((_, i) => (
-        <button
-          class:list={[
-            'race-dot h-2 rounded-full transition-all duration-300 cursor-pointer',
-            i === 0 ? 'w-6 bg-moss' : 'w-2 bg-charcoal/20',
-          ]}
-          data-dot-index={i}
-          aria-label={`Aller à l'épreuve ${i + 1}`}
-        ></button>
-      ))}
-    </div>
-
-    <!-- Selected race details -->
-    <div class="mb-8">
-      {races.map((race, i) => (
-        <div
-          class:list={['race-info', i === 0 ? '' : 'hidden']}
-          data-info-index={i}
-        >
-          <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-2 mb-3">
-            <div>
-              <p class="text-terracotta text-xs uppercase tracking-wider">{race.type}</p>
-              <h3 class="font-serif text-2xl sm:text-3xl font-bold text-charcoal">{race.title}</h3>
+          <!-- Key facts grid -->
+          <div class="grid grid-cols-3 gap-px mt-8 border border-[color:var(--color-line)]" style="background: var(--color-line);">
+            <div class="p-4 sm:p-5" style="background: var(--color-bg);">
+              <div class="text-[9px] tracking-[0.22em] opacity-50 mb-1.5" style="font-family: var(--font-mono);">DISTANCE</div>
+              <div class="text-[color:var(--color-accent)]" style="font-family: var(--font-serif); font-size: clamp(20px, 2.2vw, 28px);">{race.dist} {race.unit.toLowerCase()}</div>
             </div>
-            <div class="text-right">
-              <span class="text-moss font-serif text-3xl sm:text-4xl font-bold">{race.distance}</span>
-              {race.ascent && <p class="text-clay text-xs mt-1">↗ {race.ascent}</p>}
+            <div class="p-4 sm:p-5" style="background: var(--color-bg);">
+              <div class="text-[9px] tracking-[0.22em] opacity-50 mb-1.5" style="font-family: var(--font-mono);">D+</div>
+              <div class="text-[color:var(--color-accent)]" style="font-family: var(--font-serif); font-size: clamp(20px, 2.2vw, 28px);">{race.dplus === '—' ? '—' : `${race.dplus} m`}</div>
+            </div>
+            <div class="p-4 sm:p-5" style="background: var(--color-bg);">
+              <div class="text-[9px] tracking-[0.22em] opacity-50 mb-1.5" style="font-family: var(--font-mono);">DÉPART</div>
+              <div class="text-[color:var(--color-accent)]" style="font-family: var(--font-serif); font-size: clamp(20px, 2.2vw, 28px);">{race.startTime}</div>
             </div>
           </div>
-          <p class="text-clay text-sm max-w-2xl leading-relaxed mb-3">{race.desc}</p>
-          <div class="flex flex-wrap gap-x-4 gap-y-1 text-xs text-clay">
-            <span>🕐 Départ {race.startTime}</span>
-            {race.duration && <span>· {race.duration}</span>}
-            <span>· {race.timed ? 'Chronométré' : 'Non chronométré'}</span>
-          </div>
+
+          {race.loops && (
+            <div class="mt-8">
+              <div class="text-[10px] tracking-[0.3em] opacity-50 mb-3" style="font-family: var(--font-mono);">QUATRE BOUCLES · QUATRE VALEURS</div>
+              {race.loops.map((loop) => (
+                <div class="grid items-baseline py-2.5 border-t border-[color:var(--color-line-soft)]" style="grid-template-columns: 40px 1fr auto auto; gap: 12px;">
+                  <span class="text-[color:var(--color-accent)]" style="font-family: var(--font-serif); font-style: italic; font-size: clamp(18px, 1.8vw, 22px);">{loop.roman}</span>
+                  <span class="text-[13px] sm:text-[15px] italic">« {loop.label} »</span>
+                  <span class="text-[10px] sm:text-[11px] opacity-70" style="font-family: var(--font-mono);">{loop.distance} · {loop.ascent}</span>
+                  <span class="hidden sm:inline text-[11px] opacity-70" style="font-family: var(--font-mono);">lim. {loop.timeLimit}</span>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       ))}
     </div>
-
-    <!-- Stats bar (single race) -->
-    <div id="stats-single" class="flex flex-wrap gap-x-6 gap-y-2 text-sm mb-6 px-1">
-      <div><span class="text-clay">Distance </span><span class="text-moss font-semibold" id="stat-distance">—</span></div>
-      <div><span class="text-clay">D+ </span><span class="text-moss font-semibold" id="stat-ascent">—</span></div>
-      <div><span class="text-clay">D− </span><span class="text-moss font-semibold" id="stat-descent">—</span></div>
-      <div><span class="text-clay">Alt. min </span><span class="text-moss font-semibold" id="stat-min-ele">—</span></div>
-      <div><span class="text-clay">Alt. max </span><span class="text-moss font-semibold" id="stat-max-ele">—</span></div>
-    </div>
-
-    <!-- Stats bar (multi-loop race) — total + per-segment -->
-    <div id="stats-multi" class="hidden mb-6 px-1">
-      <!-- Total line -->
-      <div class="flex flex-wrap gap-x-6 gap-y-2 text-sm mb-3">
-        <div><span class="text-clay">Total </span><span class="text-moss font-semibold" id="stat-total-distance">—</span></div>
-        <div><span class="text-clay">D+ </span><span class="text-moss font-semibold" id="stat-total-ascent">—</span></div>
-        <div><span class="text-clay">D− </span><span class="text-moss font-semibold" id="stat-total-descent">—</span></div>
-        <div><span class="text-clay">Alt. min </span><span class="text-moss font-semibold" id="stat-total-min-ele">—</span></div>
-        <div><span class="text-clay">Alt. max </span><span class="text-moss font-semibold" id="stat-total-max-ele">—</span></div>
-      </div>
-      <!-- Segment chips -->
-      <div id="loop-chips" class="flex flex-wrap gap-2">
-        <!-- Populated dynamically -->
-      </div>
-    </div>
-
-    <!-- Map -->
-    <div class="rounded-xl overflow-hidden border border-charcoal/10 mb-6 shadow-sm">
-      <div id="race-map" class="map-container"></div>
-    </div>
-
-    <!-- Elevation -->
-    <div class="bg-linen border border-charcoal/10 rounded-xl p-4 sm:p-6 shadow-sm">
-      <p class="text-moss text-xs uppercase tracking-wider mb-3 font-medium">Profil altimétrique</p>
-      <div class="elevation-container">
-        <canvas id="elevation-chart"></canvas>
-      </div>
-    </div>
   </div>
 </section>
+
+<style>
+  .race-card .race-diff-bar[data-filled="1"] { background: var(--color-accent); }
+  .race-card .race-diff-bar[data-filled="0"] { background: rgba(232,227,211,0.15); }
+  /* When card is active (gold bg), flip diff bars */
+  .race-card.is-active .race-diff-bar[data-filled="1"] { background: var(--color-bg); }
+  .race-card.is-active .race-diff-bar[data-filled="0"] { background: rgba(15,20,18,0.2); }
+  .race-card:not(.is-active):hover {
+    background: rgba(212,165,116,0.05) !important;
+  }
+</style>
 
 <script>
   import { parseGPX, parseMultiTrackGPX, type TrackData } from '../scripts/gpx-parser';
@@ -133,7 +147,6 @@ import { races } from '../data/races';
   import { races as racesData } from '../data/races';
 
   const cards = document.querySelectorAll('.race-card');
-  const dots = document.querySelectorAll('.race-dot');
   const carousel = document.getElementById('race-carousel')!;
   const infoPanels = document.querySelectorAll('.race-info');
   const mapContainer = document.getElementById('race-map')!;
@@ -142,20 +155,21 @@ import { races } from '../data/races';
   const statsMulti = document.getElementById('stats-multi')!;
   const loopChips = document.getElementById('loop-chips')!;
 
+  // Mark initial active card
+  (cards[0] as HTMLElement).classList.add('is-active');
+
   let currentMap: ReturnType<typeof initMap> | null = null;
   let currentMultiMap: MultiLoopMapResult | null = null;
   let currentChart: any = null;
   let activeIndex = 0;
   let activeLoopIndex = 0;
-
   const loopTrackDataCache: Record<number, TrackData[]> = {};
+  const allTrackData: TrackData[] = [];
 
   function resolveUrl(path: string): string {
     const base = import.meta.env.BASE_URL;
     return base.endsWith('/') ? base + path.replace(/^\//, '') : base + path;
   }
-
-  const allTrackData: TrackData[] = [];
 
   async function preloadAll() {
     const gpxUrls = Array.from(cards).map(card => (card as HTMLElement).dataset.gpx!);
@@ -164,12 +178,15 @@ import { races } from '../data/races';
     showRace(0);
   }
 
+  function fmtKm(v: number) { return `${v.toFixed(1)} km`; }
+  function fmtM(v: number) { return `${Math.round(v)} m`; }
+
   function showStatsSingle(data: TrackData) {
-    document.getElementById('stat-distance')!.textContent = `${data.totalDistance.toFixed(1)} km`;
-    document.getElementById('stat-ascent')!.textContent = `${Math.round(data.totalAscent)} m`;
-    document.getElementById('stat-descent')!.textContent = `${Math.round(data.totalDescent)} m`;
-    document.getElementById('stat-min-ele')!.textContent = `${Math.round(data.minEle)} m`;
-    document.getElementById('stat-max-ele')!.textContent = `${Math.round(data.maxEle)} m`;
+    document.getElementById('stat-distance')!.textContent = fmtKm(data.totalDistance);
+    document.getElementById('stat-ascent')!.textContent = fmtM(data.totalAscent);
+    document.getElementById('stat-descent')!.textContent = fmtM(data.totalDescent);
+    document.getElementById('stat-min-ele')!.textContent = fmtM(data.minEle);
+    document.getElementById('stat-max-ele')!.textContent = fmtM(data.maxEle);
   }
 
   function showStatsMultiTotal(loopData: TrackData[]) {
@@ -178,35 +195,32 @@ import { races } from '../data/races';
     const totalDesc = loopData.reduce((s, d) => s + d.totalDescent, 0);
     const minEle = Math.min(...loopData.map(d => d.minEle));
     const maxEle = Math.max(...loopData.map(d => d.maxEle));
-
-    document.getElementById('stat-total-distance')!.textContent = `${totalDist.toFixed(1)} km`;
-    document.getElementById('stat-total-ascent')!.textContent = `${Math.round(totalAsc)} m`;
-    document.getElementById('stat-total-descent')!.textContent = `${Math.round(totalDesc)} m`;
-    document.getElementById('stat-total-min-ele')!.textContent = `${Math.round(minEle)} m`;
-    document.getElementById('stat-total-max-ele')!.textContent = `${Math.round(maxEle)} m`;
+    document.getElementById('stat-total-distance')!.textContent = fmtKm(totalDist);
+    document.getElementById('stat-total-ascent')!.textContent = fmtM(totalAsc);
+    document.getElementById('stat-total-descent')!.textContent = fmtM(totalDesc);
+    document.getElementById('stat-total-min-ele')!.textContent = fmtM(minEle);
+    document.getElementById('stat-total-max-ele')!.textContent = fmtM(maxEle);
   }
 
   function buildLoopChips(raceIndex: number, loopTrackData: TrackData[]) {
     const race = racesData[raceIndex];
     if (!race.loops) return;
-
     loopChips.innerHTML = '';
     race.loops.forEach((loop, i) => {
       const data = loopTrackData[i];
-      const isActive = i === 0;
       const chip = document.createElement('button');
-      chip.className = `loop-chip flex items-center gap-2 px-3 py-2 rounded-lg border text-xs transition-all duration-300 cursor-pointer ${
-        isActive ? 'border-moss/60 bg-moss/5' : 'border-charcoal/10 bg-linen hover:border-moss/30'
-      }`;
+      chip.className = 'loop-chip flex items-center gap-2 px-3 py-2 border text-[11px] cursor-pointer transition-colors';
       chip.dataset.loopIndex = String(i);
-
+      chip.style.fontFamily = 'var(--font-mono)';
+      chip.style.background = i === 0 ? 'rgba(212,165,116,0.08)' : 'var(--color-bg-elev)';
+      chip.style.borderColor = i === 0 ? 'var(--color-accent)' : 'var(--color-line)';
+      chip.style.color = 'var(--color-ink)';
       chip.innerHTML = `
-        <span class="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold text-white flex-shrink-0" style="background: ${loop.color};">${i + 1}</span>
-        <span class="text-charcoal font-medium">${data.totalDistance.toFixed(1)} km</span>
-        <span class="text-moss">↗ ${Math.round(data.totalAscent)}</span>
-        <span class="text-clay hidden sm:inline">⏱ ${loop.timeLimit}</span>
+        <span style="width: 18px; height: 18px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700; color: #0f1412; background: ${loop.color};">${i + 1}</span>
+        <span>${fmtKm(data.totalDistance)}</span>
+        <span style="color: var(--color-accent);">↗ ${Math.round(data.totalAscent)}</span>
+        <span class="hidden sm:inline opacity-60">lim. ${loop.timeLimit}</span>
       `;
-
       chip.addEventListener('click', () => selectLoop(raceIndex, i, loopTrackData));
       loopChips.appendChild(chip);
     });
@@ -214,36 +228,19 @@ import { races } from '../data/races';
 
   function updateChipStyles(activeLoop: number) {
     loopChips.querySelectorAll('.loop-chip').forEach((chip, i) => {
-      if (i === activeLoop) {
-        chip.classList.remove('border-charcoal/10', 'bg-linen');
-        chip.classList.add('border-moss/60', 'bg-moss/5');
-      } else {
-        chip.classList.remove('border-moss/60', 'bg-moss/5');
-        chip.classList.add('border-charcoal/10', 'bg-linen');
-      }
+      const el = chip as HTMLElement;
+      el.style.background = i === activeLoop ? 'rgba(212,165,116,0.08)' : 'var(--color-bg-elev)';
+      el.style.borderColor = i === activeLoop ? 'var(--color-accent)' : 'var(--color-line)';
     });
   }
 
   function updateCardStyles(selectedIndex: number) {
     cards.forEach((card, i) => {
       const el = card as HTMLElement;
-      if (i === selectedIndex) {
-        el.classList.remove('border-charcoal/10');
-        el.classList.add('border-moss/60', 'shadow-md', 'shadow-moss/15');
-      } else {
-        el.classList.remove('border-moss/60', 'shadow-md', 'shadow-moss/15');
-        el.classList.add('border-charcoal/10');
-      }
-    });
-    dots.forEach((dot, i) => {
-      const el = dot as HTMLElement;
-      if (i === selectedIndex) {
-        el.classList.remove('w-2', 'bg-charcoal/20');
-        el.classList.add('w-6', 'bg-moss');
-      } else {
-        el.classList.remove('w-6', 'bg-moss');
-        el.classList.add('w-2', 'bg-charcoal/20');
-      }
+      const isActive = i === selectedIndex;
+      el.classList.toggle('is-active', isActive);
+      el.style.background = isActive ? 'var(--color-accent)' : 'var(--color-bg)';
+      el.style.color = isActive ? 'var(--color-bg)' : 'var(--color-ink)';
     });
     infoPanels.forEach((panel, i) => {
       panel.classList.toggle('hidden', i !== selectedIndex);
@@ -253,12 +250,7 @@ import { races } from '../data/races';
   function selectLoop(raceIndex: number, loopIndex: number, loopTrackData: TrackData[]) {
     activeLoopIndex = loopIndex;
     updateChipStyles(loopIndex);
-
-    if (currentMultiMap) {
-      currentMultiMap.setActiveLoop(loopIndex);
-    }
-
-    // Animate transition to new elevation data
+    if (currentMultiMap) currentMultiMap.setActiveLoop(loopIndex);
     if (currentChart) {
       updateElevationChart(currentChart, loopTrackData[loopIndex], (index) => {
         currentMultiMap?.setMarkerAt(index);
@@ -275,40 +267,31 @@ import { races } from '../data/races';
   async function showRace(raceIndex: number) {
     cleanupMap();
     updateCardStyles(raceIndex);
-
     const race = racesData[raceIndex];
 
     if (race.loops) {
       statsSingle.classList.add('hidden');
       statsMulti.classList.remove('hidden');
-
       if (!loopTrackDataCache[raceIndex]) {
         loopTrackDataCache[raceIndex] = await parseMultiTrackGPX(resolveUrl(race.gpx));
       }
-
       const loopTrackData = loopTrackDataCache[raceIndex];
       const colors = race.loops.map(l => l.color);
-
       showStatsMultiTotal(loopTrackData);
       buildLoopChips(raceIndex, loopTrackData);
-
       activeLoopIndex = 0;
-
       currentMultiMap = initMultiLoopMap(mapContainer, loopTrackData, colors, 0);
       currentChart = initElevationChart(canvas, loopTrackData[0], (index) => {
         currentMultiMap?.setMarkerAt(index);
       });
-
       mapContainer.addEventListener('loopchange', ((e: CustomEvent) => {
         selectLoop(raceIndex, e.detail.index, loopTrackData);
       }) as EventListener);
     } else {
       statsSingle.classList.remove('hidden');
       statsMulti.classList.add('hidden');
-
       const trackData = allTrackData[raceIndex];
       showStatsSingle(trackData);
-
       currentMap = initMap(mapContainer, trackData);
       currentChart = initElevationChart(canvas, trackData, (index) => {
         currentMap?.setMarkerAt(index);
@@ -331,18 +314,6 @@ import { races } from '../data/races';
     });
   });
 
-  dots.forEach((dot) => {
-    dot.addEventListener('click', () => {
-      const index = parseInt((dot as HTMLElement).dataset.dotIndex!);
-      const card = cards[index] as HTMLElement;
-      card.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
-      if (index !== activeIndex) {
-        activeIndex = index;
-        showRace(index);
-      }
-    });
-  });
-
   let scrollTimeout: number;
   carousel.addEventListener('scroll', () => {
     if (window.innerWidth >= CAROUSEL_BREAKPOINT) return;
@@ -356,10 +327,7 @@ import { races } from '../data/races';
         const rect = (card as HTMLElement).getBoundingClientRect();
         const cardCenter = rect.left + rect.width / 2;
         const dist = Math.abs(cardCenter - carouselCenter);
-        if (dist < closestDist) {
-          closestDist = dist;
-          closestIndex = i;
-        }
+        if (dist < closestDist) { closestDist = dist; closestIndex = i; }
       });
       if (closestIndex !== activeIndex) {
         activeIndex = closestIndex;

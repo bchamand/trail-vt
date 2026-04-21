@@ -3,11 +3,11 @@ import type { TrackData } from './gpx-parser';
 
 Chart.register(...registerables);
 
-const BRIQUE = '#B85A3E';
-const TEXT = '#3B2F26';
-const TEXT_MUTED = 'rgba(59, 47, 38, 0.5)';
-const GRID = 'rgba(59, 47, 38, 0.08)';
-const BORDER = 'rgba(59, 47, 38, 0.15)';
+const BRIQUE = '#d4a574';
+const TEXT = '#e8e3d3';
+const TEXT_MUTED = 'rgba(232, 227, 211, 0.5)';
+const GRID = 'rgba(232, 227, 211, 0.08)';
+const BORDER = 'rgba(232, 227, 211, 0.15)';
 
 export function initElevationChart(
   canvas: HTMLCanvasElement,
@@ -18,8 +18,8 @@ export function initElevationChart(
 
   // Gradient fill — brique toulousaine warm wash
   const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-  gradient.addColorStop(0, 'rgba(184, 90, 62, 0.35)');
-  gradient.addColorStop(1, 'rgba(184, 90, 62, 0.03)');
+  gradient.addColorStop(0, 'rgba(212, 165, 116, 0.35)');
+  gradient.addColorStop(1, 'rgba(212, 165, 116, 0.03)');
 
   const dataPoints = trackData.distances.map((d, i) => ({
     x: d,
@@ -38,7 +38,7 @@ export function initElevationChart(
         pointRadius: 0,
         pointHoverRadius: 5,
         pointHoverBackgroundColor: BRIQUE,
-        pointHoverBorderColor: '#FAF5EB',
+        pointHoverBorderColor: '#0f1412',
         pointHoverBorderWidth: 2,
         tension: 0.3,
       }],
@@ -62,10 +62,10 @@ export function initElevationChart(
       plugins: {
         legend: { display: false },
         tooltip: {
-          backgroundColor: 'rgba(250, 245, 235, 0.98)',
+          backgroundColor: 'rgba(21, 28, 24, 0.95)',
           titleColor: BRIQUE,
           bodyColor: TEXT,
-          borderColor: 'rgba(184, 90, 62, 0.3)',
+          borderColor: 'rgba(212, 165, 116, 0.3)',
           borderWidth: 1,
           cornerRadius: 8,
           padding: 12,
