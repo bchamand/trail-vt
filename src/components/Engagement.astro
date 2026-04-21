@@ -1,4 +1,6 @@
 ---
+const base = import.meta.env.BASE_URL;
+const marieLouise = `${base}${base.endsWith('/') ? '' : '/'}images/logo-marie-louise.png`;
 ---
 <section id="engagement"
   class="border-t border-[color:var(--color-line-soft)]"
@@ -8,7 +10,7 @@
        style="gap: clamp(24px, 4vw, 60px);">
     <div class="logo-tile mx-auto lg:mx-0"
          style="width: clamp(140px, 18vw, 220px); height: clamp(140px, 18vw, 220px); padding: clamp(14px, 1.5vw, 20px);">
-      <img src="/images/logo-marie-louise.png" alt="Fondation Marie-Louise"
+      <img src={marieLouise} alt="Fondation Marie-Louise"
            style="max-width: 100%; max-height: 100%; object-fit: contain;" />
     </div>
     <div>

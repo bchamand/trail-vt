@@ -1,4 +1,8 @@
 ---
+const base = import.meta.env.BASE_URL;
+const withBase = (p: string) => `${base}${base.endsWith('/') ? '' : '/'}${p.replace(/^\//, '')}`;
+const lionsLogo = withBase('images/logo-lions.png');
+const marieLouise = withBase('images/logo-marie-louise.png');
 ---
 <footer class="border-t border-[color:var(--color-line-soft)]"
   style="padding: clamp(32px, 5vw, 48px) clamp(20px, 4vw, 80px) clamp(24px, 3vw, 32px);">
@@ -10,11 +14,11 @@
     </div>
     <div class="flex gap-5 sm:gap-10 items-center">
       <div class="logo-tile" style="padding: 10px;">
-        <img src="/images/logo-lions.png" alt="Lions Club Toulouse Arènes Romaines"
+        <img src={lionsLogo} alt="Lions Club Toulouse Arènes Romaines"
              style="height: clamp(50px, 6vw, 70px); object-fit: contain;" />
       </div>
       <div class="logo-tile" style="padding: 10px;">
-        <img src="/images/logo-marie-louise.png" alt="Fondation Marie-Louise"
+        <img src={marieLouise} alt="Fondation Marie-Louise"
              style="height: clamp(44px, 6vw, 70px); object-fit: contain;" />
       </div>
     </div>
