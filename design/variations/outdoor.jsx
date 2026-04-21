@@ -282,7 +282,7 @@ const OutdoorLanding = ({ assets, gpx }) => {
           <div style={{ fontSize: isMobile ? 10 : 11, letterSpacing: '0.3em', fontFamily: '"JetBrains Mono", monospace', color: '#d4a574', marginBottom: 20 }}>— §02 / LE SOIR</div>
           <h2 style={{ fontFamily: '"Instrument Serif", serif', fontSize: h2Big, lineHeight: 0.88, fontWeight: 400, margin: 0, letterSpacing: '-0.03em' }}>Le <em style={{ color: '#d4a574' }}>Banquet</em><br/>des Chefs.</h2>
           <p style={{ fontSize: isMobile ? 15 : 16, lineHeight: 1.6, opacity: 0.85, marginTop: 24, maxWidth: 460, textWrap: 'pretty' }}>
-            La nuit tombée, le village se rassemble. Banquet organisé par le Comité des Fêtes — tables longues, produits du Lauragais, breuvage des conquérants. Inscription séparée.
+            La nuit tombée, le village se rassemble. Banquet organisé par le <em style={{ color: '#d4a574', fontStyle: 'normal', fontWeight: 500 }}>Golf de Vieille-Toulouse</em> — tables longues, produits du Lauragais, breuvage des conquérants. Inscription séparée.
           </p>
           <button style={{ background: '#d4a574', color: '#0f1412', border: 'none', padding: isMobile ? '14px 24px' : '14px 28px', fontSize: 12, fontWeight: 600, letterSpacing: '0.2em', cursor: 'pointer', fontFamily: 'inherit', marginTop: 24, width: isMobile ? '100%' : 'auto' }}>RÉSERVER SA PLACE →</button>
         </div>
@@ -310,29 +310,96 @@ const OutdoorLanding = ({ assets, gpx }) => {
         </div>
       </section>
 
-      {/* CTA */}
-      <section style={{ padding: isMobile ? '80px 20px 72px' : `120px ${pad}px 100px`, textAlign: 'center', background: '#0a0e0c', borderTop: '1px solid rgba(232,227,211,0.1)' }}>
-        <div style={{ fontSize: isMobile ? 9 : 10, letterSpacing: '0.3em', fontFamily: '"JetBrains Mono", monospace', color: '#d4a574', marginBottom: isMobile ? 20 : 32 }}>— III · X · MMXXVI / INSCRIPTIONS OUVERTES</div>
-        <h2 style={{ fontFamily: '"Instrument Serif", serif', fontSize: ctaTitle, lineHeight: 0.82, fontWeight: 400, letterSpacing: '-0.04em', margin: isMobile ? '0 0 32px' : '0 0 48px' }}>
-          Héritier de<br/><em style={{ color: '#d4a574' }}>Copilos</em> ?
-        </h2>
-        <button style={{ background: '#d4a574', color: '#0f1412', border: 'none', padding: isMobile ? '18px 32px' : '22px 48px', fontSize: 13, fontWeight: 600, letterSpacing: '0.2em', cursor: 'pointer', fontFamily: 'inherit', width: isMobile ? '100%' : 'auto' }}>PRENDRE SON DOSSARD →</button>
-      </section>
+      {/* FINAL — CTA + FOOTER fusionnés, une seule page écran */}
+      <section style={{ background: '#0a0e0c', borderTop: '1px solid rgba(232,227,211,0.1)', position: 'relative' }}>
+        {/* CTA */}
+        <div style={{ padding: isMobile ? '64px 20px 48px' : `96px ${pad}px 72px`, textAlign: 'center', position: 'relative' }}>
+          <div style={{ fontSize: isMobile ? 9 : 10, letterSpacing: '0.32em', fontFamily: '"JetBrains Mono", monospace', color: '#d4a574', marginBottom: isMobile ? 20 : 28 }}>
+            — III · X · MMXXVI &nbsp;/&nbsp; INSCRIPTIONS OUVERTES
+          </div>
+          <h2 style={{ fontFamily: '"Instrument Serif", serif', fontSize: isMobile ? 56 : isTablet ? 84 : 108, lineHeight: 0.9, fontWeight: 400, letterSpacing: '-0.035em', margin: isMobile ? '0 0 28px' : '0 0 40px' }}>
+            Héritier de <em style={{ color: '#d4a574' }}>Copilos</em> ?
+          </h2>
+          <button style={{ background: '#d4a574', color: '#0f1412', border: 'none', padding: isMobile ? '16px 28px' : '18px 40px', fontSize: 12, fontWeight: 600, letterSpacing: '0.22em', cursor: 'pointer', fontFamily: 'inherit', width: isMobile ? '100%' : 'auto' }}>
+            PRENDRE SON DOSSARD →
+          </button>
+        </div>
 
-      <footer style={{ padding: isMobile ? '32px 20px 24px' : `48px ${pad}px 32px`, borderTop: '1px solid rgba(232,227,211,0.1)' }}>
-        <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', justifyContent: 'space-between', alignItems: 'center', gap: isMobile ? 24 : 40, flexWrap: 'wrap', marginBottom: 24 }}>
-          <div style={{ fontSize: 10, letterSpacing: '0.2em', fontFamily: '"JetBrains Mono", monospace', opacity: 0.6, textAlign: isMobile ? 'center' : 'left' }}>
-            TRAIL DES TECTOSAGES · VIEILLE-TOULOUSE · MMXXVI
+        {/* FOOTER — colonnes structurées */}
+        <footer style={{ padding: isMobile ? '36px 20px 24px' : `48px ${pad}px 28px`, borderTop: '1px solid rgba(232,227,211,0.1)' }}>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: isMobile ? '1fr' : '1.4fr 1fr 1fr 1fr',
+            gap: isMobile ? 32 : 48,
+            marginBottom: isMobile ? 32 : 40,
+            alignItems: 'flex-start',
+          }}>
+            {/* Col 1 — identité */}
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
+                <div style={{ width: 30, height: 30, border: '1.5px solid #d4a574', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: '"Instrument Serif", serif', fontSize: 14, fontStyle: 'italic', color: '#d4a574' }}>T</div>
+                <div style={{ fontFamily: '"Instrument Serif", serif', fontSize: 20, fontWeight: 400 }}>
+                  Trail des <em style={{ color: '#d4a574' }}>Tectosages</em>
+                </div>
+              </div>
+              <div style={{ fontSize: 10, letterSpacing: '0.24em', fontFamily: '"JetBrains Mono", monospace', opacity: 0.55, marginBottom: 14 }}>ÉDITION I · MMXXVI</div>
+              <p style={{ fontSize: 13, lineHeight: 1.55, opacity: 0.65, margin: 0, maxWidth: 340, textWrap: 'pretty' }}>
+                Samedi 3 octobre 2026 · Vieille-Toulouse, Haute-Garonne.
+              </p>
+            </div>
+
+            {/* Col 2 — navigation */}
+            <div>
+              <div style={{ fontSize: 10, letterSpacing: '0.26em', fontFamily: '"JetBrains Mono", monospace', color: '#d4a574', marginBottom: 16, opacity: 0.85 }}>ÉVÉNEMENT</div>
+              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {['Les épreuves', 'L\'histoire', 'Le banquet', 'Règlement', 'FAQ'].map(l => (
+                  <li key={l}><a href="#" style={{ color: '#e8e3d3', textDecoration: 'none', fontSize: 13, opacity: 0.8 }}>{l}</a></li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Col 3 — contact */}
+            <div>
+              <div style={{ fontSize: 10, letterSpacing: '0.26em', fontFamily: '"JetBrains Mono", monospace', color: '#d4a574', marginBottom: 16, opacity: 0.85 }}>CONTACT</div>
+              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 10 }}>
+                <li><a href="mailto:contact@tectosages.fr" style={{ color: '#e8e3d3', textDecoration: 'none', fontSize: 13, opacity: 0.8 }}>contact@tectosages.fr</a></li>
+                <li><a href="#" style={{ color: '#e8e3d3', textDecoration: 'none', fontSize: 13, opacity: 0.8 }}>Instagram</a></li>
+                <li><a href="#" style={{ color: '#e8e3d3', textDecoration: 'none', fontSize: 13, opacity: 0.8 }}>Presse & médias</a></li>
+              </ul>
+            </div>
+
+            {/* Col 4 — partenaires */}
+            <div>
+              <div style={{ fontSize: 10, letterSpacing: '0.26em', fontFamily: '"JetBrains Mono", monospace', color: '#d4a574', marginBottom: 16, opacity: 0.85 }}>AVEC</div>
+              <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
+                <div style={{ background: '#e8e3d3', padding: 6, borderRadius: 2 }}><img src={assets.lions} style={{ height: 42, objectFit: 'contain', display: 'block' }}/></div>
+                <div style={{ background: '#e8e3d3', padding: 6, borderRadius: 2 }}><img src={assets.marieLouise} style={{ height: 42, objectFit: 'contain', display: 'block' }}/></div>
+                <div style={{ background: '#e8e3d3', padding: 6, borderRadius: 2 }}><img src={assets.golf} style={{ height: 42, objectFit: 'contain', display: 'block' }}/></div>
+              </div>
+              <div style={{ fontSize: 10, letterSpacing: '0.16em', fontFamily: '"JetBrains Mono", monospace', opacity: 0.5, marginTop: 12, lineHeight: 1.6 }}>
+                Lions Club Toulouse Arènes Romaines<br/>Fondation Marie-Louise<br/>Golf de Vieille-Toulouse
+              </div>
+            </div>
           </div>
-          <div style={{ display: 'flex', gap: isMobile ? 20 : 40, alignItems: 'center' }}>
-            <div style={{ background: '#e8e3d3', padding: 10 }}><img src={assets.lions} style={{ height: isMobile ? 50 : 70, objectFit: 'contain' }}/></div>
-            <div style={{ background: '#e8e3d3', padding: 10 }}><img src={assets.marieLouise} style={{ height: isMobile ? 44 : 70, objectFit: 'contain' }}/></div>
+
+          {/* Bottom line */}
+          <div style={{
+            display: 'flex', flexDirection: isMobile ? 'column' : 'row',
+            justifyContent: 'space-between', alignItems: isMobile ? 'flex-start' : 'center',
+            gap: isMobile ? 10 : 20,
+            paddingTop: isMobile ? 20 : 24,
+            borderTop: '1px solid rgba(232,227,211,0.08)',
+            fontSize: 10, letterSpacing: '0.2em', fontFamily: '"JetBrains Mono", monospace', opacity: 0.45,
+          }}>
+            <div>© MMXXVI · ASSOCIATION TRAIL DES TECTOSAGES</div>
+            <div style={{ display: 'flex', gap: 24 }}>
+              <a href="#" style={{ color: 'inherit', textDecoration: 'none' }}>MENTIONS LÉGALES</a>
+              <a href="#" style={{ color: 'inherit', textDecoration: 'none' }}>CGV</a>
+              <a href="#" style={{ color: 'inherit', textDecoration: 'none' }}>CONFIDENTIALITÉ</a>
+            </div>
           </div>
-        </div>
-        <div style={{ fontSize: isMobile ? 9 : 10, letterSpacing: '0.18em', fontFamily: '"JetBrains Mono", monospace', opacity: 0.4, textAlign: 'center', lineHeight: 1.8 }}>
-          ASSOCIATION TRAIL DES TECTOSAGES · COMITÉ DES FÊTES · LIONS CLUB TOULOUSE ARÈNES ROMAINES · FONDATION MARIE-LOUISE
-        </div>
-      </footer>
+        </footer>
+      </section>
     </div>
   );
 };
