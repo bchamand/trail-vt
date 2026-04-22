@@ -1,24 +1,35 @@
 ---
+interface Props {
+  data: {
+    label: string;
+    titleLine1: string;
+    titleEmphasis: string;
+    titleLine2: string;
+    body: string;
+    cta: string;
+    ctaUrl: string;
+    imagePlaceholder: string;
+  };
+}
+const { data } = Astro.props;
 ---
 <section id="banquet"
   class="border-t border-[color:var(--color-line-soft)] grid grid-cols-1 lg:grid-cols-2 items-center"
   style="padding: clamp(72px, 10vw, 120px) clamp(20px, 4vw, 80px); gap: clamp(32px, 5vw, 80px);">
 
   <div>
-    <div class="mono-label mb-5">— §02 / LE SOIR</div>
-    <h2 class="h2-big">Le <em style="color: var(--color-accent); font-style: italic;">Banquet</em><br/>des Chefs.</h2>
-    <p class="mt-6 text-[15px] sm:text-[16px] leading-[1.6] opacity-85 max-w-[460px]" style="text-wrap: pretty;">
-      La nuit tombée, le village se rassemble. Banquet organisé par le <em style="color: var(--color-accent); font-style: normal; font-weight: 500;">Golf de Vieille-Toulouse</em> — tables longues, produits du Lauragais, breuvage des conquérants. Inscription séparée.
-    </p>
-    <a href="https://chrono-start.com/" target="_blank" rel="noopener noreferrer"
+    <div class="mono-label mb-5">{data.label}</div>
+    <h2 class="h2-big">{data.titleLine1}<em style="color: var(--color-accent); font-style: italic;">{data.titleEmphasis}</em><br/>{data.titleLine2}</h2>
+    <p class="mt-6 text-[15px] sm:text-[16px] leading-[1.6] opacity-85 max-w-[460px]" style="text-wrap: pretty;" set:html={data.body} />
+    <a href={data.ctaUrl} target="_blank" rel="noopener noreferrer"
        class="btn-gold mt-6 w-full sm:w-auto"
-       style="padding: 14px 28px; letter-spacing: 0.2em;">RÉSERVER SA PLACE →</a>
+       style="padding: 14px 28px; letter-spacing: 0.2em;">{data.cta}</a>
   </div>
 
   <div class="relative border border-[color:var(--color-line)] flex items-center justify-center"
        style="background: var(--color-bg-elev); height: clamp(260px, 40vw, 480px);">
     <div class="text-center opacity-40 text-[11px] tracking-[0.22em] leading-[1.8]"
-         style="font-family: var(--font-mono);">PHOTO BANQUET<br/>[À FOURNIR]</div>
+         style="font-family: var(--font-mono);" set:html={data.imagePlaceholder} />
     <div class="absolute pointer-events-none" style="inset: 16px; border: 1px solid rgba(212,165,116,0.2);"></div>
   </div>
 </section>

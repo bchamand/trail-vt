@@ -1,0 +1,119 @@
+main:
+  name: Trail des Tectosages
+  nameShort: Trail des
+  nameEmphasis: Tectosages
+  initial: T
+  edition: I
+  year: 2026
+  dateFull: Samedi 3 octobre 2026
+  dateShort: SAM. 3 OCTOBRE
+  dateShortMobile: 3 OCT
+  dateBadge: SAM. 3 OCT. 2026
+  location: Vieille-Toulouse, Haute-Garonne
+  locationShort: VIEILLE-TOULOUSE · HAUTE-GARONNE
+  tagline: Sur la trace des Volques Tectosages.
+  description: >-
+    Vieille-Toulouse fut la capitale des Volques Tectosages il y a 2300 ans.
+    Cinq épreuves, un territoire, une première édition.
+  heroImage: /images/garonne.jpg
+
+  urls:
+    registration: https://chrono-start.com/
+    contactEmail: contact@tectosages.fr
+
+  nav:
+    - { label: ÉPREUVES,   href: '#epreuves'   }
+    - { label: HISTOIRE,   href: '#histoire'   }
+    - { label: BANQUET,    href: '#banquet'    }
+    - { label: ENGAGEMENT, href: '#engagement' }
+
+  ctaLabel: S'INSCRIRE
+  heroCtaLabel: PRENDRE SON DOSSARD →
+
+  stats:
+    - { big: '{edition}',       small: ÉDITION  }
+    - { big: '{raceCount}',     small: ÉPREUVES }
+    - { big: '{maxDistance}KM', small: DÉFI MAX }
+    - { big: '3 OCT.',          small: SAMEDI   }
+
+  racesSection:
+    label: — §01 / LES ÉPREUVES
+    titleLine1: Cinq départs.
+    titleLine2: Un seul territoire.
+    tagline: >-
+      Du Défi de Copilos à la Tectokids, chacune et chacun trouve sa boucle.
+      Tout se court en fin d'après-midi — arrivée avant la tombée de la nuit.
+
+  storytelling:
+    label: — §00 / L'HISTOIRE
+    title: 'Les traileurs sont-ils les'
+    titleEmphasis: 'descendants des Tectosages ?'
+    pillars:
+      - n: 'I'
+        title: L'ESPRIT DE CONQUÊTE
+        body: >-
+          Partir à la conquête du territoire de Tolosa — comme nos ancêtres gaulois,
+          il y a 2300 ans.
+      - n: 'II'
+        title: COURAGE · BRAVOURE · HONNEUR
+        body: >-
+          Trois valeurs, trois boucles. Chaque passage qualifie ou élimine.
+          Seuls les dignes franchiront.
+      - n: 'III'
+        title: LE DÉFI DE COPILOS
+        body: >-
+          Dernier chef gaulois des Tectosages. Son nom reste à celles et ceux
+          qui complètent les quatre boucles.
+
+  banquet:
+    label: — §02 / LE SOIR
+    titleLine1: 'Le '
+    titleEmphasis: Banquet
+    titleLine2: des Chefs.
+    body: >-
+      La nuit tombée, le village se rassemble. Banquet organisé par le
+      <em>Golf de Vieille-Toulouse</em> — tables longues, produits du Lauragais,
+      breuvage des conquérants. Inscription séparée.
+    cta: RÉSERVER SA PLACE →
+    ctaUrl: https://chrono-start.com/
+    imagePlaceholder: 'PHOTO BANQUET<br/>[À FOURNIR]'
+
+  engagement:
+    label: — §03 / NOTRE ENGAGEMENT
+    titleLine1: Une part des inscriptions
+    titleLine2: 'pour la '
+    titleEmphasis: Fondation Marie-Louise
+    body: >-
+      Le Trail des Tectosages s'engage au côté de la Fondation Marie-Louise,
+      dont l'action caritative est portée par le Lions Club Toulouse Arènes Romaines.
+      Chaque dossard vendu contribue à cet engagement.
+    logo: /images/logo-marie-louise.png
+    logoAlt: Fondation Marie-Louise
+
+  cta:
+    label: — SAM. 3 OCT. 2026 &nbsp;/&nbsp; INSCRIPTIONS OUVERTES
+    titleLine1: Héritier de
+    titleEmphasis: Copilos
+    titleSuffix: '?'
+    button: PRENDRE SON DOSSARD →
+
+  footer:
+    legal: © 2026 · ASSOCIATION TRAIL DES TECTOSAGES
+    eventLinks:
+      - { label: Les épreuves, href: '#epreuves' }
+      - { label: L'histoire,   href: '#histoire' }
+      - { label: Le banquet,   href: '#banquet'  }
+      - { label: Règlement,    href: '#'         }
+      - { label: FAQ,          href: '#'         }
+    contactLinks:
+      - { label: contact@tectosages.fr, href: 'mailto:contact@tectosages.fr' }
+      - { label: Instagram,             href: '#' }
+      - { label: Presse & médias,       href: '#' }
+    partners:
+      - { name: Lions Club Toulouse Arènes Romaines, logo: /images/logo-lions.png }
+      - { name: Fondation Marie-Louise,              logo: /images/logo-marie-louise.png }
+      - { name: Golf de Vieille-Toulouse,            logo: /images/logo-golf.png }
+    legalLinks:
+      - { label: MENTIONS LÉGALES,  href: '#' }
+      - { label: CGV,               href: '#' }
+      - { label: CONFIDENTIALITÉ,   href: '#' }

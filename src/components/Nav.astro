@@ -1,31 +1,36 @@
 ---
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  event: CollectionEntry<'event'>['data'];
+}
+const { event } = Astro.props;
 ---
 <header id="site-nav" class="fixed top-0 left-0 right-0 z-40 transition-[background,border,backdrop-filter] duration-300 border-b border-transparent bg-transparent">
   <div class="flex items-center justify-between px-4 sm:px-6 lg:px-8 py-3 lg:py-4">
     <!-- Brand -->
     <a href="#top" class="flex items-center gap-3 sm:gap-3.5 no-underline text-[color:var(--color-ink)]">
       <span class="flex items-center justify-center rounded-full border shrink-0 text-[14px] sm:text-[16px]"
-            style="width: clamp(28px, 3vw, 36px); height: clamp(28px, 3vw, 36px); border-color: var(--color-accent); border-width: 1.5px; color: var(--color-accent); font-family: var(--font-serif); font-style: italic;">T</span>
+            style="width: clamp(28px, 3vw, 36px); height: clamp(28px, 3vw, 36px); border-color: var(--color-accent); border-width: 1.5px; color: var(--color-accent); font-family: var(--font-serif); font-style: italic;">{event.initial}</span>
       <span class="flex flex-col leading-none">
         <span class="text-[16px] sm:text-[20px] tracking-[0.005em]" style="font-family: var(--font-serif); font-weight: 400;">
-          Trail des <em style="color: var(--color-accent); font-style: italic;">Tectosages</em>
+          {event.nameShort} <em style="color: var(--color-accent); font-style: italic;">{event.nameEmphasis}</em>
         </span>
-        <span class="text-[9px] sm:text-[10px] mt-[5px] opacity-60 tracking-[0.24em]" style="font-family: var(--font-mono);">ÉDITION I · 2026</span>
+        <span class="text-[9px] sm:text-[10px] mt-[5px] opacity-60 tracking-[0.24em]" style="font-family: var(--font-mono);">ÉDITION {event.edition} · {event.year}</span>
       </span>
     </a>
 
     <!-- Desktop links -->
     <nav class="hidden md:flex items-center gap-6 lg:gap-8 text-[12px] font-medium tracking-[0.08em]">
-      <a href="#epreuves" class="hover:text-[color:var(--color-accent)] transition-colors">ÉPREUVES</a>
-      <a href="#histoire" class="hover:text-[color:var(--color-accent)] transition-colors">HISTOIRE</a>
-      <a href="#banquet" class="hover:text-[color:var(--color-accent)] transition-colors">BANQUET</a>
-      <a href="#engagement" class="hover:text-[color:var(--color-accent)] transition-colors">ENGAGEMENT</a>
+      {event.nav.map(link => (
+        <a href={link.href} class="hover:text-[color:var(--color-accent)] transition-colors">{link.label}</a>
+      ))}
     </nav>
 
     <!-- Desktop CTA -->
-    <a href="https://chrono-start.com/" target="_blank" rel="noopener noreferrer"
+    <a href={event.urls.registration} target="_blank" rel="noopener noreferrer"
        class="hidden md:inline-flex items-center bg-[color:var(--color-accent)] text-[color:var(--color-bg)] px-5 py-2.5 text-[12px] font-semibold tracking-[0.12em] hover:brightness-110 transition"
-       style="font-family: inherit;">S'INSCRIRE</a>
+       style="font-family: inherit;">{event.ctaLabel}</a>
 
     <!-- Mobile menu toggle -->
     <button id="nav-toggle" aria-label="Menu" class="md:hidden p-1.5 bg-transparent border-0 cursor-pointer">
@@ -40,12 +45,11 @@
   <div id="nav-drawer" class="md:hidden hidden border-b"
        style="background: rgba(10,14,12,0.97); backdrop-filter: blur(16px); border-color: rgba(232,227,211,0.1);">
     <nav class="flex flex-col px-5 pt-4 pb-6">
-      <a href="#epreuves" class="nav-drawer-link">ÉPREUVES</a>
-      <a href="#histoire" class="nav-drawer-link">HISTOIRE</a>
-      <a href="#banquet" class="nav-drawer-link">BANQUET</a>
-      <a href="#engagement" class="nav-drawer-link">ENGAGEMENT</a>
-      <a href="https://chrono-start.com/" target="_blank" rel="noopener noreferrer"
-         class="mt-5 btn-gold w-full" style="padding: 16px; letter-spacing: 0.16em; font-size: 13px;">S'INSCRIRE</a>
+      {event.nav.map(link => (
+        <a href={link.href} class="nav-drawer-link">{link.label}</a>
+      ))}
+      <a href={event.urls.registration} target="_blank" rel="noopener noreferrer"
+         class="mt-5 btn-gold w-full" style="padding: 16px; letter-spacing: 0.16em; font-size: 13px;">{event.ctaLabel}</a>
     </nav>
   </div>
 </header>
@@ -77,7 +81,6 @@
     icon.innerHTML = isOpen ? OPEN_ICON : CLOSE_ICON;
   });
 
-  // Close drawer when a link is clicked
   drawer.querySelectorAll('a').forEach((a) => {
     a.addEventListener('click', () => {
       drawer.classList.add('hidden');

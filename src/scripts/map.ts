@@ -1,5 +1,5 @@
 import maplibregl from 'maplibre-gl';
-import type { TrackData } from './gpx-parser';
+import type { Track } from '../lib/gpx';
 
 const INK = '#e8e3d3';
 const ACCENT = '#d4a574';
@@ -157,7 +157,7 @@ export interface SingleMapResult {
   clearMarker: () => void;
 }
 
-export function initMap(container: HTMLElement, trackData: TrackData): SingleMapResult {
+export function initMap(container: HTMLElement, trackData: Track): SingleMapResult {
   const bounds = new maplibregl.LngLatBounds(trackData.coords[0], trackData.coords[0]);
   trackData.coords.forEach(c => bounds.extend(new maplibregl.LngLat(c[0], c[1])));
 
@@ -217,7 +217,7 @@ export interface MultiLoopMapResult {
 
 export function initMultiLoopMap(
   container: HTMLElement,
-  loopData: TrackData[],
+  loopData: Track[],
   colors: string[],
   initialActive: number | null = null,
 ): MultiLoopMapResult {

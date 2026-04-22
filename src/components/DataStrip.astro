@@ -1,19 +1,15 @@
 ---
-const stats = [
-  { big: 'I',    small: 'ÉDITION' },
-  { big: 'V',    small: 'ÉPREUVES' },
-  { big: '30KM', small: 'DÉFI MAX' },
-  { big: '3 OCT.', small: 'SAMEDI' },
-];
+interface Props {
+  stats: { big: string; small: string }[];
+}
+const { stats } = Astro.props;
 ---
 <section class="grid grid-cols-2 lg:grid-cols-4 border-y border-[color:var(--color-line)]">
   {stats.map((s, i) => (
     <div
       class:list={[
         'py-6 px-5 sm:py-10 sm:px-8',
-        // desktop: right border except last
         i < 3 ? 'lg:border-r lg:border-[color:var(--color-line)]' : '',
-        // mobile 2-col: right border on left column + bottom border on top row
         i % 2 === 0 ? 'border-r border-[color:var(--color-line)] lg:border-r' : 'lg:border-r',
         i < 2 ? 'border-b border-[color:var(--color-line)] lg:border-b-0' : '',
       ]}

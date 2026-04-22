@@ -1,24 +1,87 @@
 ---
+import { getCollection, getEntry } from 'astro:content';
+import { join } from 'node:path';
 import Layout from '../layouts/Layout.astro';
 import Nav from '../components/Nav.astro';
 import Hero from '../components/Hero.astro';
 import DataStrip from '../components/DataStrip.astro';
 import Storytelling from '../components/Storytelling.astro';
 import Races from '../components/Races.astro';
+import type { RaceViewModel } from '../components/Races.astro';
 import Banquet from '../components/Banquet.astro';
 import Engagement from '../components/Engagement.astro';
 import CTA from '../components/CTA.astro';
 import Footer from '../components/Footer.astro';
+import { parseGpxFile } from '../lib/gpx';
+import { withBase } from '../lib/url';
 import '../styles/global.css';
+
+const ROMAN = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'];
+
+const eventEntry = await getEntry('event', 'main');
+if (!eventEntry) throw new Error('event.yaml: missing "main" entry');
+const event = eventEntry.data;
+
+const raceEntries = (await getCollection('races')).sort((a, b) => a.data.order - b.data.order);
+
+const races: RaceViewModel[] = await Promise.all(
+  raceEntries.map(async (entry, i) => {
+    const d = entry.data;
+    const gpxPath = join('public/traces', `${entry.id}.gpx`);
+    const tracks = await parseGpxFile(gpxPath);
+    const totalDistance = tracks.reduce((s, t) => s + t.totalDistance, 0);
+    const totalAscent = tracks.reduce((s, t) => s + t.totalAscent, 0);
+
+    const segments = d.segments?.map((seg, si) => ({
+      ...seg,
+      roman: ROMAN[si],
+      distance: Math.round((tracks[si]?.totalDistance ?? 0) * 10) / 10,
+      ascent: Math.round(tracks[si]?.totalAscent ?? 0),
+    }));
+
+    return {
+      id: entry.id,
+      order: d.order,
+      roman: ROMAN[i],
+      title: d.title,
+      type: d.type,
+      description: d.description,
+      startTime: d.startTime,
+      difficulty: d.difficulty,
+      timed: d.timed,
+      unit: d.unit,
+      color: d.color,
+      distanceDisplay: String(Math.round(totalDistance)),
+      ascentDisplay: String(Math.round(totalAscent)),
+      gpxUrl: withBase(`/traces/${entry.id}.gpx`),
+      tracks,
+      segments,
+    };
+  })
+);
+
+const pageTitle = `${event.name} — ${event.location} · ${event.dateShort.toLowerCase()} ${event.year}`;
+
+const maxDistance = Math.max(...races.map(r => Number(r.distanceDisplay) || 0));
+const statTokens: Record<string, string> = {
+  edition: event.edition,
+  raceCount: ROMAN[races.length - 1] ?? String(races.length),
+  maxDistance: String(maxDistance),
+  year: String(event.year),
+};
+const computedStats = event.stats.map(s => ({
+  big: s.big.replace(/\{(\w+)\}/g, (_, k) => statTokens[k] ?? `{${k}}`),
+  small: s.small,
+}));
 ---
-<Layout title="Trail des Tectosages — Vieille-Toulouse · 3 oct. 2026">
-  <Nav />
-  <Hero />
-  <DataStrip />
-  <Storytelling />
-  <Races />
-  <Banquet />
-  <Engagement />
-  <CTA />
-  <Footer />
+<Layout title={pageTitle} description={event.description}>
+  <Nav event={event} />
+  <Hero event={event} />
+  <DataStrip stats={computedStats} />
+  <Storytelling data={event.storytelling} />
+  <Races races={races} section={event.racesSection} />
+  <Banquet data={event.banquet} />
+  <Engagement data={event.engagement} />
+  <CTA data={event.cta} registrationUrl={event.urls.registration} />
+  <Footer event={event} />
 </Layout>

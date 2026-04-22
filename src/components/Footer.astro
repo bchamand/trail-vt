@@ -1,15 +1,17 @@
 ---
-const base = import.meta.env.BASE_URL;
-const withBase = (p: string) => `${base}${base.endsWith('/') ? '' : '/'}${p.replace(/^\//, '')}`;
-const lionsLogo = withBase('images/logo-lions.png');
-const marieLouise = withBase('images/logo-marie-louise.png');
-const golfLogo = withBase('images/logo-golf.png');
+import type { CollectionEntry } from 'astro:content';
+import { withBase } from '../lib/url';
+
+interface Props {
+  event: CollectionEntry<'event'>['data'];
+}
+const { event } = Astro.props;
+const { footer } = event;
 ---
 <footer
   class="border-t border-[color:var(--color-line-soft)]"
   style="background: var(--color-bg-deep); padding: clamp(36px, 5vw, 48px) clamp(20px, 4vw, 80px) clamp(24px, 3vw, 28px);">
 
-  <!-- 4-column grid: Identity / Événement / Contact / Avec -->
   <div class="grid grid-cols-1 lg:grid-cols-[1.4fr_1fr_1fr_1fr] items-start"
        style="gap: clamp(32px, 4vw, 48px); margin-bottom: clamp(32px, 4vw, 40px);">
 
@@ -17,30 +19,28 @@ const golfLogo = withBase('images/logo-golf.png');
     <div>
       <div class="flex items-center gap-3 mb-4">
         <span class="flex items-center justify-center rounded-full border shrink-0"
-              style="width: 30px; height: 30px; border-color: var(--color-accent); border-width: 1.5px; color: var(--color-accent); font-family: var(--font-serif); font-size: 14px; font-style: italic;">T</span>
+              style="width: 30px; height: 30px; border-color: var(--color-accent); border-width: 1.5px; color: var(--color-accent); font-family: var(--font-serif); font-size: 14px; font-style: italic;">{event.initial}</span>
         <span style="font-family: var(--font-serif); font-size: 20px; font-weight: 400;">
-          Trail des <em style="color: var(--color-accent); font-style: italic;">Tectosages</em>
+          {event.nameShort} <em style="color: var(--color-accent); font-style: italic;">{event.nameEmphasis}</em>
         </span>
       </div>
       <div class="text-[10px] tracking-[0.24em] opacity-55 mb-3.5" style="font-family: var(--font-mono);">
-        ÉDITION I · 2026
+        ÉDITION {event.edition} · {event.year}
       </div>
       <p class="text-[13px] leading-[1.55] opacity-65 m-0 max-w-[340px]" style="text-wrap: pretty;">
-        Samedi 3 octobre 2026 · Vieille-Toulouse, Haute-Garonne.
+        {event.dateFull} · {event.location}.
       </p>
     </div>
 
-    <!-- Col 2 — Événement -->
+    <!-- Col 2 — Event -->
     <div>
       <div class="text-[10px] tracking-[0.26em] mb-4" style="font-family: var(--font-mono); color: var(--color-accent); opacity: 0.85;">
         ÉVÉNEMENT
       </div>
       <ul class="list-none p-0 m-0 flex flex-col gap-2.5">
-        <li><a href="#epreuves" class="footer-link">Les épreuves</a></li>
-        <li><a href="#histoire" class="footer-link">L'histoire</a></li>
-        <li><a href="#banquet"  class="footer-link">Le banquet</a></li>
-        <li><a href="#" class="footer-link">Règlement</a></li>
-        <li><a href="#" class="footer-link">FAQ</a></li>
+        {footer.eventLinks.map(l => (
+          <li><a href={l.href} class="footer-link">{l.label}</a></li>
+        ))}
       </ul>
     </div>
 
@@ -50,48 +50,41 @@ const golfLogo = withBase('images/logo-golf.png');
         CONTACT
       </div>
       <ul class="list-none p-0 m-0 flex flex-col gap-2.5">
-        <li><a href="mailto:contact@tectosages.fr" class="footer-link">contact@tectosages.fr</a></li>
-        <li><a href="#" class="footer-link">Instagram</a></li>
-        <li><a href="#" class="footer-link">Presse &amp; médias</a></li>
+        {footer.contactLinks.map(l => (
+          <li><a href={l.href} class="footer-link">{l.label}</a></li>
+        ))}
       </ul>
     </div>
 
-    <!-- Col 4 — Avec (partenaires) -->
+    <!-- Col 4 — Partners -->
     <div>
       <div class="text-[10px] tracking-[0.26em] mb-4" style="font-family: var(--font-mono); color: var(--color-accent); opacity: 0.85;">
         AVEC
       </div>
       <div class="flex flex-wrap items-center gap-2.5">
-        <div class="logo-tile" style="padding: 6px; border-radius: 2px;">
-          <img src={lionsLogo} alt="Lions Club Toulouse Arènes Romaines"
-               style="height: 42px; object-fit: contain; display: block;" />
-        </div>
-        <div class="logo-tile" style="padding: 6px; border-radius: 2px;">
-          <img src={marieLouise} alt="Fondation Marie-Louise"
-               style="height: 42px; object-fit: contain; display: block;" />
-        </div>
-        <div class="logo-tile" style="padding: 6px; border-radius: 2px;" id="footer-golf-tile">
-          <img src={golfLogo} alt="Golf de Vieille-Toulouse"
-               style="height: 42px; object-fit: contain; display: block;"
-               onerror="this.closest('#footer-golf-tile')?.remove();" />
-        </div>
+        {footer.partners.map(p => (
+          <div class="logo-tile partner-tile" style="padding: 6px; border-radius: 2px;">
+            <img src={withBase(p.logo)} alt={p.name}
+                 style="height: 42px; object-fit: contain; display: block;"
+                 onerror="this.closest('.partner-tile')?.remove();" />
+          </div>
+        ))}
       </div>
       <div class="text-[10px] tracking-[0.16em] opacity-50 mt-3 leading-[1.6]" style="font-family: var(--font-mono);">
-        Lions Club Toulouse Arènes Romaines<br/>
-        Fondation Marie-Louise<br/>
-        Golf de Vieille-Toulouse
+        {footer.partners.map((p, i) => (
+          <>{p.name}{i < footer.partners.length - 1 && <br/>}</>
+        ))}
       </div>
     </div>
   </div>
 
-  <!-- Bottom legal line -->
   <div class="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-2.5 lg:gap-5 text-[10px] tracking-[0.2em] opacity-45"
        style="font-family: var(--font-mono); padding-top: clamp(20px, 2.5vw, 24px); border-top: 1px solid rgba(232,227,211,0.08);">
-    <div>© 2026 · ASSOCIATION TRAIL DES TECTOSAGES</div>
+    <div>{footer.legal}</div>
     <div class="flex gap-6">
-      <a href="#" class="no-underline" style="color: inherit;">MENTIONS LÉGALES</a>
-      <a href="#" class="no-underline" style="color: inherit;">CGV</a>
-      <a href="#" class="no-underline" style="color: inherit;">CONFIDENTIALITÉ</a>
+      {footer.legalLinks.map(l => (
+        <a href={l.href} class="no-underline" style="color: inherit;">{l.label}</a>
+      ))}
     </div>
   </div>
 </footer>

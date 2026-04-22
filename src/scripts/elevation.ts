@@ -1,7 +1,7 @@
 // SVG-based elevation profile — adapted from design/variations/gpx-map.jsx
 // Displays one or more track segments along a cumulative distance axis.
 
-import type { TrackData } from './gpx-parser';
+import type { Track } from '../lib/gpx';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 const EW = 600;
@@ -16,7 +16,7 @@ const ROMAN = ['I', 'II', 'III', 'IV', 'V'];
 
 export interface ElevationOptions {
   container: HTMLElement;
-  segments: TrackData[];
+  segments: Track[];
   segmentColors: string[];
   gpxHref?: string;
   /** null = show all (or for single-track). Otherwise index of active segment. */
@@ -64,12 +64,14 @@ export function renderElevation(opts: ElevationOptions): ElevationHandle {
   let kmAcc = 0;
   segments.forEach((seg, si) => {
     segStartKm.push(kmAcc);
-    seg.points.forEach((p, pi) => {
-      const kmGlobal = kmAcc + p.dist;
+    for (let pi = 0; pi < seg.distances.length; pi++) {
+      const dist = seg.distances[pi];
+      const ele = seg.elevations[pi];
+      const kmGlobal = kmAcc + dist;
       const x = PAD + (kmGlobal / Math.max(totalKm, 0.001)) * (EW - PAD * 2);
-      const y = EH - PAD - ((p.ele - minEle) / Math.max(1, maxEle - minEle)) * (EH - PAD * 2);
-      projectedPoints.push({ x, y, segIdx: si, ptIdx: pi, ele: p.ele, km: kmGlobal });
-    });
+      const y = EH - PAD - ((ele - minEle) / Math.max(1, maxEle - minEle)) * (EH - PAD * 2);
+      projectedPoints.push({ x, y, segIdx: si, ptIdx: pi, ele, km: kmGlobal });
+    }
     kmAcc += seg.totalDistance;
   });
   segStartKm.push(kmAcc); // push end-of-last

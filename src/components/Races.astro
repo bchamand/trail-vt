@@ -1,5 +1,73 @@
 ---
-import { races } from '../data/races';
+import type { Track } from '../lib/gpx';
+
+export interface RaceSegment {
+  roman: string;
+  label: string;
+  value: string;
+  status: string;
+  timeLimit: string;
+  color: string;
+  distance: number;
+  ascent: number;
+}
+
+export interface RaceViewModel {
+  id: string;
+  order: number;
+  roman: string;
+  title: string;
+  type: string;
+  description: string;
+  startTime: string;
+  difficulty: number;
+  timed: boolean;
+  unit: string;
+  color: string;
+  distanceDisplay: string;
+  ascentDisplay: string;
+  gpxUrl: string;
+  tracks: Track[];
+  segments?: RaceSegment[];
+}
+
+interface Props {
+  races: RaceViewModel[];
+  section: {
+    label: string;
+    titleLine1: string;
+    titleLine2: string;
+    tagline: string;
+  };
+}
+const { races, section } = Astro.props;
+
+// Compact track payload for the client — strip redundant fields, round values.
+const clientRaces = races.map(r => ({
+  id: r.id,
+  color: r.color,
+  segments: r.segments?.map(s => ({
+    roman: s.roman,
+    label: s.label,
+    color: s.color,
+    distance: Math.round(s.distance * 10) / 10,
+    ascent: Math.round(s.ascent),
+  })),
+  tracks: r.tracks.map(t => ({
+    coords: t.coords.map(([lon, lat]) => [
+      Math.round(lon * 1e5) / 1e5,
+      Math.round(lat * 1e5) / 1e5,
+    ]),
+    elevations: t.elevations.map(e => Math.round(e)),
+    distances: t.distances.map(d => Math.round(d * 1000) / 1000),
+    totalDistance: Math.round(t.totalDistance * 100) / 100,
+    totalAscent: Math.round(t.totalAscent),
+    totalDescent: Math.round(t.totalDescent),
+    minEle: Math.round(t.minEle),
+    maxEle: Math.round(t.maxEle),
+  })),
+  gpxUrl: r.gpxUrl,
+}));
 ---
 <section id="epreuves" class="border-t border-[color:var(--color-line-soft)]"
   style="padding: clamp(48px, 8vw, 80px) clamp(20px, 4vw, 80px) clamp(72px, 12vw, 120px);">
@@ -8,15 +76,15 @@ import { races } from '../data/races';
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-7 lg:gap-15 items-baseline mb-10 lg:mb-15"
        style="margin-bottom: clamp(40px, 6vw, 60px);">
     <div>
-      <div class="mono-label mb-5">— §01 / LES ÉPREUVES</div>
-      <h2 class="h2-med">Cinq départs.<br/><span class="italic opacity-75">Un seul territoire.</span></h2>
+      <div class="mono-label mb-5">{section.label}</div>
+      <h2 class="h2-med">{section.titleLine1}<br/><span class="italic opacity-75">{section.titleLine2}</span></h2>
     </div>
     <p class="max-w-[460px] text-[15px] sm:text-[17px] leading-[1.55] opacity-75 m-0" style="text-wrap: pretty;">
-      Du Défi de Copilos à la Tectokids, chacune et chacun trouve sa boucle. Tout se court en fin d'après-midi — arrivée avant la tombée de la nuit.
+      {section.tagline}
     </p>
   </div>
 
-  <!-- Selector — horizontal scroll mobile, 5-col grid desktop -->
+  <!-- Carousel / grid of race cards -->
   <div id="race-carousel"
        class="flex lg:grid lg:grid-cols-5 gap-3 lg:gap-px overflow-x-auto lg:overflow-visible snap-x snap-mandatory scrollbar-hide -mx-5 px-5 lg:mx-0 lg:px-0"
        style="background: transparent;">
@@ -24,40 +92,35 @@ import { races } from '../data/races';
       <button
         class="race-card group text-left cursor-pointer flex-shrink-0 w-[220px] lg:w-auto snap-start transition-colors duration-200"
         data-race-index={i}
-        data-gpx={race.gpx}
-        data-has-loops={race.loops ? 'true' : 'false'}
+        data-has-segments={race.segments ? 'true' : 'false'}
         style={`padding: 24px 20px; border: 1px solid var(--color-line); background: ${i === 0 ? 'var(--color-accent)' : 'var(--color-bg)'}; color: ${i === 0 ? 'var(--color-bg)' : 'var(--color-ink)'}; font-family: inherit;`}
       >
         <div class="mb-5 text-[10px] sm:text-[11px] tracking-[0.22em] opacity-65" style="font-family: var(--font-mono);">
-          {race.roman} / {race.title}
+          {race.roman} / {race.title.toUpperCase()}
         </div>
         <div class="flex items-baseline gap-1 mb-3">
-          <span style="font-family: var(--font-serif); font-size: clamp(36px, 4.5vw, 44px); line-height: 0.9;">{race.dist}</span>
+          <span style="font-family: var(--font-serif); font-size: clamp(36px, 4.5vw, 44px); line-height: 0.9;">{race.distanceDisplay}</span>
           <span class="text-[10px] sm:text-[11px] tracking-[0.15em] opacity-70" style="font-family: var(--font-mono);">{race.unit}</span>
         </div>
         <div class="flex gap-[3px] mt-3">
           {Array.from({ length: 5 }).map((_, n) => (
-            <span class="race-diff-bar" data-filled={n < race.diff ? '1' : '0'} style="width: 14px; height: 3px; display: block;"></span>
+            <span class="race-diff-bar" data-filled={n < race.difficulty ? '1' : '0'} style="width: 14px; height: 3px; display: block;"></span>
           ))}
         </div>
       </button>
     ))}
   </div>
 
-  <!-- Details area: map + details panel -->
+  <!-- Details area -->
   <div class="grid grid-cols-1 lg:grid-cols-[1fr_1.2fr] gap-8 lg:gap-16 items-start"
        style="margin-top: clamp(32px, 5vw, 64px);">
 
-    <!-- Left: segment selector + map + elevation -->
     <div class="border border-[color:var(--color-line)]" style="background: var(--color-bg);">
-      <!-- Segment selector (multi-loop only) -->
       <div id="segment-selector" class="hidden"></div>
 
-      <!-- Map + overlays -->
       <div class="relative">
         <div id="race-map" class="map-container" style="height: 52vh; min-height: 320px; max-height: 540px; border: none;"></div>
 
-        <!-- Stats overlay (top-left) -->
         <div id="map-stats" class="pointer-events-none"
              style="position: absolute; top: 14px; left: 14px; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.18em; color: var(--color-ink); opacity: 0.85; line-height: 1.8; text-shadow: 0 1px 3px rgba(0,0,0,0.8);">
           <div id="stats-label">TRACÉ COMPLET</div>
@@ -65,7 +128,6 @@ import { races } from '../data/races';
           <div id="stats-alt">—</div>
         </div>
 
-        <!-- Compass (top-right) -->
         <div class="pointer-events-none"
              style="position: absolute; top: 14px; right: 14px; font-family: var(--font-mono); color: var(--color-ink); opacity: 0.6; text-align: center;">
           <div style="font-size: 11px; font-weight: 600; letter-spacing: 0.1em; line-height: 1;">N</div>
@@ -75,34 +137,30 @@ import { races } from '../data/races';
           </svg>
         </div>
 
-        <!-- Hover tooltip (bottom-right) -->
         <div id="map-tooltip" class="pointer-events-none"
              style="position: absolute; bottom: 12px; right: 12px; display: none; background: var(--color-ink); color: var(--color-bg); padding: 8px 12px; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.14em; line-height: 1.6;"></div>
       </div>
 
-      <!-- Elevation (SVG injected via script) -->
       <div id="elevation-chart"></div>
     </div>
 
-    <!-- Right: race info (one panel per race, toggled) -->
     <div>
       {races.map((race, i) => (
         <div class:list={['race-info', i === 0 ? '' : 'hidden']} data-info-index={i}>
-          <div class="mono-label mb-5">{race.roman} / {race.title}</div>
+          <div class="mono-label mb-5">{race.roman} / {race.title.toUpperCase()}</div>
           <h3 class="mb-5" style="font-family: var(--font-serif); font-weight: 400; line-height: 0.95; letter-spacing: -0.025em; font-size: clamp(44px, 5vw, 68px); margin: 0 0 20px;">
             <em style="font-style: italic;">{race.type}</em>
           </h3>
-          <p class="text-[15px] sm:text-[17px] leading-[1.55] opacity-85 m-0" style="text-wrap: pretty;">{race.desc}</p>
+          <p class="text-[15px] sm:text-[17px] leading-[1.55] opacity-85 m-0" style="text-wrap: pretty;">{race.description}</p>
 
-          <!-- Key facts grid -->
           <div class="grid grid-cols-3 gap-px mt-8 border border-[color:var(--color-line)]" style="background: var(--color-line);">
             <div class="p-4 sm:p-5" style="background: var(--color-bg);">
               <div class="text-[9px] tracking-[0.22em] opacity-50 mb-1.5" style="font-family: var(--font-mono);">DISTANCE</div>
-              <div class="text-[color:var(--color-accent)]" style="font-family: var(--font-serif); font-size: clamp(20px, 2.2vw, 28px);">{race.dist} {race.unit.toLowerCase()}</div>
+              <div class="text-[color:var(--color-accent)]" style="font-family: var(--font-serif); font-size: clamp(20px, 2.2vw, 28px);">{race.distanceDisplay} {race.unit.toLowerCase()}</div>
             </div>
             <div class="p-4 sm:p-5" style="background: var(--color-bg);">
               <div class="text-[9px] tracking-[0.22em] opacity-50 mb-1.5" style="font-family: var(--font-mono);">D+</div>
-              <div class="text-[color:var(--color-accent)]" style="font-family: var(--font-serif); font-size: clamp(20px, 2.2vw, 28px);">{race.dplus === '—' ? '—' : `${race.dplus} m`}</div>
+              <div class="text-[color:var(--color-accent)]" style="font-family: var(--font-serif); font-size: clamp(20px, 2.2vw, 28px);">{race.ascentDisplay === '—' ? '—' : `${race.ascentDisplay} m`}</div>
             </div>
             <div class="p-4 sm:p-5" style="background: var(--color-bg);">
               <div class="text-[9px] tracking-[0.22em] opacity-50 mb-1.5" style="font-family: var(--font-mono);">DÉPART</div>
@@ -110,15 +168,17 @@ import { races } from '../data/races';
             </div>
           </div>
 
-          {race.loops && (
+          {race.segments && (
             <div class="mt-8">
-              <div class="text-[10px] tracking-[0.3em] opacity-50 mb-3" style="font-family: var(--font-mono);">QUATRE BOUCLES · QUATRE VALEURS</div>
-              {race.loops.map((loop) => (
+              <div class="text-[10px] tracking-[0.3em] opacity-50 mb-3" style="font-family: var(--font-mono);">
+                {race.segments.length} BOUCLES · {race.segments.length} VALEURS
+              </div>
+              {race.segments.map((seg) => (
                 <div class="grid items-baseline py-2.5 border-t border-[color:var(--color-line-soft)]" style="grid-template-columns: 40px 1fr auto auto; gap: 12px;">
-                  <span class="text-[color:var(--color-accent)]" style="font-family: var(--font-serif); font-style: italic; font-size: clamp(18px, 1.8vw, 22px);">{loop.roman}</span>
-                  <span class="text-[13px] sm:text-[15px] italic">« {loop.label} »</span>
-                  <span class="text-[10px] sm:text-[11px] opacity-70" style="font-family: var(--font-mono);">{loop.distance} · {loop.ascent}</span>
-                  <span class="hidden sm:inline text-[11px] opacity-70" style="font-family: var(--font-mono);">lim. {loop.timeLimit}</span>
+                  <span class="text-[color:var(--color-accent)]" style="font-family: var(--font-serif); font-style: italic; font-size: clamp(18px, 1.8vw, 22px);">{seg.roman}</span>
+                  <span class="text-[13px] sm:text-[15px] italic">« {seg.label} »</span>
+                  <span class="text-[10px] sm:text-[11px] opacity-70" style="font-family: var(--font-mono);">{seg.distance} km · +{seg.ascent} m</span>
+                  <span class="hidden sm:inline text-[11px] opacity-70" style="font-family: var(--font-mono);">lim. {seg.timeLimit}</span>
                 </div>
               ))}
             </div>
@@ -128,6 +188,8 @@ import { races } from '../data/races';
     </div>
   </div>
 </section>
+
+<script type="application/json" id="race-data" set:html={JSON.stringify(clientRaces)} />
 
 <style is:global>
   .race-card .race-diff-bar[data-filled="1"] { background: var(--color-accent); }
@@ -159,9 +221,7 @@ import { races } from '../data/races';
     text-align: center;
   }
   #segment-selector button:hover { background: rgba(212, 165, 116, 0.06); }
-  #segment-selector button.is-active {
-    color: var(--color-bg);
-  }
+  #segment-selector button.is-active { color: var(--color-bg); }
   #segment-selector .seg-sub {
     display: block;
     opacity: 0.7; font-size: 9px; margin-top: 3px; letter-spacing: 0.12em;
@@ -169,12 +229,20 @@ import { races } from '../data/races';
 </style>
 
 <script>
-  import { parseGPX, parseMultiTrackGPX, type TrackData } from '../scripts/gpx-parser';
   import { initMap, initMultiLoopMap, type MultiLoopMapResult, type SingleMapResult } from '../scripts/map';
   import { renderElevation, type ElevationHandle } from '../scripts/elevation';
-  import { races as racesData } from '../data/races';
+  import type { Track } from '../lib/gpx';
 
-  const ROMAN = ['I', 'II', 'III', 'IV', 'V'];
+  interface ClientSegment { roman: string; label: string; color: string; distance: number; ascent: number; }
+  interface ClientRace {
+    id: string;
+    color: string;
+    segments?: ClientSegment[];
+    tracks: Track[];
+    gpxUrl: string;
+  }
+
+  const racesData: ClientRace[] = JSON.parse(document.getElementById('race-data')!.textContent!);
 
   const cards = document.querySelectorAll('.race-card');
   const carousel = document.getElementById('race-carousel')!;
@@ -187,161 +255,111 @@ import { races } from '../data/races';
   const statsAlt = document.getElementById('stats-alt')!;
   const mapTooltip = document.getElementById('map-tooltip')!;
 
-  (cards[0] as HTMLElement).classList.add('is-active');
-
   let currentMap: SingleMapResult | MultiLoopMapResult | null = null;
   let currentElev: ElevationHandle | null = null;
   let activeIndex = 0;
-  let currentLoopData: TrackData[] = [];
   let activeSeg: number | null = null;
 
-  const loopTrackDataCache: Record<number, TrackData[]> = {};
-  const allTrackData: TrackData[] = [];
+  const fmt1 = (v: number) => v.toFixed(1);
+  const fmtI = (v: number) => String(Math.round(v));
 
-  function resolveUrl(path: string): string {
-    const base = import.meta.env.BASE_URL;
-    return base.endsWith('/') ? base + path.replace(/^\//, '') : base + path;
-  }
-
-  function fmt1(v: number) { return v.toFixed(1); }
-  function fmtI(v: number) { return String(Math.round(v)); }
-
-  async function preloadAll() {
-    const gpxUrls = Array.from(cards).map(card => (card as HTMLElement).dataset.gpx!);
-    const results = await Promise.all(gpxUrls.map(url => parseGPX(resolveUrl(url))));
-    results.forEach((data, i) => { allTrackData[i] = data; });
-    showRace(0);
-  }
-
-  function updateCardStyles(selectedIndex: number) {
+  function updateCardStyles(selected: number) {
     cards.forEach((card, i) => {
       const el = card as HTMLElement;
-      const isActive = i === selectedIndex;
+      const isActive = i === selected;
       el.classList.toggle('is-active', isActive);
       el.style.background = isActive ? 'var(--color-accent)' : 'var(--color-bg)';
       el.style.color = isActive ? 'var(--color-bg)' : 'var(--color-ink)';
     });
-    infoPanels.forEach((panel, i) => {
-      panel.classList.toggle('hidden', i !== selectedIndex);
-    });
+    infoPanels.forEach((panel, i) => panel.classList.toggle('hidden', i !== selected));
   }
 
   function updateStatsOverlay() {
-    const segs = currentLoopData;
-    if (segs.length === 0) return;
-
+    const race = racesData[activeIndex];
+    const segs = race.tracks;
     if (segs.length === 1) {
-      const d = segs[0];
+      const t = segs[0];
       statsLabel.textContent = 'TRACÉ';
-      statsDistance.textContent = `${fmt1(d.totalDistance)} KM · +${fmtI(d.totalAscent)}M`;
-      statsAlt.textContent = `ALT. ${fmtI(d.minEle)}–${fmtI(d.maxEle)} M`;
+      statsDistance.textContent = `${fmt1(t.totalDistance)} KM · +${fmtI(t.totalAscent)}M`;
+      statsAlt.textContent = `ALT. ${fmtI(t.minEle)}–${fmtI(t.maxEle)} M`;
     } else if (activeSeg == null) {
-      const totalDist = segs.reduce((s, d) => s + d.totalDistance, 0);
-      const totalAsc = segs.reduce((s, d) => s + d.totalAscent, 0);
-      const minEle = Math.min(...segs.map(d => d.minEle));
-      const maxEle = Math.max(...segs.map(d => d.maxEle));
+      const totalDist = segs.reduce((s, t) => s + t.totalDistance, 0);
+      const totalAsc = segs.reduce((s, t) => s + t.totalAscent, 0);
+      const minEle = Math.min(...segs.map(t => t.minEle));
+      const maxEle = Math.max(...segs.map(t => t.maxEle));
       statsLabel.textContent = 'TRACÉ COMPLET';
       statsDistance.textContent = `${fmt1(totalDist)} KM · +${fmtI(totalAsc)}M`;
       statsAlt.textContent = `ALT. ${fmtI(minEle)}–${fmtI(maxEle)} M`;
     } else {
-      const d = segs[activeSeg];
-      statsLabel.textContent = `BOUCLE ${ROMAN[activeSeg]}`;
-      statsDistance.textContent = `${fmt1(d.totalDistance)} KM · +${fmtI(d.totalAscent)}M`;
-      statsAlt.textContent = `ALT. ${fmtI(d.minEle)}–${fmtI(d.maxEle)} M`;
+      const t = segs[activeSeg];
+      statsLabel.textContent = `BOUCLE ${race.segments![activeSeg].roman}`;
+      statsDistance.textContent = `${fmt1(t.totalDistance)} KM · +${fmtI(t.totalAscent)}M`;
+      statsAlt.textContent = `ALT. ${fmtI(t.minEle)}–${fmtI(t.maxEle)} M`;
     }
   }
 
   function updateSegmentSelectorActive() {
-    segmentSelector.querySelectorAll<HTMLButtonElement>('button').forEach((btn) => {
+    segmentSelector.querySelectorAll<HTMLButtonElement>('button').forEach(btn => {
       const raw = btn.dataset.seg!;
       const segIdx = raw === 'all' ? null : parseInt(raw);
       const isActive = segIdx === activeSeg;
       btn.classList.toggle('is-active', isActive);
-      if (isActive) {
-        const color = btn.dataset.color || 'var(--color-ink)';
-        btn.style.background = color;
-      } else {
-        btn.style.background = 'var(--color-bg)';
-      }
+      btn.style.background = isActive ? (btn.dataset.color || 'var(--color-ink)') : 'var(--color-bg)';
     });
   }
 
-  function buildSegmentSelector(raceIndex: number) {
-    const race = racesData[raceIndex];
+  function buildSegmentSelector(race: ClientRace) {
     segmentSelector.innerHTML = '';
-
-    if (!race.loops) {
+    if (!race.segments) {
       segmentSelector.classList.add('hidden');
       return;
     }
     segmentSelector.classList.remove('hidden');
 
-    // "Vue complète"
     const allBtn = document.createElement('button');
     allBtn.dataset.seg = 'all';
     allBtn.dataset.color = 'var(--color-ink)';
-    allBtn.innerHTML = 'VUE COMPLÈTE';
-    allBtn.style.color = 'var(--color-ink)'; // will be overridden by active state below
+    allBtn.textContent = 'VUE COMPLÈTE';
     allBtn.addEventListener('click', () => selectSeg(null));
     segmentSelector.appendChild(allBtn);
 
-    // Per-loop buttons
-    race.loops.forEach((loop, i) => {
+    race.segments.forEach((seg, i) => {
       const btn = document.createElement('button');
       btn.dataset.seg = String(i);
-      btn.dataset.color = loop.color;
-      const distTxt = loop.distance.replace(/\s*km\s*$/i, '').trim();
-      const ascTxt = loop.ascent.replace(/\s*m\s*$/i, '').trim();
-      const sub = `${distTxt} KM · ${ascTxt}M`;
-      btn.innerHTML = `BOUCLE ${ROMAN[i]}<span class="seg-sub">${sub}</span>`;
+      btn.dataset.color = seg.color;
+      btn.innerHTML = `BOUCLE ${seg.roman}<span class="seg-sub">${seg.distance} KM · ${seg.ascent}M</span>`;
       btn.addEventListener('click', () => selectSeg(i));
       segmentSelector.appendChild(btn);
     });
-
-    // Active color/text colors: when active, the text should be bg-colored (dark on gold/ink bg)
-    segmentSelector.querySelectorAll<HTMLButtonElement>('button.is-active, button').forEach(btn => {
-      // leave default; updateSegmentSelectorActive will handle it
-    });
-
-    // Inject the :is-active color rule via inline style — handled by update fn below
-    const style = document.createElement('style');
-    style.textContent = `#segment-selector button.is-active { color: var(--color-bg) !important; }`;
-    if (!document.getElementById('seg-active-style')) {
-      style.id = 'seg-active-style';
-      document.head.appendChild(style);
-    }
   }
 
   function selectSeg(i: number | null) {
     activeSeg = i;
     updateSegmentSelectorActive();
     updateStatsOverlay();
+    if (currentMap && 'setActiveSeg' in currentMap) (currentMap as MultiLoopMapResult).setActiveSeg(i);
+    currentElev?.setActiveSeg(i);
+  }
 
-    if (currentMap && 'setActiveSeg' in currentMap) {
-      (currentMap as MultiLoopMapResult).setActiveSeg(i);
-    }
-    if (currentElev) {
-      currentElev.setActiveSeg(i);
-    }
+  function segOffset(segIdx: number): number {
+    const segs = racesData[activeIndex].tracks;
+    let acc = 0;
+    for (let i = 0; i < segIdx; i++) acc += segs[i].totalDistance;
+    return acc;
   }
 
   function onElevationHover(segIdx: number, ptIdx: number) {
-    const seg = currentLoopData[segIdx];
+    const seg = racesData[activeIndex].tracks[segIdx];
     if (!seg) return;
-    const pt = seg.points[ptIdx];
-    if (!pt) return;
-
+    const km = seg.distances[ptIdx] + segOffset(segIdx);
+    const ele = seg.elevations[ptIdx];
     mapTooltip.style.display = 'block';
-    mapTooltip.textContent = `KM ${fmt1(pt.dist + segStartKmOffset(segIdx))} · ALT ${fmtI(pt.ele)} M`;
-
-    if (currentMap) {
-      if ('setMarkerAt' in currentMap) {
-        if (currentLoopData.length > 1) {
-          (currentMap as MultiLoopMapResult).setMarkerAt(segIdx, ptIdx);
-        } else {
-          (currentMap as SingleMapResult).setMarkerAt(ptIdx);
-        }
-      }
+    mapTooltip.textContent = `KM ${fmt1(km)} · ALT ${fmtI(ele)} M`;
+    if (!currentMap) return;
+    if (racesData[activeIndex].tracks.length > 1) {
+      (currentMap as MultiLoopMapResult).setMarkerAt(segIdx, ptIdx);
+    } else {
+      (currentMap as SingleMapResult).setMarkerAt(ptIdx);
     }
   }
 
@@ -350,59 +368,43 @@ import { races } from '../data/races';
     currentMap?.clearMarker?.();
   }
 
-  function segStartKmOffset(segIdx: number): number {
-    let acc = 0;
-    for (let i = 0; i < segIdx; i++) acc += currentLoopData[i].totalDistance;
-    return acc;
-  }
-
   function cleanup() {
     if (currentMap) { currentMap.map.remove(); currentMap = null; }
     if (currentElev) { currentElev.destroy(); currentElev = null; }
     mapTooltip.style.display = 'none';
   }
 
-  async function showRace(raceIndex: number) {
+  function showRace(raceIndex: number) {
     cleanup();
+    activeIndex = raceIndex;
+    activeSeg = null;
     updateCardStyles(raceIndex);
     const race = racesData[raceIndex];
 
-    if (race.loops) {
-      if (!loopTrackDataCache[raceIndex]) {
-        loopTrackDataCache[raceIndex] = await parseMultiTrackGPX(resolveUrl(race.gpx));
-      }
-      currentLoopData = loopTrackDataCache[raceIndex];
-      const colors = race.loops.map(l => l.color);
-
-      activeSeg = null;
-      buildSegmentSelector(raceIndex);
+    if (race.segments) {
+      buildSegmentSelector(race);
       updateSegmentSelectorActive();
       updateStatsOverlay();
-
-      currentMap = initMultiLoopMap(mapContainer, currentLoopData, colors, null);
-
+      const colors = race.segments.map(s => s.color);
+      currentMap = initMultiLoopMap(mapContainer, race.tracks, colors, null);
       currentElev = renderElevation({
         container: elevContainer,
-        segments: currentLoopData,
+        segments: race.tracks,
         segmentColors: colors,
-        gpxHref: resolveUrl(race.gpx),
+        gpxHref: race.gpxUrl,
         activeSeg: null,
         onHover: onElevationHover,
         onLeave: onElevationLeave,
       });
     } else {
-      currentLoopData = [allTrackData[raceIndex]];
       segmentSelector.classList.add('hidden');
-      activeSeg = null;
       updateStatsOverlay();
-
-      currentMap = initMap(mapContainer, currentLoopData[0]);
-
+      currentMap = initMap(mapContainer, race.tracks[0]);
       currentElev = renderElevation({
         container: elevContainer,
-        segments: currentLoopData,
-        segmentColors: ['#d4a574'],
-        gpxHref: resolveUrl(race.gpx),
+        segments: race.tracks,
+        segmentColors: [race.color],
+        gpxHref: race.gpxUrl,
         activeSeg: null,
         onHover: onElevationHover,
         onLeave: onElevationLeave,
@@ -412,13 +414,12 @@ import { races } from '../data/races';
 
   const CAROUSEL_BREAKPOINT = 1024;
 
-  cards.forEach((card) => {
+  cards.forEach(card => {
     card.addEventListener('click', () => {
       const el = card as HTMLElement;
-      const index = parseInt(el.dataset.raceIndex!);
-      if (index === activeIndex) return;
-      activeIndex = index;
-      showRace(index);
+      const i = parseInt(el.dataset.raceIndex!);
+      if (i === activeIndex) return;
+      showRace(i);
       if (window.innerWidth < CAROUSEL_BREAKPOINT) {
         el.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
       }
@@ -430,22 +431,17 @@ import { races } from '../data/races';
     if (window.innerWidth >= CAROUSEL_BREAKPOINT) return;
     clearTimeout(scrollTimeout);
     scrollTimeout = window.setTimeout(() => {
-      const carouselRect = carousel.getBoundingClientRect();
-      const carouselCenter = carouselRect.left + carouselRect.width / 2;
-      let closestIndex = 0;
-      let closestDist = Infinity;
+      const rect = carousel.getBoundingClientRect();
+      const center = rect.left + rect.width / 2;
+      let closest = 0, bestD = Infinity;
       cards.forEach((card, i) => {
-        const rect = (card as HTMLElement).getBoundingClientRect();
-        const cardCenter = rect.left + rect.width / 2;
-        const dist = Math.abs(cardCenter - carouselCenter);
-        if (dist < closestDist) { closestDist = dist; closestIndex = i; }
+        const r = (card as HTMLElement).getBoundingClientRect();
+        const d = Math.abs(r.left + r.width / 2 - center);
+        if (d < bestD) { bestD = d; closest = i; }
       });
-      if (closestIndex !== activeIndex) {
-        activeIndex = closestIndex;
-        showRace(closestIndex);
-      }
+      if (closest !== activeIndex) showRace(closest);
     }, 100);
   }, { passive: true });
 
-  preloadAll();
+  showRace(0);
 </script>
