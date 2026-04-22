@@ -27,8 +27,11 @@ function setBoundsLock(map: maplibregl.Map, bounds: maplibregl.LngLatBounds) {
 /** Build the styled Départ marker (dashed outer ring + filled dot + "DÉPART" label). */
 function mkStartMarker(): HTMLElement {
   const el = document.createElement('div');
+  // NOTE: no `position` override — MapLibre's .maplibregl-marker class sets
+  // `position: absolute`, which we rely on. Setting `position: relative` here
+  // would force the marker into document flow and make it shift when sibling
+  // markers toggle display.
   el.style.cssText = `
-    position: relative;
     width: 32px; height: 32px;
     pointer-events: none;
   `;
@@ -73,30 +76,37 @@ function mkEndMarker(roman: string, color: string): HTMLElement {
   return el;
 }
 
-/** Hover marker: dashed outer ring + filled dot. */
-function mkHoverMarker(color: string): HTMLElement {
+/**
+ * Hover marker: SOLID outer ring + cream-filled dot.
+ * Intentionally different from the Départ marker (which uses a dashed
+ * ring + accent-colored dot) so the two are never confused when the
+ * hover point is near the start.
+ */
+function mkHoverMarker(_color: string): HTMLElement {
   const el = document.createElement('div');
+  // No `position` override — see note in mkStartMarker.
   el.style.cssText = `
-    position: relative; width: 24px; height: 24px; pointer-events: none; display: none;
+    width: 24px; height: 24px; pointer-events: none; display: none;
   `;
   el.innerHTML = `
-    <div style="
+    <div class="hover-ring" style="
       position: absolute; inset: 0; border-radius: 50%;
-      border: 1.5px dashed ${ACCENT}; opacity: 0.6;
+      border: 1.5px solid ${ACCENT}; opacity: 0.55;
     "></div>
     <div class="hover-dot" style="
       position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
       width: 10px; height: 10px; border-radius: 50%;
-      background: ${color};
+      background: ${INK};
       border: 1.5px solid ${BG};
     "></div>
   `;
   return el;
 }
 
+/** Tint the hover ring with the active segment color; dot stays cream. */
 function updateHoverDotColor(el: HTMLElement, color: string) {
-  const dot = el.querySelector('.hover-dot') as HTMLElement | null;
-  if (dot) dot.style.background = color;
+  const ring = el.querySelector('.hover-ring') as HTMLElement | null;
+  if (ring) ring.style.borderColor = color;
 }
 
 /** Path styling helpers. */

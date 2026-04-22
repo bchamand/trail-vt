@@ -110,15 +110,6 @@
 }
 .scrollbar-hide::-webkit-scrollbar { display: none; }
 
-/* Subtle vertical side text (desktop decoration) */
-.side-rail {
-  writing-mode: vertical-rl;
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 0.3em;
-  color: rgba(232, 227, 211, 0.55);
-}
-
 /* Fluid hero title — responsive with clamp */
 .hero-title {
   font-family: var(--font-serif);
