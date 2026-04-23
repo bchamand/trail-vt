@@ -4,7 +4,8 @@ interface Props {
 }
 const { stats } = Astro.props;
 ---
-<section class="grid grid-cols-2 lg:grid-cols-4 border-y border-[color:var(--color-line)]">
+<section class="grid grid-cols-2 lg:grid-cols-4 border-y border-[color:var(--color-line)]"
+  style="background: var(--color-bg-deep);">
   {stats.map((s, i) => (
     <div
       class:list={[
