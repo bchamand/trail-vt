@@ -7,13 +7,16 @@ interface Props {
 }
 const { event } = Astro.props;
 const { footer } = event;
+const partner = footer.featuredPartner;
 ---
 <footer
   class="border-t border-[color:var(--color-line-soft)]"
   style="background: var(--color-bg-deep); padding: clamp(36px, 5vw, 48px) clamp(20px, 4vw, 80px) clamp(24px, 3vw, 28px);">
 
-  <div class="grid grid-cols-1 lg:grid-cols-[1.4fr_1fr_1fr_1fr] items-start"
-       style="gap: clamp(32px, 4vw, 48px); margin-bottom: clamp(32px, 4vw, 40px);">
+  <div
+    class="grid grid-cols-1 items-start"
+    style={`grid-template-columns: 1fr; gap: clamp(32px, 4vw, 48px); margin-bottom: clamp(32px, 4vw, 40px); --cols-lg: ${partner ? '1.4fr 1fr 1fr 1fr' : '1.6fr 1fr 1fr'};`}
+  >
 
     <!-- Col 1 — Identity -->
     <div>
@@ -56,26 +59,25 @@ const { footer } = event;
       </ul>
     </div>
 
-    <!-- Col 4 — Partners -->
-    <div>
-      <div class="text-[10px] tracking-[0.26em] mb-4" style="font-family: var(--font-mono); color: var(--color-accent); opacity: 0.85;">
-        AVEC
-      </div>
-      <div class="flex flex-wrap items-center gap-2.5">
-        {footer.partners.map(p => (
-          <div class="logo-tile partner-tile" style="padding: 6px; border-radius: 2px;">
-            <img src={withBase(p.logo)} alt={p.name}
-                 style="height: 42px; object-fit: contain; display: block;"
-                 onerror="this.closest('.partner-tile')?.remove();" />
+    {partner && (
+      <!-- Col 4 — Featured partner -->
+      <div>
+        <div class="text-[10px] tracking-[0.26em] mb-4" style="font-family: var(--font-mono); color: var(--color-accent); opacity: 0.85;">
+          {partner.label}
+        </div>
+        <div class="flex flex-col items-start gap-2.5">
+          <div class="flex items-center justify-center bg-white p-2.5"
+               style="width: 100%; max-width: 180px; aspect-ratio: 1.3 / 1;">
+            <img src={withBase(partner.logo)} alt={partner.logoAlt}
+                 style="max-width: 100%; max-height: 100%; object-fit: contain; display: block;" />
           </div>
-        ))}
+          <div class="text-[10px] tracking-[0.12em] opacity-70 leading-[1.5]"
+               style="font-family: var(--font-mono);">
+            {partner.name}<br/><span style="opacity: 0.7;">{partner.sub}</span>
+          </div>
+        </div>
       </div>
-      <div class="text-[10px] tracking-[0.16em] opacity-50 mt-3 leading-[1.6]" style="font-family: var(--font-mono);">
-        {footer.partners.map((p, i) => (
-          <>{p.name}{i < footer.partners.length - 1 && <br/>}</>
-        ))}
-      </div>
-    </div>
+    )}
   </div>
 
   <div class="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-2.5 lg:gap-5 text-[10px] tracking-[0.2em] opacity-45"
@@ -100,5 +102,10 @@ const { footer } = event;
   .footer-link:hover {
     color: var(--color-accent);
     opacity: 1;
+  }
+  @media (min-width: 1024px) {
+    footer > div:first-child {
+      grid-template-columns: var(--cols-lg) !important;
+    }
   }
 </style>

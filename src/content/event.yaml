@@ -118,10 +118,11 @@ main:
       title: Place du Village
       address: 31320 Vieille-Toulouse · Haute-Garonne
       accessNote: 15 min au sud de Toulouse centre
-      # Placeholder coordinates — to be replaced with precise GPS.
-      markers:
-        - { n: 1, title: Mairie,        sub: Vieille-Toulouse,            lat: 43.5367, lon: 1.4449, primary: true  }
-        - { n: 2, title: Parking école, sub: École de Vieille-Toulouse,   lat: 43.5371, lon: 1.4455, primary: false }
+      infoTiles:
+        - { key: PARKING, value: 'Golf de V-T'       }
+        - { key: NAVETTE, value: 'Dep. Ramonville'   }
+        - { key: RETRAIT, value: 'Dès 14h00'         }
+        - { key: GPS,     value: '43.526 · 1.445'    }
     schedule:
       label: DÉROULÉ DE LA JOURNÉE
       items:
@@ -167,11 +168,13 @@ main:
       - { label: contact@tectosages.fr, href: 'mailto:contact@tectosages.fr' }
       - { label: Instagram,             href: '#' }
       - { label: Presse & médias,       href: '#' }
-    partners:
-      - { name: Lions Club Toulouse Arènes Romaines, logo: /images/logo-lions.png }
-      - { name: Fondation Marie-Louise,              logo: /images/logo-marie-louise.png }
-      - { name: Golf de Vieille-Toulouse,            logo: /images/logo-golf.png }
     legalLinks:
       - { label: MENTIONS LÉGALES,  href: '#' }
       - { label: CGV,               href: '#' }
       - { label: CONFIDENTIALITÉ,   href: '#' }
+    featuredPartner:
+      label: PARTENAIRE
+      name: Fondation
+      sub: Marie-Louise · Lions Club
+      logo: /images/logo-marie-louise.png
+      logoAlt: Fondation Marie-Louise

@@ -705,13 +705,13 @@ const OutdoorLanding = ({ assets, gpx }) => {
             <h2 style={{ fontFamily: '"Instrument Serif", serif', fontSize: isMobile ? 34 : 56, lineHeight: 1.05, fontWeight: 400, margin: '0 0 20px' }}>
               Une part des inscriptions<br/>pour la <em style={{ color: '#d4a574' }}>Fondation Marie-Louise</em>.
             </h2>
-            <p style={{ fontSize: isMobile ? 14 : 15, lineHeight: 1.65, opacity: 0.8, margin: '0 0 20px', maxWidth: 680, textWrap: 'pretty' }}>
+            <p style={{ fontSize: isMobile ? 14 : 16, lineHeight: 1.65, opacity: 0.8, margin: '0 0 20px', maxWidth: 820, textWrap: 'pretty' }}>
               Portée par le <em style={{ color: '#d4a574', fontStyle: 'normal', fontWeight: 500 }}>Lions Club Toulouse Arènes Romaines</em>, la Fondation Marie-Louise œuvre depuis plus de trente ans auprès des enfants et adolescents en situation de handicap ou de grande précarité en Haute-Garonne — séjours de répit, matériel adapté, soutien aux familles.
             </p>
-            <p style={{ fontSize: isMobile ? 14 : 15, lineHeight: 1.65, opacity: 0.8, margin: '0 0 24px', maxWidth: 680, textWrap: 'pretty' }}>
+            <p style={{ fontSize: isMobile ? 14 : 16, lineHeight: 1.65, opacity: 0.8, margin: '0 0 24px', maxWidth: 820, textWrap: 'pretty' }}>
               Chaque dossard vendu contribue directement à cet engagement. Courir, marcher, banqueter — c'est aussi donner.
             </p>
-            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(3, auto)', gap: isMobile ? 14 : 36, paddingTop: 24, borderTop: '1px solid rgba(232,227,211,0.12)', maxWidth: 680 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(3, auto)', gap: isMobile ? 14 : 48, paddingTop: 24, borderTop: '1px solid rgba(232,227,211,0.12)', maxWidth: 820 }}>
               {[['+30', 'ANS D\'ACTION'], ['100%', 'BÉNÉVOLE'], ['HAUTE-', 'GARONNE']].map(([big, small], i) => (
                 <div key={i}>
                   <div style={{ fontFamily: '"Instrument Serif", serif', fontSize: isMobile ? 26 : 32, color: '#d4a574', lineHeight: 1 }}>{big}</div>
@@ -738,7 +738,7 @@ const OutdoorLanding = ({ assets, gpx }) => {
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: isMobile ? 32 : 48 }}>
-          {/* Lieu de rencontre + carte des spots */}
+          {/* Lieu de rencontre */}
           <div style={{ border: '1px solid rgba(232,227,211,0.14)', padding: isMobile ? '24px 20px' : '32px 28px', background: '#151c18' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20 }}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#d4a574" strokeWidth="1.7"><path d="M12 2C7.5 2 4 5.5 4 10c0 6 8 12 8 12s8-6 8-12c0-4.5-3.5-8-8-8z"/><circle cx="12" cy="10" r="2.8"/></svg>
@@ -748,108 +748,22 @@ const OutdoorLanding = ({ assets, gpx }) => {
             <div style={{ fontSize: isMobile ? 14 : 15, lineHeight: 1.55, opacity: 0.8, marginBottom: 20 }}>
               31320 Vieille-Toulouse · Haute-Garonne<br/>15 min au sud de Toulouse centre
             </div>
-
-            {/* Mini-carte des spots */}
-            <div style={{ position: 'relative', background: '#0f1412', border: '1px solid rgba(232,227,211,0.1)', aspectRatio: '4 / 3', overflow: 'hidden' }}>
-              <svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }}>
-                <defs>
-                  <pattern id="ipgrid" width="40" height="40" patternUnits="userSpaceOnUse">
-                    <path d="M40 0H0V40" fill="none" stroke="rgba(232,227,211,0.06)" strokeWidth="0.5"/>
-                  </pattern>
-                  <pattern id="ipgridFine" width="8" height="8" patternUnits="userSpaceOnUse">
-                    <path d="M8 0H0V8" fill="none" stroke="rgba(232,227,211,0.025)" strokeWidth="0.3"/>
-                  </pattern>
-                </defs>
-                <rect width="400" height="300" fill="url(#ipgridFine)"/>
-                <rect width="400" height="300" fill="url(#ipgrid)"/>
-
-                {/* Topo lines (stylized) */}
-                <g fill="none" stroke="rgba(212,165,116,0.18)" strokeWidth="0.8">
-                  <path d="M-20 180 Q 100 150, 200 170 T 420 160"/>
-                  <path d="M-20 200 Q 120 170, 220 195 T 420 185"/>
-                  <path d="M-20 220 Q 140 200, 240 220 T 420 210"/>
-                  <path d="M-20 240 Q 160 230, 250 245 T 420 240"/>
-                </g>
-
-                {/* Garonne (rivière, côté est) */}
-                <path d="M 360 -10 Q 340 60 350 140 Q 358 220 340 310" fill="none" stroke="rgba(108,154,170,0.55)" strokeWidth="6" strokeLinecap="round"/>
-                <text x="358" y="50" fill="rgba(108,154,170,0.8)" fontSize="8" fontFamily='"JetBrains Mono", monospace' letterSpacing="2">GARONNE</text>
-
-                {/* Routes principales */}
-                <path d="M 0 100 Q 100 110 180 150 Q 260 200 400 210" fill="none" stroke="rgba(232,227,211,0.28)" strokeWidth="2"/>
-                <path d="M 200 0 L 210 150 L 170 300" fill="none" stroke="rgba(232,227,211,0.2)" strokeWidth="1.5"/>
-                <path d="M 100 300 L 150 180 L 280 140 L 400 120" fill="none" stroke="rgba(232,227,211,0.15)" strokeWidth="1" strokeDasharray="2 3"/>
-
-                {/* Village area (sentiers trail, hints) */}
-                <circle cx="210" cy="150" r="60" fill="none" stroke="rgba(212,165,116,0.15)" strokeWidth="1" strokeDasharray="2 3"/>
-
-                {/* Labels zones */}
-                <text x="20" y="30" fill="rgba(232,227,211,0.35)" fontSize="9" fontFamily='"JetBrains Mono", monospace' letterSpacing="2">N ↑</text>
-                <text x="20" y="285" fill="rgba(232,227,211,0.3)" fontSize="8" fontFamily='"JetBrains Mono", monospace' letterSpacing="2">← TOULOUSE · 8 KM</text>
-                <text x="330" y="285" fill="rgba(232,227,211,0.3)" fontSize="8" fontFamily='"JetBrains Mono", monospace' letterSpacing="2" textAnchor="end">LACROIX-FALGARDE →</text>
-
-                {/* Spots */}
-                {/* 1 — Départ / Arrivée (centre) */}
-                <g transform="translate(210 150)">
-                  <circle r="18" fill="none" stroke="#d4a574" strokeWidth="1" strokeDasharray="2 2" opacity="0.6"/>
-                  <circle r="9" fill="#d4a574"/>
-                  <text x="0" y="3" fill="#0f1412" fontSize="11" fontFamily='"Instrument Serif", serif' fontStyle="italic" textAnchor="middle">1</text>
-                </g>
-                {/* 2 — Retrait dossards (juste à côté, nord) */}
-                <g transform="translate(232 128)">
-                  <circle r="8" fill="#e8e3d3" stroke="#0f1412" strokeWidth="1.5"/>
-                  <text x="0" y="3" fill="#0f1412" fontSize="9" fontFamily='"Instrument Serif", serif' textAnchor="middle">2</text>
-                </g>
-                {/* 3 — Parking Golf (ouest) */}
-                <g transform="translate(130 175)">
-                  <circle r="8" fill="#e8e3d3" stroke="#0f1412" strokeWidth="1.5"/>
-                  <text x="0" y="3" fill="#0f1412" fontSize="9" fontFamily='"Instrument Serif", serif' textAnchor="middle">3</text>
-                </g>
-                {/* 4 — Arrêt TAD119 (sud) */}
-                <g transform="translate(195 230)">
-                  <circle r="8" fill="#e8e3d3" stroke="#0f1412" strokeWidth="1.5"/>
-                  <text x="0" y="3" fill="#0f1412" fontSize="9" fontFamily='"Instrument Serif", serif' textAnchor="middle">4</text>
-                </g>
-
-                {/* Échelle */}
-                <g transform="translate(20 260)">
-                  <line x1="0" y1="0" x2="40" y2="0" stroke="rgba(232,227,211,0.4)" strokeWidth="1"/>
-                  <line x1="0" y1="-3" x2="0" y2="3" stroke="rgba(232,227,211,0.4)" strokeWidth="1"/>
-                  <line x1="40" y1="-3" x2="40" y2="3" stroke="rgba(232,227,211,0.4)" strokeWidth="1"/>
-                  <text x="20" y="14" fill="rgba(232,227,211,0.5)" fontSize="7" fontFamily='"JetBrains Mono", monospace' letterSpacing="1" textAnchor="middle">300 M</text>
-                </g>
-              </svg>
-              <div style={{ position: 'absolute', top: 10, right: 12, fontSize: 8, letterSpacing: '0.22em', fontFamily: '"JetBrains Mono", monospace', color: 'rgba(232,227,211,0.55)' }}>
-                VIEILLE-TOULOUSE · PLAN
-              </div>
-            </div>
-
-            {/* Légende spots */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 20 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1, background: 'rgba(232,227,211,0.1)', border: '1px solid rgba(232,227,211,0.1)' }}>
               {[
-                ['1', 'Départ & arrivée', 'Place du Village', true],
-                ['2', 'Retrait des dossards', 'Salle des fêtes · dès 14h00', false],
-                ['3', 'Parking', 'Golf de Vieille-Toulouse', false],
-                ['4', 'Arrêt TAD 119', 'Tisséo — sur réservation', false],
-              ].map(([n, title, sub, primary], i) => (
-                <div key={i} style={{ display: 'grid', gridTemplateColumns: '24px 1fr auto', alignItems: 'center', gap: 12 }}>
-                  <span style={{
-                    width: 22, height: 22, borderRadius: '50%',
-                    display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                    background: primary ? '#d4a574' : '#e8e3d3',
-                    color: '#0f1412',
-                    fontSize: 11, fontFamily: '"Instrument Serif", serif', fontStyle: primary ? 'italic' : 'normal',
-                  }}>{n}</span>
-                  <div>
-                    <div style={{ fontSize: isMobile ? 13 : 14, fontWeight: 500 }}>{title}</div>
-                    <div style={{ fontSize: 11, letterSpacing: '0.08em', fontFamily: '"JetBrains Mono", monospace', opacity: 0.6, marginTop: 2 }}>{sub}</div>
-                  </div>
+                ['PARKING', 'Golf de V-T'],
+                ['NAVETTE', 'Dep. Ramonville'],
+                ['RETRAIT', 'Dès 14h00'],
+                ['GPS', '43.526 · 1.445'],
+              ].map(([k, v], i) => (
+                <div key={i} style={{ background: '#151c18', padding: '14px 16px' }}>
+                  <div style={{ fontSize: 9, letterSpacing: '0.22em', opacity: 0.55, fontFamily: '"JetBrains Mono", monospace', marginBottom: 6 }}>{k}</div>
+                  <div style={{ fontSize: isMobile ? 13 : 14, fontFamily: '"JetBrains Mono", monospace' }}>{v}</div>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Déroulé de la journée */}
+                    {/* Déroulé de la journée */}
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 20 }}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#d4a574" strokeWidth="1.7"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
@@ -888,14 +802,23 @@ const OutdoorLanding = ({ assets, gpx }) => {
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(5, 1fr)', gap: 1, background: 'rgba(232,227,211,0.1)', border: '1px solid rgba(232,227,211,0.1)' }}>
           {[
-            { src: assets.logoVT, name: 'Mairie', sub: 'Vieille-Toulouse', invert: false },
-            { src: assets.logoVigoulet, name: 'Mairie', sub: 'Vigoulet-Auzil', invert: false },
-            { src: assets.logoPechbusque, name: 'Mairie', sub: 'Pechbusque', invert: false },
-            { src: assets.golf, name: 'Golf de', sub: 'Vieille-Toulouse', invert: false },
-            { src: assets.lions, name: 'Lions Club', sub: 'Toulouse Arènes', invert: false },
+            // bg: light tiles need white/cream bg for dark logos; dark tiles (#0f1412) for light/white logos
+            // fit: 'wide' for banner-shaped logos (taller padding + smaller wrapper), 'square' for normal
+            { src: assets.logoVT, name: 'Mairie', sub: 'Vieille-Toulouse', bg: '#ffffff', fit: 'wide' },
+            { src: assets.logoVigoulet, name: 'Mairie', sub: 'Vigoulet-Auzil', bg: '#ffffff', fit: 'square' },
+            { src: assets.logoPechbusque, name: 'Mairie', sub: 'Pechbusque', bg: '#ffffff', fit: 'square' },
+            { src: assets.golf, name: 'Golf de', sub: 'Vieille-Toulouse', bg: '#ffffff', fit: 'square' },
+            { src: assets.lions, name: 'Lions Club', sub: 'Toulouse Arènes', bg: '#151c18', fit: 'square' },
           ].map((p, i) => (
             <div key={i} style={{ background: '#0a0e0c', padding: isMobile ? '24px 16px' : '32px 24px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 14 }}>
-              <div style={{ background: '#ffffff', width: '100%', aspectRatio: '1.3 / 1', padding: 14, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <div style={{
+                background: p.bg,
+                width: '100%',
+                aspectRatio: '1.3 / 1',
+                padding: p.fit === 'wide' ? '28px 12px' : 14,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                border: p.bg === '#151c18' ? '1px solid rgba(232,227,211,0.14)' : 'none',
+              }}>
                 <img src={p.src} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', display: 'block' }}/>
               </div>
               <div style={{ fontSize: 10, letterSpacing: '0.16em', fontFamily: '"JetBrains Mono", monospace', opacity: 0.75, textAlign: 'center', lineHeight: 1.5 }}>

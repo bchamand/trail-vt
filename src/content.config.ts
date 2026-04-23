@@ -97,14 +97,7 @@ const event = defineCollection({
         title: z.string(),
         address: z.string(),
         accessNote: z.string(),
-        markers: z.array(z.object({
-          n: z.number(),
-          title: z.string(),
-          sub: z.string(),
-          lat: z.number(),
-          lon: z.number(),
-          primary: z.boolean().default(false),
-        })),
+        infoTiles: z.array(z.object({ key: z.string(), value: z.string() })),
       }),
       schedule: z.object({
         label: z.string(),
@@ -133,8 +126,14 @@ const event = defineCollection({
       legal: z.string(),
       eventLinks: z.array(link),
       contactLinks: z.array(link),
-      partners: z.array(z.object({ name: z.string(), logo: z.string() })),
       legalLinks: z.array(link),
+      featuredPartner: z.object({
+        label: z.string(),
+        name: z.string(),
+        sub: z.string(),
+        logo: z.string(),
+        logoAlt: z.string(),
+      }).optional(),
     }),
   }),
 });
