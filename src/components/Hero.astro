@@ -8,20 +8,32 @@ interface Props {
 const { event } = Astro.props;
 const mediaUrl = withBase(event.heroMedia);
 const isVideo = /\.(mp4|webm|mov)$/i.test(event.heroMedia);
+const posterUrl = withBase('/images/hero-poster.jpg');
 ---
 <section id="top" class="relative overflow-hidden" style="min-height: 88vh;">
   {isVideo ? (
-    <video
-      id="hero-media"
-      src={mediaUrl}
-      autoplay
-      muted
-      loop
-      playsinline
-      preload="metadata"
-      class="absolute inset-0 w-full object-cover pointer-events-none"
-      style="height: 110%; object-position: center 40%; filter: brightness(0.7) contrast(1.1) saturate(0.85); transform: translateY(0) scale(1.05);"
-    />
+    <>
+      <!-- Poster stays behind the video; if autoplay is blocked the
+           video is removed client-side so no play button can appear. -->
+      <img
+        id="hero-poster"
+        src={posterUrl}
+        alt=""
+        class="absolute inset-0 w-full object-cover pointer-events-none"
+        style="height: 110%; object-position: center 40%; filter: brightness(0.7) contrast(1.1) saturate(0.85); transform: translateY(0) scale(1.05);"
+      />
+      <video
+        id="hero-media"
+        src={mediaUrl}
+        autoplay
+        muted
+        loop
+        playsinline
+        preload="metadata"
+        class="absolute inset-0 w-full object-cover pointer-events-none"
+        style="height: 110%; object-position: center 40%; filter: brightness(0.7) contrast(1.1) saturate(0.85); transform: translateY(0) scale(1.05);"
+      />
+    </>
   ) : (
     <img
       id="hero-media"
@@ -100,25 +112,17 @@ const isVideo = /\.(mp4|webm|mov)$/i.test(event.heroMedia);
   </div>
 </section>
 
-<style>
-  /* iOS low-power mode blocks autoplay and overlays a play button on
-     the paused video. We hide it — the frozen first frame is fine as
-     a decorative poster. */
-  #hero-media::-webkit-media-controls-start-playback-button {
-    display: none !important;
-    -webkit-appearance: none;
-  }
-  #hero-media::-webkit-media-controls {
-    display: none !important;
-  }
-</style>
-
 <script>
-  const media = document.getElementById('hero-media') as HTMLElement;
+  const video = document.getElementById('hero-media') as HTMLVideoElement | null;
+  const poster = document.getElementById('hero-poster') as HTMLImageElement | null;
+  const layers = [video, poster].filter(Boolean) as HTMLElement[];
+
+  // Parallax applies to whichever layers remain.
   let ticking = false;
   function update() {
     const y = window.scrollY;
-    media.style.transform = `translateY(${y * 0.3}px) scale(1.05)`;
+    const t = `translateY(${y * 0.3}px) scale(1.05)`;
+    layers.forEach(el => { el.style.transform = t; });
     ticking = false;
   }
   window.addEventListener('scroll', () => {
@@ -127,4 +131,13 @@ const isVideo = /\.(mp4|webm|mov)$/i.test(event.heroMedia);
       ticking = true;
     }
   }, { passive: true });
+
+  // If autoplay is blocked (low-power mode on iOS/macOS Safari), drop
+  // the video entirely — the poster stays, the native play-button
+  // overlay can't appear since the <video> is no longer in the DOM.
+  if (video) {
+    const giveUp = () => video.remove();
+    video.play?.().catch(giveUp);
+    setTimeout(() => { if (video.paused) giveUp(); }, 1200);
+  }
 </script>
