@@ -1,40 +1,16 @@
 import maplibregl from 'maplibre-gl';
 import type { Track } from '../lib/gpx';
+import { resolveMapStyle } from '../lib/map-style';
 
 const INK = '#e8e3d3';
 const ACCENT = '#d4a574';
 const BG = '#0f1412';
-const MAP_STYLE = 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json';
 const PADDING = 40;
+const SAME_POINT_DEG = 0.0005; // ~50m
 
-const ROMAN = ['I', 'II', 'III', 'IV', 'V'];
-
-function setBoundsLock(map: maplibregl.Map, bounds: maplibregl.LngLatBounds) {
-  function lock() {
-    const visibleBounds = map.getBounds();
-    map.setMaxBounds(visibleBounds);
-    map.setMinZoom(map.getZoom());
-  }
-  map.on('load', lock);
-  map.on('resize', () => {
-    map.setMaxBounds(undefined as any);
-    map.setMinZoom(0);
-    map.fitBounds(bounds, { padding: PADDING, duration: 0 });
-    requestAnimationFrame(lock);
-  });
-}
-
-/** Build the styled Départ marker (dashed outer ring + filled dot + "DÉPART" label). */
 function mkStartMarker(): HTMLElement {
   const el = document.createElement('div');
-  // NOTE: no `position` override — MapLibre's .maplibregl-marker class sets
-  // `position: absolute`, which we rely on. Setting `position: relative` here
-  // would force the marker into document flow and make it shift when sibling
-  // markers toggle display.
-  el.style.cssText = `
-    width: 32px; height: 32px;
-    pointer-events: none;
-  `;
+  el.style.cssText = 'width: 32px; height: 32px; pointer-events: none;';
   el.innerHTML = `
     <div style="
       position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
@@ -59,8 +35,7 @@ function mkStartMarker(): HTMLElement {
   return el;
 }
 
-/** Segment end marker: circle with Roman numeral. */
-function mkEndMarker(roman: string, color: string): HTMLElement {
+function mkEndMarker(label: string, color: string): HTMLElement {
   const el = document.createElement('div');
   el.style.cssText = `
     width: 22px; height: 22px; border-radius: 50%;
@@ -72,22 +47,13 @@ function mkEndMarker(roman: string, color: string): HTMLElement {
     box-shadow: 0 2px 6px rgba(0,0,0,0.4);
     transition: opacity 0.25s ease;
   `;
-  el.textContent = roman;
+  el.textContent = label;
   return el;
 }
 
-/**
- * Hover marker: SOLID outer ring + cream-filled dot.
- * Intentionally different from the Départ marker (which uses a dashed
- * ring + accent-colored dot) so the two are never confused when the
- * hover point is near the start.
- */
-function mkHoverMarker(_color: string): HTMLElement {
+function mkHoverMarker(): HTMLElement {
   const el = document.createElement('div');
-  // No `position` override — see note in mkStartMarker.
-  el.style.cssText = `
-    width: 24px; height: 24px; pointer-events: none; display: none;
-  `;
+  el.style.cssText = 'width: 24px; height: 24px; pointer-events: none; display: none;';
   el.innerHTML = `
     <div class="hover-ring" style="
       position: absolute; inset: 0; border-radius: 50%;
@@ -103,200 +69,193 @@ function mkHoverMarker(_color: string): HTMLElement {
   return el;
 }
 
-/** Tint the hover ring with the active segment color; dot stays cream. */
-function updateHoverDotColor(el: HTMLElement, color: string) {
+function setHoverRingColor(el: HTMLElement, color: string) {
   const ring = el.querySelector('.hover-ring') as HTMLElement | null;
   if (ring) ring.style.borderColor = color;
 }
 
-/** Path styling helpers. */
-function drawTrack(
-  map: maplibregl.Map,
-  id: string,
-  coords: [number, number][],
-  color: string,
-  active: boolean,
-) {
-  const glowColor = color + '4D'; // 30% opacity
-  map.addSource(id, {
-    type: 'geojson',
-    data: { type: 'Feature', properties: {}, geometry: { type: 'LineString', coordinates: coords } },
-  });
-  map.addLayer({
-    id: `${id}-glow`, type: 'line', source: id,
-    paint: {
-      'line-color': glowColor,
-      'line-width': active ? 10 : 4,
-      'line-blur': active ? 6 : 2,
-      'line-opacity': active ? 1 : 0.3,
-    },
-  });
-  map.addLayer({
-    id: `${id}-line`, type: 'line', source: id,
-    paint: {
-      'line-color': color,
-      'line-width': active ? 3.2 : 2,
-      'line-opacity': active ? 1 : 0.3,
-    },
-  });
+function boundsOf(tracks: Track[]): maplibregl.LngLatBounds {
+  const b = new maplibregl.LngLatBounds(tracks[0].coords[0], tracks[0].coords[0]);
+  tracks.forEach(t => t.coords.forEach(c => b.extend(new maplibregl.LngLat(c[0], c[1]))));
+  return b;
 }
 
-function setTrackActive(map: maplibregl.Map, id: string, active: boolean) {
-  map.setPaintProperty(`${id}-glow`, 'line-width', active ? 10 : 4);
-  map.setPaintProperty(`${id}-glow`, 'line-blur', active ? 6 : 2);
-  map.setPaintProperty(`${id}-glow`, 'line-opacity', active ? 1 : 0.3);
-  map.setPaintProperty(`${id}-line`, 'line-width', active ? 3.2 : 2);
-  map.setPaintProperty(`${id}-line`, 'line-opacity', active ? 1 : 0.3);
+export interface SetRaceOptions {
+  colors: string[];          // one color per track (single-track passes one color)
+  endLabels?: string[];      // end marker labels per track (multi-track uses Roman numerals)
 }
 
-// ─── Single-track map ──────────────────────────────────────────────────────
-
-export interface SingleMapResult {
-  map: maplibregl.Map;
-  setMarkerAt: (index: number) => void;
-  clearMarker: () => void;
+export interface RaceMapHandle {
+  setRace(tracks: Track[], options: SetRaceOptions): void;
+  setActiveSeg(i: number | null): void;
+  setMarkerAt(segIdx: number, ptIdx: number): void;
+  clearMarker(): void;
+  destroy(): void;
 }
 
-export function initMap(container: HTMLElement, trackData: Track): SingleMapResult {
-  const bounds = new maplibregl.LngLatBounds(trackData.coords[0], trackData.coords[0]);
-  trackData.coords.forEach(c => bounds.extend(new maplibregl.LngLat(c[0], c[1])));
-
+export function createRaceMap(container: HTMLElement, mapStyle: string): RaceMapHandle {
   const map = new maplibregl.Map({
-    container, style: MAP_STYLE, bounds,
-    fitBoundsOptions: { padding: PADDING },
-    maxZoom: 15, attributionControl: false,
-    dragRotate: false, pitchWithRotate: false, touchZoomRotate: true,
+    container,
+    style: resolveMapStyle(mapStyle),
+    center: [0, 0],
+    zoom: 2,
+    maxZoom: 16,
+    attributionControl: false,
+    dragRotate: false,
+    pitchWithRotate: false,
+    touchZoomRotate: true,
   });
   map.touchZoomRotate.disableRotation();
   map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'bottom-right');
-  setBoundsLock(map, bounds);
 
-  // Hover marker
-  const hoverEl = mkHoverMarker(ACCENT);
-  const hoverMarker = new maplibregl.Marker({ element: hoverEl })
-    .setLngLat(trackData.coords[0]).addTo(map);
+  const hoverEl = mkHoverMarker();
+  const hoverMarker = new maplibregl.Marker({ element: hoverEl }).setLngLat([0, 0]).addTo(map);
 
-  function setMarkerAt(index: number) {
-    if (index < 0 || index >= trackData.coords.length) return;
-    hoverEl.style.display = 'block';
-    hoverMarker.setLngLat(trackData.coords[index]);
+  let tracks: Track[] = [];
+  let colors: string[] = [];
+  let activeSeg: number | null = null;
+  let currentBounds: maplibregl.LngLatBounds | null = null;
+  let startMarker: maplibregl.Marker | null = null;
+  const endMarkers: (maplibregl.Marker | null)[] = [];
+
+  function unlockView() {
+    map.setMaxBounds(undefined as any);
+    map.setMinZoom(0);
   }
-  function clearMarker() {
-    hoverEl.style.display = 'none';
+  function lockView() {
+    map.setMaxBounds(map.getBounds());
+    map.setMinZoom(map.getZoom());
   }
+  function refitAndLock(animate: boolean) {
+    if (!currentBounds) return;
+    unlockView();
+    map.fitBounds(currentBounds, { padding: PADDING, duration: animate ? 600 : 0 });
+    map.once('moveend', lockView);
+  }
+  map.on('resize', () => refitAndLock(false));
 
-  map.on('load', () => {
-    drawTrack(map, 'track', trackData.coords, ACCENT, true);
+  function trackId(i: number) { return `track-${i}`; }
 
-    // Départ marker (offset left-top)
-    const startEl = mkStartMarker();
-    new maplibregl.Marker({ element: startEl, anchor: 'center' })
-      .setLngLat(trackData.coords[0]).addTo(map);
-
-    // End marker (skip if it coincides with the start — loop returning home)
-    const [sLon, sLat] = trackData.coords[0];
-    const last = trackData.coords[trackData.coords.length - 1];
-    const SAME = 0.0005;
-    if (Math.abs(last[0] - sLon) >= SAME || Math.abs(last[1] - sLat) >= SAME) {
-      const endEl = mkEndMarker('A', ACCENT);
-      new maplibregl.Marker({ element: endEl }).setLngLat(last).addTo(map);
+  function removeTrackLayers() {
+    for (let i = 0; i < tracks.length; i++) {
+      const id = trackId(i);
+      if (map.getLayer(`${id}-line`)) map.removeLayer(`${id}-line`);
+      if (map.getLayer(`${id}-glow`)) map.removeLayer(`${id}-glow`);
+      if (map.getSource(id)) map.removeSource(id);
     }
-  });
-
-  return { map, setMarkerAt, clearMarker };
-}
-
-// ─── Multi-loop map ────────────────────────────────────────────────────────
-
-export interface MultiLoopMapResult {
-  map: maplibregl.Map;
-  setActiveSeg: (i: number | null) => void;
-  setMarkerAt: (segIdx: number, ptIdx: number) => void;
-  clearMarker: () => void;
-}
-
-export function initMultiLoopMap(
-  container: HTMLElement,
-  loopData: Track[],
-  colors: string[],
-  initialActive: number | null = null,
-): MultiLoopMapResult {
-  const allBounds = new maplibregl.LngLatBounds(loopData[0].coords[0], loopData[0].coords[0]);
-  loopData.forEach(track => {
-    track.coords.forEach(c => allBounds.extend(new maplibregl.LngLat(c[0], c[1])));
-  });
-
-  const map = new maplibregl.Map({
-    container, style: MAP_STYLE, bounds: allBounds,
-    fitBoundsOptions: { padding: PADDING },
-    maxZoom: 15, attributionControl: false,
-    dragRotate: false, pitchWithRotate: false, touchZoomRotate: true,
-  });
-  map.touchZoomRotate.disableRotation();
-  map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'bottom-right');
-  setBoundsLock(map, allBounds);
-
-  let activeSeg: number | null = initialActive;
-
-  // Hover marker
-  const hoverEl = mkHoverMarker(colors[0]);
-  const hoverMarker = new maplibregl.Marker({ element: hoverEl })
-    .setLngLat(loopData[0].coords[0]).addTo(map);
-
-  // End markers (one per loop)
-  const endMarkers: { el: HTMLElement; marker: maplibregl.Marker }[] = [];
-
-  function updateDimming() {
-    loopData.forEach((_, i) => {
-      const isActive = activeSeg == null || activeSeg === i;
-      setTrackActive(map, `loop-${i}`, isActive);
-      if (endMarkers[i]) endMarkers[i].el.style.opacity = isActive ? '1' : '0.3';
-    });
   }
 
-  function setActiveSeg(i: number | null) {
-    activeSeg = i;
-    updateDimming();
+  function removeMarkers() {
+    startMarker?.remove();
+    startMarker = null;
+    endMarkers.forEach(m => m?.remove());
+    endMarkers.length = 0;
   }
 
-  function setMarkerAt(segIdx: number, ptIdx: number) {
-    const track = loopData[segIdx];
-    if (!track || ptIdx < 0 || ptIdx >= track.coords.length) return;
-    updateHoverDotColor(hoverEl, colors[segIdx]);
-    hoverEl.style.display = 'block';
-    hoverMarker.setLngLat(track.coords[ptIdx]);
+  function paintTrack(i: number, active: boolean) {
+    const id = trackId(i);
+    map.setPaintProperty(`${id}-glow`, 'line-width', active ? 10 : 4);
+    map.setPaintProperty(`${id}-glow`, 'line-blur', active ? 6 : 2);
+    map.setPaintProperty(`${id}-glow`, 'line-opacity', active ? 1 : 0.3);
+    map.setPaintProperty(`${id}-line`, 'line-width', active ? 3.2 : 2);
+    map.setPaintProperty(`${id}-line`, 'line-opacity', active ? 1 : 0.3);
+    const em = endMarkers[i]?.getElement();
+    if (em) em.style.opacity = active ? '1' : '0.3';
   }
-  function clearMarker() { hoverEl.style.display = 'none'; }
 
-  map.on('load', () => {
-    loopData.forEach((track, i) => {
-      const isActive = activeSeg == null || activeSeg === i;
-      drawTrack(map, `loop-${i}`, track.coords, colors[i], isActive);
+  function applyActive() {
+    tracks.forEach((_, i) => paintTrack(i, activeSeg == null || activeSeg === i));
+  }
+
+  function drawCurrent(endLabels?: string[]) {
+    tracks.forEach((t, i) => {
+      const id = trackId(i);
+      const color = colors[i];
+      const active = activeSeg == null || activeSeg === i;
+      map.addSource(id, {
+        type: 'geojson',
+        data: { type: 'Feature', properties: {}, geometry: { type: 'LineString', coordinates: t.coords } },
+      });
+      map.addLayer({
+        id: `${id}-glow`, type: 'line', source: id,
+        paint: {
+          'line-color': color + '4D',
+          'line-width': active ? 10 : 4,
+          'line-blur': active ? 6 : 2,
+          'line-opacity': active ? 1 : 0.3,
+        },
+      });
+      map.addLayer({
+        id: `${id}-line`, type: 'line', source: id,
+        paint: {
+          'line-color': color,
+          'line-width': active ? 3.2 : 2,
+          'line-opacity': active ? 1 : 0.3,
+        },
+      });
     });
 
-    // Départ on the first loop's start
-    const startEl = mkStartMarker();
-    new maplibregl.Marker({ element: startEl, anchor: 'center' })
-      .setLngLat(loopData[0].coords[0]).addTo(map);
+    const start = tracks[0].coords[0];
+    startMarker = new maplibregl.Marker({ element: mkStartMarker(), anchor: 'center' })
+      .setLngLat(start).addTo(map);
 
-    // End marker per segment (Roman numeral). If a segment ends (near) the
-    // départ (shared start/end), skip it so we don't stack on the Départ pin.
-    const [startLon, startLat] = loopData[0].coords[0];
-    const SAME_POINT_DEG = 0.0005; // ~50m at this latitude
-    loopData.forEach((track, i) => {
-      const last = track.coords[track.coords.length - 1];
+    tracks.forEach((t, i) => {
+      const last = t.coords[t.coords.length - 1];
       const coincides =
-        Math.abs(last[0] - startLon) < SAME_POINT_DEG &&
-        Math.abs(last[1] - startLat) < SAME_POINT_DEG;
-      if (coincides) return; // départ pin represents all loop ends here
-      const el = mkEndMarker(ROMAN[i], colors[i]);
-      const marker = new maplibregl.Marker({ element: el })
+        Math.abs(last[0] - start[0]) < SAME_POINT_DEG &&
+        Math.abs(last[1] - start[1]) < SAME_POINT_DEG;
+      if (coincides) {
+        endMarkers[i] = null;
+        return;
+      }
+      const label = endLabels?.[i] ?? 'A';
+      endMarkers[i] = new maplibregl.Marker({ element: mkEndMarker(label, colors[i]) })
         .setLngLat(last).addTo(map);
-      endMarkers[i] = { el, marker };
     });
+  }
 
-    updateDimming();
-  });
+  function applyRace(next: Track[], opts: SetRaceOptions) {
+    removeTrackLayers();
+    removeMarkers();
+    tracks = next;
+    colors = opts.colors;
+    activeSeg = null;
+    drawCurrent(opts.endLabels);
+    currentBounds = boundsOf(tracks);
+    refitAndLock(true);
+  }
 
-  return { map, setActiveSeg, setMarkerAt, clearMarker };
+  let pending: { tracks: Track[]; opts: SetRaceOptions } | null = null;
+  function whenReady(fn: () => void) {
+    if (map.isStyleLoaded()) fn();
+    else map.once('load', fn);
+  }
+
+  return {
+    setRace(next, opts) {
+      pending = { tracks: next, opts };
+      whenReady(() => {
+        if (!pending) return;
+        const p = pending; pending = null;
+        applyRace(p.tracks, p.opts);
+      });
+    },
+    setActiveSeg(i) {
+      activeSeg = i;
+      if (tracks.length) applyActive();
+    },
+    setMarkerAt(segIdx, ptIdx) {
+      const t = tracks[segIdx];
+      if (!t || ptIdx < 0 || ptIdx >= t.coords.length) return;
+      setHoverRingColor(hoverEl, colors[segIdx] ?? ACCENT);
+      hoverEl.style.display = 'block';
+      hoverMarker.setLngLat(t.coords[ptIdx]);
+    },
+    clearMarker() {
+      hoverEl.style.display = 'none';
+    },
+    destroy() {
+      map.remove();
+    },
+  };
 }

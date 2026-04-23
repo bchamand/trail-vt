@@ -17,6 +17,11 @@ main:
     Cinq épreuves, un territoire, une première édition.
   heroImage: /images/garonne.jpg
 
+  # Map background. Presets: dark-matter, positron, voyager,
+  # openfreemap-liberty/positron/dark, ign-plan-v2, ign-scan-25, ign-photo.
+  # Any other value is passed through as a raw style URL.
+  mapStyle: ign-plan-v2
+
   urls:
     registration: https://chrono-start.com/
     contactEmail: contact@tectosages.fr
@@ -31,10 +36,10 @@ main:
   heroCtaLabel: PRENDRE SON DOSSARD →
 
   stats:
-    - { big: '{edition}',       small: ÉDITION  }
-    - { big: '{raceCount}',     small: ÉPREUVES }
-    - { big: '{maxDistance}KM', small: DÉFI MAX }
-    - { big: '3 OCT.',          small: SAMEDI   }
+    - { big: '{raceCount}',      small: ÉPREUVES       }
+    - { big: '{maxDistance}KM',  small: DÉFI MAX       }
+    - { big: '3 OCT.',           small: SAMEDI         }
+    - { big: VIEILLE-TOULOUSE,   small: HAUTE-GARONNE  }
 
   racesSection:
     label: — §01 / LES ÉPREUVES

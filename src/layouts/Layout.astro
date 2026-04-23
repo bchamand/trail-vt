@@ -2,8 +2,9 @@
 interface Props {
   title: string;
   description: string;
+  preconnect?: string[];
 }
-const { title, description } = Astro.props;
+const { title, description, preconnect = [] } = Astro.props;
 ---
 <!doctype html>
 <html lang="fr">
@@ -14,6 +15,9 @@ const { title, description } = Astro.props;
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    {preconnect.map(host => (
+      <link rel="preconnect" href={host} crossorigin />
+    ))}
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
     <title>{title}</title>
   </head>

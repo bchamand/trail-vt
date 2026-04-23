@@ -45,6 +45,7 @@ const event = defineCollection({
     tagline: z.string(),
     description: z.string(),
     heroImage: z.string(),
+    mapStyle: z.string().default('dark-matter'),
     urls: z.object({
       registration: z.string().url(),
       contactEmail: z.string(),
