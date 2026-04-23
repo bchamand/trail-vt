@@ -1,0 +1,204 @@
+---
+interface Marker {
+  n: number;
+  title: string;
+  sub: string;
+  lat: number;
+  lon: number;
+  primary: boolean;
+}
+interface Props {
+  data: {
+    label: string;
+    titleLine1: string;
+    titleEmphasis: string;
+    tagline: string;
+    meetingPlace: {
+      label: string;
+      title: string;
+      address: string;
+      accessNote: string;
+      markers: Marker[];
+    };
+    schedule: {
+      label: string;
+      items: { time: string; title: string }[];
+    };
+  };
+}
+const { data } = Astro.props;
+const { meetingPlace, schedule } = data;
+---
+<section id="pratique"
+  class="border-t border-[color:var(--color-line-soft)]"
+  style="padding: clamp(56px, 9vw, 120px) clamp(20px, 4vw, 80px);">
+
+  <!-- Section header -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-7 lg:gap-15 items-baseline"
+       style="margin-bottom: clamp(36px, 5vw, 56px); gap: clamp(28px, 4vw, 60px);">
+    <div>
+      <div class="mono-label mb-5">{data.label}</div>
+      <h2 class="h2-med">{data.titleLine1}<br/><em style="font-style: italic; opacity: 0.75;">{data.titleEmphasis}</em></h2>
+    </div>
+    <p class="max-w-[480px] text-[15px] sm:text-[17px] leading-[1.6] opacity-78 m-0" style="text-wrap: pretty;">
+      {data.tagline}
+    </p>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2" style="gap: clamp(32px, 4vw, 48px);">
+
+    <!-- Lieu de rencontre + map -->
+    <div class="border border-[color:var(--color-line)]" style="background: var(--color-bg-elev); padding: clamp(24px, 3vw, 32px) clamp(20px, 2.5vw, 28px);">
+      <div class="flex items-center gap-2.5 mb-5">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="1.7">
+          <path d="M12 2C7.5 2 4 5.5 4 10c0 6 8 12 8 12s8-6 8-12c0-4.5-3.5-8-8-8z"/>
+          <circle cx="12" cy="10" r="2.8"/>
+        </svg>
+        <span class="text-[10px] tracking-[0.26em]" style="font-family: var(--font-mono); color: var(--color-accent); font-weight: 600;">{meetingPlace.label}</span>
+      </div>
+      <div style="font-family: var(--font-serif); font-size: clamp(28px, 2.8vw, 36px); line-height: 1.05; margin-bottom: 10px;">{meetingPlace.title}</div>
+      <div class="text-[14px] sm:text-[15px] opacity-80 leading-[1.55] mb-5">
+        {meetingPlace.address}<br/>{meetingPlace.accessNote}
+      </div>
+
+      <!-- Real MapLibre map with markers -->
+      <div id="meeting-map" class="border border-[color:var(--color-line)]"
+           style="background: var(--color-bg); aspect-ratio: 4 / 3; width: 100%;"></div>
+
+      <!-- Marker legend -->
+      <div class="flex flex-col gap-2.5 mt-5">
+        {meetingPlace.markers.map((m) => (
+          <div class="grid items-center gap-3" style="grid-template-columns: 24px 1fr;">
+            <span
+              class="rounded-full inline-flex items-center justify-center"
+              style={`width: 22px; height: 22px; background: ${m.primary ? 'var(--color-accent)' : 'var(--color-ink)'}; color: var(--color-bg); font-family: var(--font-serif); font-size: 11px; font-style: ${m.primary ? 'italic' : 'normal'};`}
+            >{m.n}</span>
+            <div>
+              <div class="text-[13px] sm:text-[14px]" style="font-weight: 500;">{m.title}</div>
+              <div class="text-[11px] tracking-[0.08em] opacity-60 mt-0.5" style="font-family: var(--font-mono);">{m.sub}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <!-- Schedule timeline -->
+    <div>
+      <div class="flex items-center gap-2.5 mb-5">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="1.7">
+          <circle cx="12" cy="12" r="9"/>
+          <path d="M12 7v5l3 2"/>
+        </svg>
+        <span class="text-[10px] tracking-[0.26em]" style="font-family: var(--font-mono); color: var(--color-accent); font-weight: 600;">{schedule.label}</span>
+      </div>
+      <ul class="list-none m-0 p-0">
+        {schedule.items.map((item, i) => (
+          <li
+            class="schedule-item grid items-baseline gap-4 py-3.5"
+            data-first={i === 0}
+          >
+            <span style="font-family: var(--font-serif); font-size: clamp(20px, 2vw, 24px); font-style: italic; color: var(--color-accent); line-height: 1;">{item.time}</span>
+            <span class="text-[14px] sm:text-[15px] leading-[1.4] opacity-90">{item.title}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+
+  </div>
+</section>
+
+<script type="application/json" id="meeting-markers" set:html={JSON.stringify(meetingPlace.markers)} />
+
+<style>
+  .schedule-item {
+    grid-template-columns: 70px 1fr;
+    border-top: 1px solid var(--color-line-soft);
+  }
+  .schedule-item[data-first="true"] {
+    border-top-color: var(--color-line);
+  }
+  @media (min-width: 720px) {
+    .schedule-item { grid-template-columns: 90px 1fr; }
+  }
+</style>
+
+<script>
+  import maplibregl from 'maplibre-gl';
+  import { resolveMapStyle } from '../lib/map-style';
+
+  interface Marker {
+    n: number;
+    title: string;
+    sub: string;
+    lat: number;
+    lon: number;
+    primary: boolean;
+  }
+
+  const ACCENT = '#d4a574';
+  const INK = '#e8e3d3';
+  const BG = '#0f1412';
+
+  function mkPrimaryMarker(label: string): HTMLElement {
+    const el = document.createElement('div');
+    el.style.cssText = 'width: 32px; height: 32px; pointer-events: none;';
+    el.innerHTML = `
+      <div style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+        width: 28px; height: 28px; border-radius: 50%; border: 1.5px dashed ${ACCENT};"></div>
+      <div style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+        width: 12px; height: 12px; border-radius: 50%; background: ${ACCENT};
+        box-shadow: 0 0 10px rgba(212, 165, 116, 0.4);"></div>
+      <div style="position: absolute; left: 36px; top: 50%; transform: translateY(-50%);
+        font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700;
+        letter-spacing: 0.15em; color: ${INK}; text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+        white-space: nowrap;">${label}</div>
+    `;
+    return el;
+  }
+
+  function mkNumberedMarker(n: number): HTMLElement {
+    const el = document.createElement('div');
+    el.style.cssText = `
+      width: 24px; height: 24px; border-radius: 50%;
+      background: ${INK}; border: 1.5px solid ${BG};
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Instrument Serif', serif; font-weight: 600;
+      font-size: 12px; color: ${BG};
+      box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+    `;
+    el.textContent = String(n);
+    return el;
+  }
+
+  const markers: Marker[] = JSON.parse(document.getElementById('meeting-markers')!.textContent!);
+  const container = document.getElementById('meeting-map')!;
+
+  const bounds = new maplibregl.LngLatBounds(
+    [markers[0].lon, markers[0].lat],
+    [markers[0].lon, markers[0].lat],
+  );
+  markers.forEach(m => bounds.extend([m.lon, m.lat]));
+
+  const map = new maplibregl.Map({
+    container,
+    style: resolveMapStyle('dark-matter'),
+    bounds,
+    fitBoundsOptions: { padding: 50, maxZoom: 16 },
+    maxZoom: 18,
+    attributionControl: false,
+    dragRotate: false,
+    pitchWithRotate: false,
+  });
+  map.touchZoomRotate.disableRotation();
+  map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'bottom-right');
+
+  map.on('load', () => {
+    markers.forEach(m => {
+      const el = m.primary
+        ? mkPrimaryMarker(m.title.toUpperCase())
+        : mkNumberedMarker(m.n);
+      new maplibregl.Marker({ element: el, anchor: 'center' })
+        .setLngLat([m.lon, m.lat]).addTo(map);
+    });
+  });
+</script>

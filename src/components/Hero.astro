@@ -6,16 +6,31 @@ interface Props {
   event: CollectionEntry<'event'>['data'];
 }
 const { event } = Astro.props;
-const heroBg = withBase(event.heroImage);
+const mediaUrl = withBase(event.heroMedia);
+const isVideo = /\.(mp4|webm|mov)$/i.test(event.heroMedia);
 ---
 <section id="top" class="relative overflow-hidden" style="min-height: 88vh;">
-  <img
-    id="hero-img"
-    src={heroBg}
-    alt=""
-    class="absolute inset-0 w-full object-cover pointer-events-none"
-    style="height: 110%; object-position: center 40%; filter: brightness(0.7) contrast(1.1) saturate(0.85); transform: translateY(0) scale(1.05);"
-  />
+  {isVideo ? (
+    <video
+      id="hero-media"
+      src={mediaUrl}
+      autoplay
+      muted
+      loop
+      playsinline
+      preload="metadata"
+      class="absolute inset-0 w-full object-cover pointer-events-none"
+      style="height: 110%; object-position: center 40%; filter: brightness(0.7) contrast(1.1) saturate(0.85); transform: translateY(0) scale(1.05);"
+    />
+  ) : (
+    <img
+      id="hero-media"
+      src={mediaUrl}
+      alt=""
+      class="absolute inset-0 w-full object-cover pointer-events-none"
+      style="height: 110%; object-position: center 40%; filter: brightness(0.7) contrast(1.1) saturate(0.85); transform: translateY(0) scale(1.05);"
+    />
+  )}
 
   <div class="absolute inset-0 pointer-events-none"
        style="background: linear-gradient(to bottom, rgba(15,20,18,0.55) 0%, transparent 30%, transparent 55%, rgba(15,20,18,0.95) 100%);"></div>
@@ -23,28 +38,46 @@ const heroBg = withBase(event.heroImage);
   <div class="grain"></div>
 
   <div class="absolute inset-0 flex flex-col justify-end px-5 pb-10 sm:px-10 sm:pb-16 lg:px-20 lg:pb-16">
-    <div class="inline-flex self-start items-center gap-2.5"
-         style="padding: 7px 12px; border: 1px solid var(--color-accent); color: var(--color-accent); margin-bottom: 20px; background: rgba(15,20,18,0.35); backdrop-filter: blur(6px);">
-      <span style="width: 6px; height: 6px; background: var(--color-accent); border-radius: 50%; display: inline-block;"></span>
-      <span class="text-[10px] sm:text-[11px] tracking-[0.28em]" style="font-family: var(--font-mono); font-weight: 600;">ÉDITION {event.edition} · {event.year}</span>
-      <span style="width: 1px; height: 12px; background: rgba(212,165,116,0.5);"></span>
-      <span class="text-[10px] sm:text-[11px] tracking-[0.2em] opacity-85" style="font-family: var(--font-mono);">
-        <span class="sm:hidden">{event.dateShortMobile}</span>
-        <span class="hidden sm:inline">{event.dateShort}</span>
+    <!-- Edition line: short horizontal bar + label -->
+    <div class="flex items-center gap-3 sm:gap-3.5" style="margin-bottom: clamp(14px, 2vw, 22px);">
+      <span class="block" style="width: clamp(24px, 3vw, 36px); height: 1px; background: var(--color-accent);"></span>
+      <span class="text-[10px] sm:text-[11px] tracking-[0.28em]"
+            style="font-family: var(--font-mono); font-weight: 600; color: var(--color-accent);">
+        ÉDITION {event.edition}
       </span>
     </div>
 
-    <div style="margin-bottom: clamp(18px, 3vw, 28px);">
-      <div class="text-[10px] sm:text-[11px] tracking-[0.3em]"
-           style="font-family: var(--font-mono); color: rgba(232,227,211,0.6); margin-bottom: clamp(10px, 1.5vw, 14px);">
-        {event.locationShort}
+    <!-- Title -->
+    <h1 style="font-family: var(--font-serif); font-weight: 400; line-height: 0.86; letter-spacing: -0.038em; margin: 0; font-size: clamp(52px, 12vw, 156px);">
+      {event.nameShort}<br/><em style="font-style: italic; color: var(--color-accent);">{event.nameEmphasis}.</em>
+    </h1>
+
+    <!-- Location + date under the title -->
+    <div class="flex flex-col gap-2 sm:gap-2.5" style="margin-top: clamp(14px, 2vw, 22px);">
+      <div class="flex items-center gap-2.5">
+        <svg width="13" height="15" viewBox="0 0 24 30" fill="none" stroke="var(--color-accent)" stroke-width="2" style="flex-shrink: 0;">
+          <path d="M12 2 C 6 2 2 7 2 12 C 2 20 12 28 12 28 C 12 28 22 20 22 12 C 22 7 18 2 12 2 Z"/>
+          <circle cx="12" cy="12" r="3.2"/>
+        </svg>
+        <span class="text-[10px] sm:text-[11px] tracking-[0.3em]"
+              style="font-family: var(--font-mono); color: rgba(232,227,211,0.6);">
+          {event.locationShort}
+        </span>
       </div>
-      <h1 style="font-family: var(--font-serif); font-weight: 400; line-height: 0.86; letter-spacing: -0.038em; margin: 0; font-size: clamp(52px, 12vw, 156px);">
-        {event.nameShort}<br/><em style="font-style: italic; color: var(--color-accent);">{event.nameEmphasis}.</em>
-      </h1>
+      <div class="flex items-center gap-2.5">
+        <svg width="13" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="1.8" style="flex-shrink: 0;">
+          <rect x="3" y="5" width="18" height="16" rx="1"/>
+          <path d="M3 10h18M8 3v4M16 3v4"/>
+        </svg>
+        <span class="text-[10px] sm:text-[11px] tracking-[0.3em] uppercase"
+              style="font-family: var(--font-mono); color: rgba(232,227,211,0.6);">
+          {event.dateFull}
+        </span>
+      </div>
     </div>
 
-    <div style="padding-top: clamp(18px, 2.5vw, 24px); border-top: 1px solid rgba(232,227,211,0.18); margin-bottom: clamp(8px, 1vw, 12px);">
+    <!-- Tagline (secondary) with top border -->
+    <div style="padding-top: clamp(18px, 2.5vw, 24px); margin-top: clamp(18px, 2.5vw, 28px); border-top: 1px solid rgba(232,227,211,0.18); margin-bottom: clamp(8px, 1vw, 12px);">
       <p style="font-family: var(--font-serif); font-style: italic; font-weight: 400; line-height: 1.2; margin: 0; opacity: 0.95; text-wrap: balance; max-width: 820px; font-size: clamp(22px, 3.2vw, 36px);">
         {event.tagline}
       </p>
@@ -68,11 +101,11 @@ const heroBg = withBase(event.heroImage);
 </section>
 
 <script>
-  const img = document.getElementById('hero-img') as HTMLImageElement;
+  const media = document.getElementById('hero-media') as HTMLElement;
   let ticking = false;
   function update() {
     const y = window.scrollY;
-    img.style.transform = `translateY(${y * 0.3}px) scale(1.05)`;
+    media.style.transform = `translateY(${y * 0.3}px) scale(1.05)`;
     ticking = false;
   }
   window.addEventListener('scroll', () => {

@@ -15,7 +15,7 @@ main:
   description: >-
     Vieille-Toulouse fut la capitale des Volques Tectosages il y a 2300 ans.
     Cinq épreuves, un territoire, une première édition.
-  heroImage: /images/garonne.jpg
+  heroMedia: /video/hero.mp4
 
   # Map background. Presets: dark-matter, positron, voyager,
   # openfreemap-liberty/positron/dark, ign-plan-v2, ign-scan-25, ign-photo.
@@ -30,6 +30,7 @@ main:
     - { label: ÉPREUVES,   href: '#epreuves'   }
     - { label: HISTOIRE,   href: '#histoire'   }
     - { label: BANQUET,    href: '#banquet'    }
+    - { label: PRATIQUE,   href: '#pratique'   }
     - { label: ENGAGEMENT, href: '#engagement' }
 
   ctaLabel: S'INSCRIRE
@@ -88,12 +89,63 @@ main:
     titleLine1: Une part des inscriptions
     titleLine2: 'pour la '
     titleEmphasis: Fondation Marie-Louise
-    body: >-
-      Le Trail des Tectosages s'engage au côté de la Fondation Marie-Louise,
-      dont l'action caritative est portée par le Lions Club Toulouse Arènes Romaines.
-      Chaque dossard vendu contribue à cet engagement.
+    body:
+      - >-
+        Portée par le <em>Lions Club Toulouse Arènes Romaines</em>,
+        la Fondation Marie-Louise œuvre depuis plus de trente ans auprès
+        des enfants et adolescents en situation de handicap ou de grande
+        précarité en Haute-Garonne — séjours de répit, matériel adapté,
+        soutien aux familles.
+      - >-
+        Chaque dossard vendu contribue directement à cet engagement.
+        Courir, marcher, banqueter — c'est aussi donner.
     logo: /images/logo-marie-louise.png
     logoAlt: Fondation Marie-Louise
+    stats:
+      - { big: '+30',      small: ANS D'ACTION }
+      - { big: '100%',     small: BÉNÉVOLE     }
+      - { big: 'HAUTE-',   small: GARONNE      }
+
+  practicalInfo:
+    label: — §04 / INFOS PRATIQUES
+    titleLine1: Un après-midi,
+    titleEmphasis: un village.
+    tagline: >-
+      Rassemblement au cœur du village de Vieille-Toulouse. Départs échelonnés
+      l'après-midi, arrivées avant la nuit, banquet à la tombée du jour.
+    meetingPlace:
+      label: LIEU DE RENCONTRE
+      title: Place du Village
+      address: 31320 Vieille-Toulouse · Haute-Garonne
+      accessNote: 15 min au sud de Toulouse centre
+      # Placeholder coordinates — to be replaced with precise GPS.
+      markers:
+        - { n: 1, title: Mairie,        sub: Vieille-Toulouse,            lat: 43.5367, lon: 1.4449, primary: true  }
+        - { n: 2, title: Parking école, sub: École de Vieille-Toulouse,   lat: 43.5371, lon: 1.4455, primary: false }
+    schedule:
+      label: DÉROULÉ DE LA JOURNÉE
+      items:
+        - { time: 14h00, title: 'Ouverture village · retrait dossards'             }
+        - { time: 15h45, title: 'Départ — Défi de Copilos (30 km)'                 }
+        - { time: 16h15, title: 'Départ — L''Oppidum (12 km)'                      }
+        - { time: 16h30, title: 'Départs — Oppi-Dog & Rando des Sages'             }
+        - { time: 18h00, title: 'Départ — Tectokids (1–3 km)'                      }
+        - { time: 19h30, title: 'Remise des prix · podiums'                        }
+        - { time: 20h30, title: 'Banquet des Chefs · Golf de Vieille-Toulouse'     }
+
+  supporters:
+    label: — §05 / AVEC LE SOUTIEN DE
+    titleLine1: Un trail rendu possible par
+    titleEmphasis: trois villages, deux partenaires
+    body: >-
+      Ils ont ouvert leurs sentiers, leurs terrains et leurs portes pour que
+      cette première édition prenne vie.
+    partners:
+      - { name: Mairie,     sub: Vieille-Toulouse, logo: /images/logo-mairie-vieille-toulouse.png }
+      - { name: Mairie,     sub: Vigoulet-Auzil,   logo: /images/logo-mairie-vigoulet-auzil.png   }
+      - { name: Mairie,     sub: Pechbusque,       logo: /images/logo-mairie-pechbusque.png       }
+      - { name: Golf de,    sub: Vieille-Toulouse, logo: /images/logo-golf.png                    }
+      - { name: Lions Club, sub: Toulouse Arènes,  logo: /images/logo-lions.png                   }
 
   cta:
     label: — SAM. 3 OCT. 2026 &nbsp;/&nbsp; INSCRIPTIONS OUVERTES
@@ -108,6 +160,7 @@ main:
       - { label: Les épreuves, href: '#epreuves' }
       - { label: L'histoire,   href: '#histoire' }
       - { label: Le banquet,   href: '#banquet'  }
+      - { label: Pratique,     href: '#pratique' }
       - { label: Règlement,    href: '#'         }
       - { label: FAQ,          href: '#'         }
     contactLinks:

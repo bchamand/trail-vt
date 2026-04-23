@@ -7,9 +7,10 @@ interface Props {
     titleLine1: string;
     titleLine2: string;
     titleEmphasis: string;
-    body: string;
+    body: string[];
     logo: string;
     logoAlt: string;
+    stats?: { big: string; small: string }[];
   };
 }
 const { data } = Astro.props;
@@ -19,21 +20,33 @@ const logoUrl = withBase(data.logo);
   class="border-t border-[color:var(--color-line-soft)]"
   style="background: var(--color-bg-deep); padding: clamp(64px, 9vw, 100px) clamp(20px, 4vw, 80px);">
 
-  <div class="grid grid-cols-1 lg:grid-cols-[auto_1fr] items-center gap-6 lg:gap-15"
+  <div class="grid grid-cols-1 lg:grid-cols-[auto_1fr] items-start gap-6 lg:gap-15"
        style="gap: clamp(24px, 4vw, 60px);">
     <div class="logo-tile mx-auto lg:mx-0"
-         style="width: clamp(140px, 18vw, 220px); height: clamp(140px, 18vw, 220px); padding: clamp(14px, 1.5vw, 20px);">
+         style="width: clamp(140px, 18vw, 220px); height: clamp(140px, 18vw, 220px); padding: clamp(14px, 1.5vw, 20px); flex-shrink: 0;">
       <img src={logoUrl} alt={data.logoAlt}
            style="max-width: 100%; max-height: 100%; object-fit: contain;" />
     </div>
     <div>
       <div class="mono-label mb-3">{data.label}</div>
-      <h2 style="font-family: var(--font-serif); font-size: clamp(34px, 4vw, 56px); line-height: 1; font-weight: 400; margin: 0 0 16px;">
+      <h2 style="font-family: var(--font-serif); font-size: clamp(34px, 4vw, 56px); line-height: 1.05; font-weight: 400; margin: 0 0 20px;">
         {data.titleLine1}<br/>{data.titleLine2}<em style="color: var(--color-accent); font-style: italic;">{data.titleEmphasis}</em>.
       </h2>
-      <p class="text-[14px] sm:text-[15px] leading-[1.6] opacity-75 m-0 max-w-[620px]" style="text-wrap: pretty;">
-        {data.body}
-      </p>
+      {data.body.map((p) => (
+        <p class="text-[14px] sm:text-[15px] leading-[1.65] opacity-80 m-0 max-w-[680px] mb-5 last:mb-6" style="text-wrap: pretty;" set:html={p} />
+      ))}
+
+      {data.stats && data.stats.length > 0 && (
+        <div class="grid grid-cols-2 lg:grid-cols-3 pt-6 max-w-[680px]"
+             style="gap: clamp(14px, 2vw, 36px); border-top: 1px solid var(--color-line);">
+          {data.stats.map((s) => (
+            <div>
+              <div style="font-family: var(--font-serif); font-size: clamp(26px, 2.4vw, 32px); color: var(--color-accent); line-height: 1;">{s.big}</div>
+              <div class="text-[9px] sm:text-[10px] tracking-[0.22em] opacity-60 mt-1.5" style="font-family: var(--font-mono);">{s.small}</div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   </div>
 </section>

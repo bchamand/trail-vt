@@ -9,6 +9,8 @@ import Storytelling from '../components/Storytelling.astro';
 import Races from '../components/Races.astro';
 import type { RaceViewModel } from '../components/Races.astro';
 import Banquet from '../components/Banquet.astro';
+import PracticalInfo from '../components/PracticalInfo.astro';
+import Supporters from '../components/Supporters.astro';
 import Engagement from '../components/Engagement.astro';
 import CTA from '../components/CTA.astro';
 import Footer from '../components/Footer.astro';
@@ -83,6 +85,8 @@ const computedStats = event.stats.map(s => ({
   <Races races={races} section={event.racesSection} mapStyle={event.mapStyle} />
   <Banquet data={event.banquet} />
   <Engagement data={event.engagement} />
+  <PracticalInfo data={event.practicalInfo} />
+  <Supporters data={event.supporters} />
   <CTA data={event.cta} registrationUrl={event.urls.registration} />
   <Footer event={event} />
 </Layout>

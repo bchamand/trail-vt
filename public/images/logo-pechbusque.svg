@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" aria-label="Pechbusque">
+  
+  <path d="M 8 8 L 52 8 L 8 62 Z" fill="#3ba9d6"></path>
+  
+  <path d="M 54 10 Q 92 10 92 62 Q 92 90 58 92 Q 56 60 54 10 Z" fill="#2f8f5a"></path>
+  
+  <path d="M 10 88 Q 50 30 90 88 L 86 92 Q 50 40 14 92 Z" fill="#f2c036"></path>
+</svg>
