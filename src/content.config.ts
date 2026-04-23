@@ -42,6 +42,7 @@ const event = defineCollection({
     dateBadge: z.string(),
     location: z.string(),
     locationShort: z.string(),
+    locationCity: z.string(),
     tagline: z.string(),
     description: z.string(),
     heroMedia: z.string(),

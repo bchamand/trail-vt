@@ -16,7 +16,7 @@ const { event } = Astro.props;
         <span class="text-[16px] sm:text-[20px] tracking-[0.005em]" style="font-family: var(--font-serif); font-weight: 400;">
           {event.nameShort} <em style="color: var(--color-accent); font-style: italic;">{event.nameEmphasis}</em>
         </span>
-        <span class="text-[9px] sm:text-[10px] mt-[5px] opacity-60 tracking-[0.24em]" style="font-family: var(--font-mono);">ÉDITION {event.edition} · {event.year}</span>
+        <span class="text-[9px] sm:text-[10px] mt-[5px] opacity-60 tracking-[0.24em]" style="font-family: var(--font-mono);">{event.locationCity}</span>
       </span>
     </a>
 
