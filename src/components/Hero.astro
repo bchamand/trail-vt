@@ -100,6 +100,19 @@ const isVideo = /\.(mp4|webm|mov)$/i.test(event.heroMedia);
   </div>
 </section>
 
+<style>
+  /* iOS low-power mode blocks autoplay and overlays a play button on
+     the paused video. We hide it — the frozen first frame is fine as
+     a decorative poster. */
+  #hero-media::-webkit-media-controls-start-playback-button {
+    display: none !important;
+    -webkit-appearance: none;
+  }
+  #hero-media::-webkit-media-controls {
+    display: none !important;
+  }
+</style>
+
 <script>
   const media = document.getElementById('hero-media') as HTMLElement;
   let ticking = false;
