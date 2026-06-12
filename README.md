@@ -88,6 +88,26 @@ du script).
 - `public/images/logo-*.png` : les logos des partenaires (référencés dans
   `event.yaml`, section `supporters`).
 
+### 5. Les affiches imprimables — [`public/affiche/`](public/affiche)
+
+Deux variantes de l'affiche officielle, tout-en-un dans ce dossier
+(HTML + photos + logos + QR dans `assets/`) :
+
+| URL                  | Fichier                             | Variante                       |
+| :------------------- | :---------------------------------- | :----------------------------- |
+| `/trail-vt/affiche1` | `public/affiche/affiche1/index.html` | Fond courbes de niveau (DEM)   |
+| `/trail-vt/affiche2` | `public/affiche/affiche2/index.html` | Fond carte topo (OpenTopoMap)  |
+
+**Pour générer le PDF à envoyer à l'imprimeur** : ouvrir l'URL dans Chrome,
+`Cmd + P` → Destination « Enregistrer au format PDF », papier A4, marges
+« Aucune », cocher « Imprimer les arrière-plans ». Le PDF A4 obtenu
+s'agrandit en A3 ou se réduit en A5 sans aucune déformation (les formats A
+gardent les mêmes proportions) — l'imprimeur s'en charge.
+
+> ⚠️ Les textes des affiches (date, distances, QR) sont écrits **en dur**
+> dans ces deux fichiers HTML : si `event.yaml` change (date, parcours…),
+> penser à mettre à jour les affiches à la main.
+
 ## 🌍 Mise en ligne
 
 Rien à faire : un `git push` sur la branche `main` déclenche le workflow
