@@ -1,0 +1,25 @@
+---
+interface Props {
+  stats: { big: string; small: string }[];
+}
+const { stats } = Astro.props;
+---
+<section class="grid grid-cols-2 lg:grid-cols-4 border-y border-[color:var(--color-line)]"
+  style="background: var(--color-bg-deep);">
+  {stats.map((s, i) => (
+    <div
+      class:list={[
+        'py-6 px-5 sm:py-10 sm:px-8',
+        // Mobile: right border on left column (even index)
+        i % 2 === 0 && 'border-r border-[color:var(--color-line)]',
+        // Mobile: bottom border on top row (dropped at lg)
+        i < 2 && 'border-b border-[color:var(--color-line)] lg:border-b-0',
+        // Desktop: right border on all except the last
+        i < 3 && 'lg:border-r lg:border-[color:var(--color-line)]',
+      ]}
+    >
+      <div style="font-family: var(--font-serif); font-weight: 400; line-height: 0.95; color: var(--color-accent); font-size: clamp(22px, 3vw, 42px); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{s.big}</div>
+      <div class="mt-2 sm:mt-3 opacity-60 text-[9px] sm:text-[10px] tracking-[0.22em]" style="font-family: var(--font-mono);">{s.small}</div>
+    </div>
+  ))}
+</section>

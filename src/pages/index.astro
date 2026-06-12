@@ -1,0 +1,101 @@
+---
+import { getCollection, getEntry } from 'astro:content';
+import { join } from 'node:path';
+import Layout from '../layouts/Layout.astro';
+import Nav from '../components/Nav.astro';
+import Hero from '../components/Hero.astro';
+import DataStrip from '../components/DataStrip.astro';
+import Storytelling from '../components/Storytelling.astro';
+import Races from '../components/Races.astro';
+import type { RaceViewModel } from '../components/Races.astro';
+import Banquet from '../components/Banquet.astro';
+import PracticalInfo from '../components/PracticalInfo.astro';
+import Supporters from '../components/Supporters.astro';
+import Engagement from '../components/Engagement.astro';
+import CTA from '../components/CTA.astro';
+import Footer from '../components/Footer.astro';
+import { parseGpxFile } from '../lib/gpx';
+import { withBase } from '../lib/url';
+import { tileHosts } from '../lib/map-style';
+import { deriveEvent, expandTokens, fmtKm, toRoman } from '../lib/event';
+import '../styles/global.css';
+
+const eventEntry = await getEntry('event', 'main');
+if (!eventEntry) throw new Error('event.yaml: missing "main" entry');
+const derived = deriveEvent(eventEntry.data);
+
+const raceEntries = (await getCollection('races')).sort((a, b) => a.data.order - b.data.order);
+
+// Distance et D+ : valeurs officielles du frontmatter si présentes,
+// sinon calculées depuis la trace GPX.
+const raceData = await Promise.all(
+  raceEntries.map(async (entry, i) => {
+    const d = entry.data;
+    const gpxPath = join('public/traces', `${entry.id}.gpx`);
+    const tracks = await parseGpxFile(gpxPath);
+    const totalDistance = d.distance ?? tracks.reduce((s, t) => s + t.totalDistance, 0);
+    const totalAscent = d.ascent ?? tracks.reduce((s, t) => s + t.totalAscent, 0);
+
+    const segments = d.segments?.map((seg, si) => ({
+      ...seg,
+      roman: toRoman(si + 1),
+      distance: seg.distance ?? Math.round((tracks[si]?.totalDistance ?? 0) * 10) / 10,
+      ascent: seg.ascent ?? Math.round(tracks[si]?.totalAscent ?? 0),
+    }));
+
+    const vm: RaceViewModel = {
+      id: entry.id,
+      order: d.order,
+      roman: toRoman(i + 1),
+      title: d.title,
+      type: d.type,
+      description: d.description,
+      startTime: d.startTime,
+      difficulty: d.difficulty,
+      timed: d.timed,
+      unit: d.unit,
+      color: d.color,
+      distanceDisplay: fmtKm(totalDistance),
+      ascentDisplay: String(Math.round(totalAscent)),
+      gpxUrl: withBase(`/traces/${entry.id}.gpx`),
+      tracks,
+      segments,
+    };
+    return { vm, distanceKm: totalDistance };
+  })
+);
+const races: RaceViewModel[] = raceData.map(r => r.vm);
+const maxDistance = Math.max(...raceData.map(r => r.distanceKm));
+
+// Jetons utilisables dans toutes les chaînes d'event.yaml — voir ce fichier.
+const tokens: Record<string, string> = {
+  name: derived.name,
+  edition: derived.edition,
+  year: String(derived.year),
+  dateFull: derived.dateFull,
+  dateShort: derived.dateShort,
+  dateShortMobile: derived.dateShortMobile,
+  dateBadge: derived.dateBadge,
+  dateWeekday: derived.dateWeekday,
+  location: derived.location,
+  locationCity: derived.locationCity,
+  raceCount: toRoman(races.length),
+  maxDistance: fmtKm(maxDistance),
+};
+const event = expandTokens(derived, tokens);
+
+const pageTitle = `${event.name} — ${event.location} · ${event.dateShort.toLowerCase()} ${event.year}`;
+---
+<Layout title={pageTitle} description={event.description} preconnect={tileHosts(event.mapStyle)}>
+  <Nav event={event} />
+  <Hero event={event} />
+  <DataStrip stats={event.stats} />
+  <Storytelling data={event.storytelling} />
+  <Races races={races} section={event.racesSection} mapStyle={event.mapStyle} />
+  <Banquet data={event.banquet} />
+  <Engagement data={event.engagement} />
+  <PracticalInfo data={event.practicalInfo} />
+  <Supporters data={event.supporters} />
+  <CTA data={event.cta} registrationUrl={event.urls.registration} />
+  <Footer event={event} />
+</Layout>

@@ -1,0 +1,105 @@
+---
+interface Props {
+  data: {
+    label: string;
+    titleLine1: string;
+    titleEmphasis: string;
+    tagline: string;
+    meetingPlace: {
+      label: string;
+      title: string;
+      address: string;
+      accessNote: string;
+      infoTiles: { key: string; value: string }[];
+    };
+    schedule: {
+      label: string;
+      items: { time: string; title: string }[];
+    };
+  };
+}
+const { data } = Astro.props;
+const { meetingPlace, schedule } = data;
+---
+<section id="pratique"
+  class="border-t border-[color:var(--color-line-soft)]"
+  style="padding: clamp(56px, 9vw, 120px) clamp(20px, 4vw, 80px);">
+
+  <!-- Section header -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-7 lg:gap-15 items-start"
+       style="margin-bottom: clamp(36px, 5vw, 56px); gap: clamp(28px, 4vw, 60px);">
+    <div>
+      <div class="mono-label mb-5">{data.label}</div>
+      <h2 class="h2-med">{data.titleLine1}<br/><em style="font-style: italic; opacity: 0.75;">{data.titleEmphasis}</em></h2>
+    </div>
+    <p class="max-w-[480px] text-[15px] sm:text-[17px] leading-[1.6] opacity-78 m-0 lg:mt-[37px]" style="text-wrap: pretty;">
+      {data.tagline}
+    </p>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2" style="gap: clamp(32px, 4vw, 48px);">
+
+    <!-- Lieu de rencontre -->
+    <div class="border border-[color:var(--color-line)]" style="background: var(--color-bg-elev); padding: clamp(24px, 3vw, 32px) clamp(20px, 2.5vw, 28px);">
+      <div class="flex items-center gap-2.5 mb-5">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="1.7">
+          <path d="M12 2C7.5 2 4 5.5 4 10c0 6 8 12 8 12s8-6 8-12c0-4.5-3.5-8-8-8z"/>
+          <circle cx="12" cy="10" r="2.8"/>
+        </svg>
+        <span class="text-[10px] tracking-[0.26em]" style="font-family: var(--font-mono); color: var(--color-accent); font-weight: 600;">{meetingPlace.label}</span>
+      </div>
+      <div style="font-family: var(--font-serif); font-size: clamp(28px, 2.8vw, 36px); line-height: 1.05; margin-bottom: 10px;">{meetingPlace.title}</div>
+      <div class="text-[14px] sm:text-[15px] opacity-80 leading-[1.55] mb-5">
+        {meetingPlace.address}<br/>{meetingPlace.accessNote}
+      </div>
+
+      <!-- 2-column info tiles -->
+      <div class="grid grid-cols-2 gap-px border border-[color:var(--color-line)]"
+           style="background: var(--color-line);">
+        {meetingPlace.infoTiles.map(tile => (
+          <div style="background: var(--color-bg-elev); padding: 14px 16px;">
+            <div class="text-[9px] tracking-[0.22em] opacity-55 mb-1.5"
+                 style="font-family: var(--font-mono);">{tile.key}</div>
+            <div class="text-[13px] sm:text-[14px]" style="font-family: var(--font-mono);">{tile.value}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <!-- Schedule timeline -->
+    <div>
+      <div class="flex items-center gap-2.5 mb-5">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="1.7">
+          <circle cx="12" cy="12" r="9"/>
+          <path d="M12 7v5l3 2"/>
+        </svg>
+        <span class="text-[10px] tracking-[0.26em]" style="font-family: var(--font-mono); color: var(--color-accent); font-weight: 600;">{schedule.label}</span>
+      </div>
+      <ul class="list-none m-0 p-0">
+        {schedule.items.map((item, i) => (
+          <li
+            class="schedule-item grid items-baseline gap-4 py-3.5"
+            data-first={i === 0}
+          >
+            <span style="font-family: var(--font-serif); font-size: clamp(20px, 2vw, 24px); font-style: italic; color: var(--color-accent); line-height: 1;">{item.time}</span>
+            <span class="text-[14px] sm:text-[15px] leading-[1.4] opacity-90">{item.title}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+
+  </div>
+</section>
+
+<style>
+  .schedule-item {
+    grid-template-columns: 70px 1fr;
+    border-top: 1px solid var(--color-line-soft);
+  }
+  .schedule-item[data-first="true"] {
+    border-top-color: var(--color-line);
+  }
+  @media (min-width: 720px) {
+    .schedule-item { grid-template-columns: 90px 1fr; }
+  }
+</style>

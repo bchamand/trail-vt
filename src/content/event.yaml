@@ -1,0 +1,209 @@
+# ══════════════════════════════════════════════════════════════════════
+# CONFIGURATION DU SITE — Trail des Tectosages
+#
+# Modifiez ce fichier puis rechargez la page : tout le site se met à jour.
+#
+# Astuce : dans n'importe quel texte ci-dessous, vous pouvez écrire un
+# de ces « jetons », il sera remplacé automatiquement :
+#   {dateFull}        → Samedi 17 octobre 2026
+#   {dateShort}       → SAM. 17 OCTOBRE
+#   {dateShortMobile} → 17 OCT
+#   {dateBadge}       → SAM. 17 OCT. 2026
+#   {dateWeekday}     → SAMEDI
+#   {year}            → 2026
+#   {edition}         → I (chiffre romain)
+#   {name}            → Trail des Tectosages
+#   {location}        → Vieille-Toulouse, Haute-Garonne
+#   {locationCity}    → VIEILLE-TOULOUSE
+#   {raceCount}       → V (nombre d'épreuves, en chiffre romain)
+#   {maxDistance}     → 40,1 (distance de la plus longue épreuve)
+# ══════════════════════════════════════════════════════════════════════
+main:
+  # ── Paramètres généraux ─────────────────────────────────────────────
+  date: 2026-10-17          # Date de l'évènement (AAAA-MM-JJ)
+  edition: 1                # Numéro de l'édition (1 → « ÉDITION I »)
+  name: Trail des Tectosages
+  nameShort: Trail des      # Première ligne du logo…
+  nameEmphasis: Tectosages  # …et seconde ligne (en italique doré)
+  location: Vieille-Toulouse, Haute-Garonne
+  locationShort: VIEILLE-TOULOUSE · HAUTE-GARONNE
+  locationCity: VIEILLE-TOULOUSE
+  tagline: Sur la trace des Volques Tectosages.
+  description: >-
+    Vieille-Toulouse fut la capitale des Volques Tectosages il y a 2300 ans.
+    Cinq épreuves, un territoire, une première édition.
+  heroMedia: /video/hero.mp4   # Vidéo (ou image) plein écran de l'accueil
+
+  # Fond de carte. Choix : dark-matter, positron, voyager,
+  # openfreemap-liberty/positron/dark, ign-plan-v2, ign-scan-25, ign-photo.
+  # Toute autre valeur est traitée comme une URL de style brute.
+  mapStyle: ign-plan-v2
+
+  urls:
+    registration: https://chrono-start.com/
+    contactEmail: contact@tectosages.fr
+
+  # ── Menu de navigation ──────────────────────────────────────────────
+  nav:
+    - { label: ÉPREUVES,   href: '#epreuves'   }
+    - { label: HISTOIRE,   href: '#histoire'   }
+    - { label: BANQUET,    href: '#banquet'    }
+    - { label: PRATIQUE,   href: '#pratique'   }
+    - { label: ENGAGEMENT, href: '#engagement' }
+
+  ctaLabel: S'INSCRIRE
+  heroCtaLabel: PRENDRE SON DOSSARD →
+
+  # ── Bandeau de chiffres sous l'accueil ──────────────────────────────
+  stats:
+    - { big: '{raceCount}',        small: ÉPREUVES        }
+    - { big: '{maxDistance} KM',   small: DÉFI MAX        }
+    - { big: '{dateShortMobile}.', small: '{dateWeekday}' }
+    - { big: '{locationCity}',     small: HAUTE-GARONNE   }
+
+  # ── Section « Les épreuves » ────────────────────────────────────────
+  # Le contenu de chaque épreuve est dans src/content/races/*.md
+  racesSection:
+    label: — §01 / LES ÉPREUVES
+    titleLine1: Cinq départs.
+    titleLine2: Un seul territoire.
+    tagline: >-
+      Du Défi de Copillos à la Tectokids, chacune et chacun trouve sa boucle.
+      La marche dès le matin, les courses l'après-midi — les derniers
+      Héritiers finiront à la frontale.
+
+  # ── Section « L'histoire » ──────────────────────────────────────────
+  storytelling:
+    label: — §00 / L'HISTOIRE
+    title: 'Les traileurs sont-ils les'
+    titleEmphasis: 'descendants des Tectosages ?'
+    pillars:
+      - n: 'I'
+        title: L'ESPRIT DE CONQUÊTE
+        body: >-
+          Partir à la conquête du territoire de Tolosa — comme nos ancêtres gaulois,
+          il y a 2300 ans.
+      - n: 'II'
+        title: SIX BOUCLES, SIX VALEURS
+        body: >-
+          Conquête, honneur, endurance, courage, bravoure, prestige.
+          Chaque passage qualifie ou élimine — seuls les dignes franchiront.
+      - n: 'III'
+        title: LE DÉFI DE COPILLOS
+        body: >-
+          Dernier chef gaulois des Tectosages. Le titre d'Héritier revient
+          à celles et ceux qui enchaînent les six boucles.
+
+  # ── Section « Le banquet » ──────────────────────────────────────────
+  banquet:
+    label: — §02 / LE SOIR
+    titleLine1: 'Le '
+    titleEmphasis: Banquet
+    titleLine2: des Chefs.
+    body: >-
+      La nuit tombée, le village se rassemble. Banquet organisé par le
+      <em>Golf de Vieille-Toulouse</em> — tables longues, produits du Lauragais,
+      breuvage des conquérants. Inscription séparée.
+    cta: RÉSERVER SA PLACE →
+    ctaUrl: https://chrono-start.com/
+    imagePlaceholder: 'PHOTO BANQUET<br/>[À FOURNIR]'
+
+  # ── Section « Notre engagement » ────────────────────────────────────
+  engagement:
+    label: — §03 / NOTRE ENGAGEMENT
+    titleLine1: Une part des inscriptions
+    titleLine2: 'pour la '
+    titleEmphasis: Fondation Marie-Louise
+    body:
+      - >-
+        Portée par le <em>Lions Club Toulouse Arènes Romaines</em>,
+        la Fondation Marie-Louise œuvre depuis plus de trente ans auprès
+        des enfants et adolescents en situation de handicap ou de grande
+        précarité en Haute-Garonne — séjours de répit, matériel adapté,
+        soutien aux familles.
+      - >-
+        Chaque dossard vendu contribue directement à cet engagement.
+        Courir, marcher, banqueter — c'est aussi donner.
+    logo: /images/logo-marie-louise.png
+    logoAlt: Fondation Marie-Louise
+    stats:
+      - { big: '+30',      small: ANS D'ACTION }
+      - { big: '100%',     small: BÉNÉVOLE     }
+      - { big: 'HAUTE-',   small: GARONNE      }
+
+  # ── Section « Infos pratiques » ─────────────────────────────────────
+  practicalInfo:
+    label: — §04 / INFOS PRATIQUES
+    titleLine1: Une journée,
+    titleEmphasis: un village.
+    tagline: >-
+      Rassemblement au cœur du village de Vieille-Toulouse. La marche dès
+      10h00, les courses à partir de 15h30, l'arrivée des derniers
+      Héritiers vers 21h45.
+    meetingPlace:
+      label: LIEU DE RENCONTRE
+      title: Place du Village
+      address: 31320 Vieille-Toulouse · Haute-Garonne
+      accessNote: 15 min au sud de Toulouse centre
+      infoTiles:
+        - { key: PARKING, value: 'Ch. de Lespinas'  }
+        - { key: NAVETTE, value: 'Dep. Ramonville'  }
+        - { key: RETRAIT, value: 'Dès 14h00'        }
+        - { key: GPS,     value: '43.526 · 1.445'   }
+    schedule:
+      label: DÉROULÉ DE LA JOURNÉE
+      items:
+        - { time: 10h00, title: 'Départs libres — La Marche des Sages (jusqu''à 13h00)' }
+        - { time: 15h30, title: 'Départ — La Boucle de l''Oppidum'                      }
+        - { time: 15h40, title: 'Départ — L''Oppi-dog'                                  }
+        - { time: 16h00, title: 'Départ — Le Défi de Copillos'                          }
+        - { time: 17h30, title: 'Départ — La Tectokids'                                 }
+        - { time: 21h45, title: 'Arrivée des derniers Héritiers de Copillos'            }
+
+  # ── Section « Avec le soutien de » ──────────────────────────────────
+  supporters:
+    label: — §05 / AVEC LE SOUTIEN DE
+    titleLine1: Un trail rendu possible par
+    titleEmphasis: trois villages, deux partenaires
+    body: >-
+      Ils ont ouvert leurs sentiers, leurs terrains et leurs portes pour que
+      cette première édition prenne vie.
+    partners:
+      - { name: Mairie,     sub: Vieille-Toulouse, logo: /images/logo-mairie-vieille-toulouse.png }
+      - { name: Mairie,     sub: Vigoulet-Auzil,   logo: /images/logo-mairie-vigoulet-auzil.png   }
+      - { name: Mairie,     sub: Pechbusque,       logo: /images/logo-mairie-pechbusque.png       }
+      - { name: Golf de,    sub: Vieille-Toulouse, logo: /images/logo-golf.png                    }
+      - { name: Lions Club, sub: Toulouse Arènes,  logo: /images/logo-lions.png                   }
+
+  # ── Bandeau final d'inscription ─────────────────────────────────────
+  cta:
+    label: '— {dateBadge} &nbsp;/&nbsp; INSCRIPTIONS OUVERTES'
+    titleLine1: Héritier de
+    titleEmphasis: Copillos
+    titleSuffix: '?'
+    button: PRENDRE SON DOSSARD →
+
+  # ── Pied de page ────────────────────────────────────────────────────
+  footer:
+    legal: '© {year} · ASSOCIATION TRAIL DES TECTOSAGES'
+    eventLinks:
+      - { label: Les épreuves, href: '#epreuves' }
+      - { label: L'histoire,   href: '#histoire' }
+      - { label: Le banquet,   href: '#banquet'  }
+      - { label: Pratique,     href: '#pratique' }
+      - { label: Règlement,    href: '#'         }
+      - { label: FAQ,          href: '#'         }
+    contactLinks:
+      - { label: contact@tectosages.fr, href: 'mailto:contact@tectosages.fr' }
+      - { label: Instagram,             href: '#' }
+      - { label: Presse & médias,       href: '#' }
+    legalLinks:
+      - { label: MENTIONS LÉGALES,  href: '#' }
+      - { label: CGV,               href: '#' }
+      - { label: CONFIDENTIALITÉ,   href: '#' }
+    featuredPartner:
+      label: PARTENAIRE
+      name: Fondation
+      sub: Marie-Louise · Lions Club
+      logo: /images/logo-marie-louise.png
+      logoAlt: Fondation Marie-Louise

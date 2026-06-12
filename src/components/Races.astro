@@ -1,0 +1,398 @@
+---
+import type { Track } from '../lib/gpx';
+
+export interface RaceSegment {
+  roman: string;
+  label: string;
+  value: string;
+  status: string;
+  timeLimit: string;
+  color: string;
+  distance: number;
+  ascent: number;
+}
+
+export interface RaceViewModel {
+  id: string;
+  order: number;
+  roman: string;
+  title: string;
+  type: string;
+  description: string;
+  startTime: string;
+  difficulty: number;
+  timed: boolean;
+  unit: string;
+  color: string;
+  distanceDisplay: string;
+  ascentDisplay: string;
+  gpxUrl: string;
+  tracks: Track[];
+  segments?: RaceSegment[];
+}
+
+interface Props {
+  races: RaceViewModel[];
+  section: {
+    label: string;
+    titleLine1: string;
+    titleLine2: string;
+    tagline: string;
+  };
+  mapStyle: string;
+}
+const { races, section, mapStyle } = Astro.props;
+
+// Compact track payload for the client — strip redundant fields, round values.
+const clientPayload = {
+  mapStyle,
+  races: races.map(r => ({
+    id: r.id,
+    color: r.color,
+    segments: r.segments?.map(s => ({
+      roman: s.roman,
+      label: s.label,
+      color: s.color,
+      distance: Math.round(s.distance * 10) / 10,
+      ascent: Math.round(s.ascent),
+    })),
+    tracks: r.tracks.map(t => ({
+      coords: t.coords.map(([lon, lat]) => [
+        Math.round(lon * 1e5) / 1e5,
+        Math.round(lat * 1e5) / 1e5,
+      ]),
+      elevations: t.elevations.map(e => Math.round(e)),
+      distances: t.distances.map(d => Math.round(d * 1000) / 1000),
+      totalDistance: Math.round(t.totalDistance * 100) / 100,
+      totalAscent: Math.round(t.totalAscent),
+      totalDescent: Math.round(t.totalDescent),
+      minEle: Math.round(t.minEle),
+      maxEle: Math.round(t.maxEle),
+    })),
+    gpxUrl: r.gpxUrl,
+  })),
+};
+---
+<section id="epreuves" class="border-t border-[color:var(--color-line-soft)]"
+  style="background: var(--color-bg-deep); padding: clamp(48px, 8vw, 80px) clamp(20px, 4vw, 80px) clamp(72px, 12vw, 120px);">
+
+  <!-- Header -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-7 lg:gap-15 items-start mb-10 lg:mb-15"
+       style="margin-bottom: clamp(40px, 6vw, 60px);">
+    <div>
+      <div class="mono-label mb-5">{section.label}</div>
+      <h2 class="h2-med">{section.titleLine1}<br/><span class="italic opacity-75">{section.titleLine2}</span></h2>
+    </div>
+    <p class="max-w-[460px] text-[15px] sm:text-[17px] leading-[1.55] opacity-75 m-0 lg:mt-[37px]" style="text-wrap: pretty;">
+      {section.tagline}
+    </p>
+  </div>
+
+  <!-- Carousel / grid of race cards -->
+  <div id="race-carousel"
+       class="flex lg:grid lg:grid-cols-5 gap-3 lg:gap-px overflow-x-auto lg:overflow-visible snap-x snap-mandatory scrollbar-hide"
+       style="background: transparent;">
+    {races.map((race, i) => (
+      <button
+        class="race-card group text-left cursor-pointer flex-shrink-0 w-[220px] lg:w-auto snap-start transition-colors duration-200"
+        data-race-index={i}
+        data-has-segments={race.segments ? 'true' : 'false'}
+        style={`padding: 24px 20px; border: 1px solid var(--color-line); background: ${i === 0 ? 'var(--color-accent)' : 'var(--color-bg)'}; color: ${i === 0 ? 'var(--color-bg)' : 'var(--color-ink)'}; font-family: inherit;`}
+      >
+        <div class="mb-5 text-[10px] sm:text-[11px] tracking-[0.22em] opacity-65" style="font-family: var(--font-mono);">
+          {race.roman} / {race.title.toUpperCase()}
+        </div>
+        <div class="flex items-baseline gap-1 mb-3">
+          <span style="font-family: var(--font-serif); font-size: clamp(36px, 4.5vw, 44px); line-height: 0.9;">{race.distanceDisplay}</span>
+          <span class="text-[10px] sm:text-[11px] tracking-[0.15em] opacity-70" style="font-family: var(--font-mono);">{race.unit}</span>
+        </div>
+        <div class="flex gap-[3px] mt-3">
+          {Array.from({ length: 5 }).map((_, n) => (
+            <span class="race-diff-bar" data-filled={n < race.difficulty ? '1' : '0'} style="width: 14px; height: 3px; display: block;"></span>
+          ))}
+        </div>
+      </button>
+    ))}
+  </div>
+
+  <!-- Details area -->
+  <div class="grid grid-cols-1 lg:grid-cols-[1fr_1.2fr] gap-8 lg:gap-16 items-start"
+       style="margin-top: clamp(32px, 5vw, 64px);">
+
+    <div class="border border-[color:var(--color-line)]" style="background: var(--color-bg);">
+      <div id="segment-selector" class="hidden"></div>
+
+      <div class="relative">
+        <div id="race-map" class="map-container" style="height: 52vh; min-height: 320px; max-height: 540px; border: none;"></div>
+
+        <div id="map-tooltip" class="pointer-events-none"
+             style="position: absolute; bottom: 12px; right: 12px; display: none; background: var(--color-ink); color: var(--color-bg); padding: 8px 12px; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.14em; line-height: 1.6;"></div>
+      </div>
+
+      <div id="elevation-chart"></div>
+    </div>
+
+    <div>
+      {races.map((race, i) => (
+        <div class:list={['race-info', i === 0 ? '' : 'hidden']} data-info-index={i}>
+          <div class="mono-label mb-5">{race.roman} / {race.title.toUpperCase()}</div>
+          <h3 class="mb-5" style="font-family: var(--font-serif); font-weight: 400; line-height: 0.95; letter-spacing: -0.025em; font-size: clamp(44px, 5vw, 68px); margin: 0 0 20px;">
+            <em style="font-style: italic;">{race.type}</em>
+          </h3>
+          <p class="text-[15px] sm:text-[17px] leading-[1.55] opacity-85 m-0" style="text-wrap: pretty;">{race.description}</p>
+
+          <div class="grid grid-cols-3 gap-px mt-8 border border-[color:var(--color-line)]" style="background: var(--color-line);">
+            <div class="p-4 sm:p-5" style="background: var(--color-bg);">
+              <div class="text-[9px] tracking-[0.22em] opacity-50 mb-1.5" style="font-family: var(--font-mono);">DISTANCE</div>
+              <div class="text-[color:var(--color-accent)]" style="font-family: var(--font-serif); font-size: clamp(20px, 2.2vw, 28px);">{race.distanceDisplay} {race.unit.toLowerCase()}</div>
+            </div>
+            <div class="p-4 sm:p-5" style="background: var(--color-bg);">
+              <div class="text-[9px] tracking-[0.22em] opacity-50 mb-1.5" style="font-family: var(--font-mono);">D+</div>
+              <div class="text-[color:var(--color-accent)]" style="font-family: var(--font-serif); font-size: clamp(20px, 2.2vw, 28px);">{race.ascentDisplay === '—' ? '—' : `${race.ascentDisplay} m`}</div>
+            </div>
+            <div class="p-4 sm:p-5" style="background: var(--color-bg);">
+              <div class="text-[9px] tracking-[0.22em] opacity-50 mb-1.5" style="font-family: var(--font-mono);">DÉPART</div>
+              <div class="text-[color:var(--color-accent)]" style="font-family: var(--font-serif); font-size: clamp(20px, 2.2vw, 28px);">{race.startTime}</div>
+            </div>
+          </div>
+
+          {race.segments && (
+            <div class="mt-8">
+              <div class="text-[10px] tracking-[0.3em] opacity-50 mb-3" style="font-family: var(--font-mono);">
+                {race.segments.length} BOUCLES · {race.segments.length} VALEURS
+              </div>
+              {race.segments.map((seg) => (
+                <div class="grid items-baseline py-2.5 border-t border-[color:var(--color-line-soft)]" style="grid-template-columns: 40px 1fr auto auto; gap: 12px;">
+                  <span class="text-[color:var(--color-accent)]" style="font-family: var(--font-serif); font-style: italic; font-size: clamp(18px, 1.8vw, 22px);">{seg.roman}</span>
+                  <span class="text-[13px] sm:text-[15px] italic">« {seg.label} »</span>
+                  <span class="text-[10px] sm:text-[11px] opacity-70" style="font-family: var(--font-mono);">{seg.distance.toLocaleString('fr-FR')} km · +{seg.ascent} m</span>
+                  <span class="hidden sm:inline text-[11px] opacity-70" style="font-family: var(--font-mono);">lim. {seg.timeLimit}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<script type="application/json" id="race-data" set:html={JSON.stringify(clientPayload)} />
+
+<style is:global>
+  /* Mobile carousel bleeds to the section's horizontal padding so card 1
+     aligns with the map/text below regardless of viewport width.
+     scroll-padding-inline makes snap-start respect that padding. */
+  @media (max-width: 1023px) {
+    #race-carousel {
+      margin-left: calc(-1 * clamp(20px, 4vw, 80px));
+      margin-right: calc(-1 * clamp(20px, 4vw, 80px));
+      padding-left: clamp(20px, 4vw, 80px);
+      padding-right: clamp(20px, 4vw, 80px);
+      scroll-padding-inline: clamp(20px, 4vw, 80px);
+    }
+  }
+
+  .race-card .race-diff-bar[data-filled="1"] { background: var(--color-accent); }
+  .race-card .race-diff-bar[data-filled="0"] { background: rgba(232,227,211,0.15); }
+  .race-card.is-active .race-diff-bar[data-filled="1"] { background: var(--color-bg); }
+  .race-card.is-active .race-diff-bar[data-filled="0"] { background: rgba(15,20,18,0.2); }
+  .race-card:not(.is-active):hover { background: rgba(212,165,116,0.05) !important; }
+
+  /* « VUE COMPLÈTE » occupe toute la première ligne ; les boucles se
+     répartissent dessous (3 par ligne en mobile, une seule ligne en desktop —
+     --seg-cols est posé en JS selon le nombre de boucles). */
+  #segment-selector {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--color-line);
+    border-bottom: 1px solid var(--color-line);
+  }
+  #segment-selector.hidden { display: none; }
+  #segment-selector > button:first-child { grid-column: 1 / -1; }
+  @media (min-width: 720px) {
+    #segment-selector { grid-template-columns: repeat(var(--seg-cols, 4), 1fr); }
+  }
+  #segment-selector button {
+    padding: 12px 8px; min-width: 0;
+    background: var(--color-bg); color: var(--color-ink);
+    border: none; cursor: pointer;
+    font-family: var(--font-mono);
+    font-size: 10px; letter-spacing: 0.18em; font-weight: 600; line-height: 1.3;
+    transition: background-color .2s ease;
+    text-align: center;
+  }
+  #segment-selector button:hover { background: rgba(212, 165, 116, 0.06); }
+  #segment-selector button.is-active { color: var(--color-bg); }
+  #segment-selector .seg-sub {
+    display: block;
+    opacity: 0.7; font-size: 9px; margin-top: 3px; letter-spacing: 0.12em;
+  }
+</style>
+
+<script>
+  import { createRaceMap, type RaceMapHandle } from '../scripts/map';
+  import { renderElevation, type ElevationHandle } from '../scripts/elevation';
+  import type { Track } from '../lib/gpx';
+
+  interface ClientSegment { roman: string; label: string; color: string; distance: number; ascent: number; }
+  interface ClientRace {
+    id: string;
+    color: string;
+    segments?: ClientSegment[];
+    tracks: Track[];
+    gpxUrl: string;
+  }
+  interface ClientPayload { mapStyle: string; races: ClientRace[]; }
+
+  const payload: ClientPayload = JSON.parse(document.getElementById('race-data')!.textContent!);
+  const racesData = payload.races;
+  const mapStyle = payload.mapStyle;
+
+  const cards = document.querySelectorAll('.race-card');
+  const carousel = document.getElementById('race-carousel')!;
+  const infoPanels = document.querySelectorAll('.race-info');
+  const mapContainer = document.getElementById('race-map')!;
+  const elevContainer = document.getElementById('elevation-chart')!;
+  const segmentSelector = document.getElementById('segment-selector')!;
+  const mapTooltip = document.getElementById('map-tooltip')!;
+
+  const raceMap: RaceMapHandle = createRaceMap(mapContainer, mapStyle);
+  let currentElev: ElevationHandle | null = null;
+  let activeIndex = 0;
+  let activeSeg: number | null = null;
+
+  const fmt1 = (v: number) => v.toFixed(1);
+  const fmtI = (v: number) => String(Math.round(v));
+
+  function updateCardStyles(selected: number) {
+    cards.forEach((card, i) => {
+      const el = card as HTMLElement;
+      const isActive = i === selected;
+      el.classList.toggle('is-active', isActive);
+      el.style.background = isActive ? 'var(--color-accent)' : 'var(--color-bg)';
+      el.style.color = isActive ? 'var(--color-bg)' : 'var(--color-ink)';
+    });
+    infoPanels.forEach((panel, i) => panel.classList.toggle('hidden', i !== selected));
+  }
+
+  function updateSegmentSelectorActive() {
+    segmentSelector.querySelectorAll<HTMLButtonElement>('button').forEach(btn => {
+      const raw = btn.dataset.seg!;
+      const segIdx = raw === 'all' ? null : parseInt(raw);
+      const isActive = segIdx === activeSeg;
+      btn.classList.toggle('is-active', isActive);
+      btn.style.background = isActive ? (btn.dataset.color || 'var(--color-ink)') : 'var(--color-bg)';
+    });
+  }
+
+  function buildSegmentSelector(race: ClientRace) {
+    segmentSelector.innerHTML = '';
+    if (!race.segments) {
+      segmentSelector.classList.add('hidden');
+      return;
+    }
+    segmentSelector.classList.remove('hidden');
+    segmentSelector.style.setProperty('--seg-cols', String(race.segments.length));
+
+    const allBtn = document.createElement('button');
+    allBtn.dataset.seg = 'all';
+    allBtn.dataset.color = 'var(--color-ink)';
+    allBtn.textContent = 'VUE COMPLÈTE';
+    allBtn.addEventListener('click', () => selectSeg(null));
+    segmentSelector.appendChild(allBtn);
+
+    race.segments.forEach((seg, i) => {
+      const btn = document.createElement('button');
+      btn.dataset.seg = String(i);
+      btn.dataset.color = seg.color;
+      btn.innerHTML = `BOUCLE ${seg.roman}<span class="seg-sub">${seg.distance.toLocaleString('fr-FR')} KM · ${seg.ascent}M</span>`;
+      btn.addEventListener('click', () => selectSeg(i));
+      segmentSelector.appendChild(btn);
+    });
+  }
+
+  function selectSeg(i: number | null) {
+    activeSeg = i;
+    updateSegmentSelectorActive();
+    raceMap.setActiveSeg(i);
+    currentElev?.setActiveSeg(i);
+  }
+
+  function segOffset(segIdx: number): number {
+    const segs = racesData[activeIndex].tracks;
+    let acc = 0;
+    for (let i = 0; i < segIdx; i++) acc += segs[i].totalDistance;
+    return acc;
+  }
+
+  function onElevationHover(segIdx: number, ptIdx: number) {
+    const seg = racesData[activeIndex].tracks[segIdx];
+    if (!seg) return;
+    const km = seg.distances[ptIdx] + segOffset(segIdx);
+    const ele = seg.elevations[ptIdx];
+    mapTooltip.style.display = 'block';
+    mapTooltip.textContent = `KM ${fmt1(km)} · ALT ${fmtI(ele)} M`;
+    raceMap.setMarkerAt(segIdx, ptIdx);
+  }
+
+  function onElevationLeave() {
+    mapTooltip.style.display = 'none';
+    raceMap.clearMarker();
+  }
+
+  function showRace(raceIndex: number) {
+    if (currentElev) { currentElev.destroy(); currentElev = null; }
+    mapTooltip.style.display = 'none';
+    activeIndex = raceIndex;
+    activeSeg = null;
+    updateCardStyles(raceIndex);
+    const race = racesData[raceIndex];
+
+    if (race.segments) {
+      buildSegmentSelector(race);
+      updateSegmentSelectorActive();
+      const colors = race.segments.map(s => s.color);
+      const endLabels = race.segments.map(s => s.roman);
+      raceMap.setRace(race.tracks, { colors, endLabels });
+      currentElev = renderElevation({
+        container: elevContainer,
+        segments: race.tracks,
+        segmentColors: colors,
+        gpxHref: race.gpxUrl,
+        activeSeg: null,
+        onHover: onElevationHover,
+        onLeave: onElevationLeave,
+      });
+    } else {
+      segmentSelector.classList.add('hidden');
+      raceMap.setRace(race.tracks, { colors: [race.color] });
+      currentElev = renderElevation({
+        container: elevContainer,
+        segments: race.tracks,
+        segmentColors: [race.color],
+        gpxHref: race.gpxUrl,
+        activeSeg: null,
+        onHover: onElevationHover,
+        onLeave: onElevationLeave,
+      });
+    }
+  }
+
+  const CAROUSEL_BREAKPOINT = 1024;
+
+  cards.forEach(card => {
+    card.addEventListener('click', () => {
+      const el = card as HTMLElement;
+      const i = parseInt(el.dataset.raceIndex!);
+      if (i === activeIndex) return;
+      showRace(i);
+      if (window.innerWidth < CAROUSEL_BREAKPOINT) {
+        el.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+      }
+    });
+  });
+
+  showRace(0);
+</script>
