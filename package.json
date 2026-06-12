@@ -17,5 +17,8 @@
     "chart.js": "^4.5.1",
     "maplibre-gl": "^5.22.0",
     "tailwindcss": "^4.2.2"
+  },
+  "devDependencies": {
+    "vite": "^7.3.5"
   }
 }
