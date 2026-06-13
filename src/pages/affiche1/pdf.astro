@@ -1,23 +1,24 @@
+---
+// Export PDF A4 de l'affiche 1.
+// On récupère la page /affiche1 (source unique), on y injecte jsPDF + snapdom +
+// une barre d'export, puis on la rend dans CE document → les polices sont
+// chargées là où snapdom capture, donc embarquées fidèlement dans le PDF.
+import { withBase } from '../../lib/url';
+const afficheUrl = withBase('/affiche1');
+---
 <!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Export PDF · Affiche 1 · Trail des Tectosages</title>
+<title>Export PDF · Affiche · Trail des Tectosages</title>
 </head>
 <body style="margin:0;background:#0a0e0c;color:#e8e3d3;font-family:ui-monospace,monospace;">
 <p id="boot" style="padding:28px;letter-spacing:.12em;font-size:13px;">Chargement de l’affiche…</p>
-<script>
-/*
-  Page d'export PDF de l'affiche 1.
-  Principe : on récupère le VRAI index.html (source unique), on y injecte
-  jsPDF + snapdom + une barre d'export, puis on le rend dans CE document.
-  → les polices (Instrument Serif / JetBrains Mono) sont chargées là où
-    snapdom capture, donc embarquées fidèlement dans le PDF.
-*/
+<script is:inline define:vars={{ afficheUrl }}>
 (async function () {
   try {
-    var html = await (await fetch('./index.html', { cache: 'no-cache' })).text();
+    var html = await (await fetch(afficheUrl, { cache: 'no-cache' })).text();
 
     // libs dans le <head>
     var head =
@@ -69,8 +70,6 @@
       while (!window.__emap && elapsed < BAKE_TIMEOUT) { await wait(200); elapsed += 200; }
       var m = window.__emap;
       if (!m) return false;
-      // on attend un VRAI idle (toutes tuiles + courbes calculées), pas un état
-      // transitoire de début de chargement
       var idleSeen = false;
       m.on('idle', function () { idleSeen = true; });
       while (elapsed < BAKE_TIMEOUT &&
@@ -93,19 +92,15 @@
 
         set('Rendu de la carte de relief…');
         var settled = await waitMapSettled();
-        // cuisson fraîche, fidèle à la carte stabilisée (AVANT de masquer le WebGL,
-        // sinon le canvas a une taille nulle). Repli sur la cuisson auto sinon.
         if (settled && typeof window.__bakeElev === 'function') {
           window.__bakeElev(); await wait(300);
           window.__bakeElev(); await wait(450);   // double cuisson → dernier état stabilisé
         } else if (!settled) {
           set('Relief indisponible (hors-ligne ?) — capture sans relief…');
         }
-        // bascule WebGL → PNG cuit, puis laisse un frame au rendu
         if (!swapStyle.parentNode) document.head.appendChild(swapStyle);
         await wait(150);
 
-        // capture à l'échelle 1 (sans le scale d'affichage), puis on restaure
         var prev = poster.style.transform;
         poster.style.transform = 'none';
         set('Capture du rendu (' + SCALE + '×)…');
@@ -114,7 +109,7 @@
           backgroundColor: '#0f1412', width: W, height: H
         });
         poster.style.transform = prev;
-        window.dispatchEvent(new Event('resize')); // re-applique l'ajustement écran
+        window.dispatchEvent(new Event('resize'));
 
         set('Prêt — ' + lastCanvas.width + '×' + lastCanvas.height + ' px. Cliquez « Télécharger le PDF ».');
         dlBtn.disabled = false; againBtn.disabled = false;

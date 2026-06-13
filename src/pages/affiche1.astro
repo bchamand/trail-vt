@@ -1,16 +1,45 @@
+---
+// Affiche imprimable A4 — page du site (synchronisée avec event.yaml + les courses).
+// Les valeurs dynamiques (édition, lieu, dates, valeurs du Défi) viennent des données.
+import { getEntry } from 'astro:content';
+import { deriveEvent } from '../lib/event';
+import { withBase } from '../lib/url';
+
+const ev = await getEntry('event', 'main');
+if (!ev) throw new Error('event.yaml: entrée "main" manquante');
+const event = deriveEvent(ev.data);
+
+// Date : jour + mois dérivés (le reste vient de deriveEvent : dateWeekday, year)
+const fr = (opts: Intl.DateTimeFormatOptions) =>
+  new Intl.DateTimeFormat('fr-FR', { timeZone: 'UTC', ...opts }).format(event.date);
+const day = fr({ day: 'numeric' });
+const month = fr({ month: 'long' }).toUpperCase();
+
+// Kicker = valeurs des boucles du Défi de Copillos (article retiré, en majuscules).
+// Se met à jour tout seul quand le Défi change (6 boucles → 4).
+const defi = (await getEntry('races', 'defi-copillos'))?.data;
+const kicker = (defi?.segments ?? []).map((s) =>
+  s.label.replace(/^(l['’]|la |le |les )\s*/i, '').toUpperCase(),
+);
+const defiLoops = defi?.segments?.length ?? 0;
+const defiKm = defi?.distance ? Math.round(defi.distance) : '';
+const defiD = defi?.ascent ?? '';
+
+const img = (name: string) => withBase(`/images/${name}`);
+---
 <!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Affiche 1 · Trail des Tectosages</title>
+<title>Affiche · {event.name}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css"/>
-<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
-<script src="https://unpkg.com/maplibre-contour@0.1.0/dist/index.min.js"></script>
-<style>
+<script is:inline src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<script is:inline src="https://unpkg.com/maplibre-contour@0.1.0/dist/index.min.js"></script>
+<style is:global>
   :root{ --bg:#0f1412; --bg2:#0a0e0c; --ink:#e8e3d3; --gold:#d4a574; --gold-d:#b8915f; --olive:#9da36a; --muted:#8a8576; --line:rgba(232,227,211,0.16); }
   *{margin:0;padding:0;box-sizing:border-box;}
   html,body{height:100%;background:#000;overflow:hidden;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
@@ -84,9 +113,9 @@
 <body>
 <div id="stage">
   <div id="poster" data-screen-label="Affiche">
-    <div class="ph pano"><img src="../assets/vue-clean.jpg" alt="" style="transform:scale(1.34);transform-origin:56% 44%;"/><div class="shade" style="background:linear-gradient(180deg,rgba(10,14,12,.35),transparent 40%,transparent 70%,rgba(10,14,12,.55));"></div></div>
-    <div class="ph forest"><img src="../assets/foret-clean.jpg" alt="" style="transform:scale(1.06);transform-origin:54% 46%;"/><div class="shade" style="background:linear-gradient(100deg,rgba(10,14,12,.85) 4%,rgba(10,14,12,.2) 26%,transparent 50%);"></div></div>
-    <div class="ph meadow"><img src="../assets/champ-clean.jpg" alt="" style="transform:scale(1.42);transform-origin:34% 52%;"/><div class="shade" style="background:linear-gradient(95deg,rgba(10,14,12,.8) 2%,rgba(10,14,12,.15) 24%,transparent 46%),linear-gradient(0deg,rgba(10,14,12,.98) 0%,rgba(10,14,12,.62) 13%,rgba(10,14,12,.18) 30%,transparent 44%);"></div></div>
+    <div class="ph pano"><img src={img('vue-clean.jpg')} alt="" style="transform:scale(1.34);transform-origin:56% 44%;"/><div class="shade" style="background:linear-gradient(180deg,rgba(10,14,12,.35),transparent 40%,transparent 70%,rgba(10,14,12,.55));"></div></div>
+    <div class="ph forest"><img src={img('foret-clean.jpg')} alt="" style="transform:scale(1.06);transform-origin:54% 46%;"/><div class="shade" style="background:linear-gradient(100deg,rgba(10,14,12,.85) 4%,rgba(10,14,12,.2) 26%,transparent 50%);"></div></div>
+    <div class="ph meadow"><img src={img('champ-clean.jpg')} alt="" style="transform:scale(1.42);transform-origin:34% 52%;"/><div class="shade" style="background:linear-gradient(95deg,rgba(10,14,12,.8) 2%,rgba(10,14,12,.15) 24%,transparent 46%),linear-gradient(0deg,rgba(10,14,12,.98) 0%,rgba(10,14,12,.62) 13%,rgba(10,14,12,.18) 30%,transparent 44%);"></div></div>
 
     <div id="cliff"></div>
     <div id="elevmap"></div>
@@ -95,52 +124,47 @@
     <div class="grain"></div>
 
     <div class="content">
-      <!-- kicker -->
+      <!-- kicker · valeurs du Défi (dynamique) -->
       <div class="abs" style="left:60px;top:51px;line-height:2;">
-        <div class="kick">NATURE</div><div class="kick">PARTAGE</div><div class="kick">D&Eacute;PASSEMENT</div>
+        {kicker.map((v) => <div class="kick">{v}</div>)}
       </div>
 
       <!-- title · single line · typo site B · centré verticalement dans le creux -->
       <div class="abs" style="left:56px;top:334px;">
         <div style="display:flex;align-items:center;gap:14px;margin:0 0 24px 4px;white-space:nowrap;">
           <span style="display:inline-block;width:46px;height:1px;background:var(--gold);flex:0 0 auto;"></span>
-          <span class="mono" style="font-size:14px;letter-spacing:.32em;color:var(--gold);font-weight:600;">&Eacute;DITION&nbsp;I</span>
+          <span class="mono" style="font-size:14px;letter-spacing:.32em;color:var(--gold);font-weight:600;">ÉDITION&nbsp;{event.edition}</span>
         </div>
         <div class="trail">TRAIL</div>
         <div class="serif gold" style="font-style:italic;font-size:94px;line-height:1;margin-top:4px;white-space:nowrap;">des Tectosages</div>
         <div style="display:flex;align-items:center;gap:11px;margin-top:30px;">
           <svg class="ico" width="21" height="21" viewBox="0 0 24 24" style="stroke-width:1.7;"><path d="M12 21s7-6.4 7-12a7 7 0 0 0-14 0c0 5.6 7 12 7 12z"/><circle cx="12" cy="9" r="2.4"/></svg>
-          <span class="mono" style="font-size:22px;letter-spacing:.16em;color:var(--ink);font-weight:600;">VIEILLE&#8209;TOULOUSE</span>
+          <span class="mono" style="font-size:22px;letter-spacing:.16em;color:var(--ink);font-weight:600;white-space:nowrap;">{event.locationShort}</span>
         </div>
       </div>
       <!-- tagline (sous le titre) -->
       <div class="abs" style="left:60px;top:700px;">
         <div style="width:54px;height:1px;background:var(--gold);margin-bottom:24px;"></div>
-        <div class="serif" style="font-style:italic;font-size:40px;line-height:1.1;color:rgba(232,227,211,.9);">Sur la trace des<br/>Volques Tectosages.</div>
+        <div class="serif" style="font-style:italic;font-size:40px;line-height:1.1;color:rgba(232,227,211,.9);max-width:360px;">{event.tagline}</div>
       </div>
 
-      <!-- (bloc citation droite retiré) -->
-
-      <!-- ===== unified info band (aucun fond ajouté : même arrière-plan que l'affiche) ===== -->
-
-      <!-- bande info : date (1/3) + parcours & QR (2/3, espaces égaux,
-           barres de séparation centrées entre les parcours) -->
+      <!-- bande info : date (1/3) + parcours & QR (2/3) -->
       <div class="abs" style="left:60px;right:60px;bottom:141px;display:flex;align-items:flex-end;">
         <div>
-          <div class="mono" style="font-size:15px;letter-spacing:.46em;color:var(--gold);">SAMEDI</div>
-          <div class="serif" style="font-size:148px;line-height:.74;margin-top:20px;">17</div>
-          <div class="serif gold" style="font-size:58px;line-height:.9;letter-spacing:.04em;margin-top:18px;">OCTOBRE</div>
-          <div class="mono" style="font-size:14px;letter-spacing:.5em;color:var(--muted);margin-top:20px;">2026</div>
+          <div class="mono" style="font-size:15px;letter-spacing:.46em;color:var(--gold);">{event.dateWeekday}</div>
+          <div class="serif" style="font-size:148px;line-height:.74;margin-top:20px;">{day}</div>
+          <div class="serif gold" style="font-size:58px;line-height:.9;letter-spacing:.04em;margin-top:18px;">{month}</div>
+          <div class="mono" style="font-size:14px;letter-spacing:.5em;color:var(--muted);margin-top:20px;">{event.year}</div>
         </div>
         <div class="parc" style="margin-left:auto;width:66.666%;justify-content:space-between;">
           <div class="cell"><span class="ptype">TECTOKIDS</span><span class="km">1&ndash;3</span><span class="u">KM</span><div class="d">&nbsp;</div></div>
           <span class="sep"></span>
           <div class="cell"><span class="ptype">COURSES &amp; MARCHE</span><span class="km">5&ndash;10</span><span class="u">KM</span><div class="d">210&ndash;360 D+</div></div>
           <span class="sep"></span>
-          <div class="cell"><span class="ptype">D&Eacute;FI &middot; 6 BOUCLES</span><span class="km">40</span><span class="u">KM</span><div class="d">1230 D+</div></div>
+          <div class="cell"><span class="ptype">DÉFI &middot; {defiLoops} BOUCLES</span><span class="km">{defiKm}</span><span class="u">KM</span><div class="d">{defiD} D+</div></div>
           <div style="display:flex;flex-direction:column;align-items:center;gap:14px;">
-            <a href="https://bchamand.github.io/trail-vt/" target="_blank" rel="noopener" style="display:block;">
-              <span style="background:#fff;border-radius:8px;padding:10px;display:block;"><img src="../assets/qr-trail-vt.png" alt="QR inscriptions" style="width:104px;height:104px;display:block;"/></span>
+            <a href={withBase('/')} target="_blank" rel="noopener" style="display:block;">
+              <span style="background:#fff;border-radius:8px;padding:10px;display:block;"><img src={img('qr-trail-vt.png')} alt="QR inscriptions" style="width:104px;height:104px;display:block;"/></span>
             </a>
             <div style="text-align:center;">
               <div class="mono" style="font-size:10px;letter-spacing:.24em;color:var(--gold);line-height:1.8;">INFOS &amp;<br/>INSCRIPTIONS</div>
@@ -155,20 +179,22 @@
         <!-- bénéficiaire (gauche) -->
         <div style="display:flex;align-items:center;gap:16px;">
           <span class="mono" style="font-size:10px;letter-spacing:.26em;color:var(--muted);white-space:nowrap;">AU&nbsp;PROFIT&nbsp;DE</span>
-          <span style="background:#fff;border-radius:9px;width:172px;height:82px;display:flex;align-items:center;justify-content:center;padding:12px 16px;"><img src="../assets/logo-marie-louise-rect.png" style="max-width:100%;max-height:100%;object-fit:contain;"/></span>
+          <span style="background:#fff;border-radius:9px;width:172px;height:82px;display:flex;align-items:center;justify-content:center;padding:12px 16px;"><img src={img('logo-marie-louise-rect.png')} style="max-width:100%;max-height:100%;object-fit:contain;"/></span>
         </div>
-        <!-- partenaires (droite) -->
-        <div style="display:flex;align-items:center;gap:16px;">
+        <!-- soutiens (droite) · cases plus larges pour les logos paysage (mairies) -->
+        <div style="display:flex;align-items:center;gap:12px;">
           <span class="mono" style="font-size:10px;letter-spacing:.26em;color:var(--muted);white-space:nowrap;">AVEC&nbsp;LE&nbsp;SOUTIEN&nbsp;DE</span>
-          <span style="background:#fff;border-radius:9px;width:82px;height:82px;display:flex;align-items:center;justify-content:center;padding:11px;"><img src="../assets/logo-lions-toulouse-arenes.png" style="max-width:100%;max-height:100%;object-fit:contain;"/></span>
-          <span style="background:#fff;border-radius:9px;width:82px;height:82px;display:flex;align-items:center;justify-content:center;padding:11px;"><img src="../assets/logo-golf-vieille-toulouse.png" style="max-width:100%;max-height:100%;object-fit:contain;"/></span>
+          <span style="background:#fff;border-radius:9px;width:150px;height:82px;display:flex;align-items:center;justify-content:center;padding:12px 16px;"><img src={img('logo-mairie-vieille-toulouse.png')} style="max-width:100%;max-height:100%;object-fit:contain;"/></span>
+          <span style="background:#fff;border-radius:9px;width:112px;height:82px;display:flex;align-items:center;justify-content:center;padding:10px 14px;"><img src={img('logo-mairie-pechbusque.jpeg')} style="max-width:100%;max-height:100%;object-fit:contain;"/></span>
+          <span style="background:#fff;border-radius:9px;width:82px;height:82px;display:flex;align-items:center;justify-content:center;padding:11px;"><img src={img('logo-lionsclubs.png')} style="max-width:100%;max-height:100%;object-fit:contain;"/></span>
+          <span style="background:#fff;border-radius:9px;width:82px;height:82px;display:flex;align-items:center;justify-content:center;padding:11px;"><img src={img('logo-golf.png')} style="max-width:100%;max-height:100%;object-fit:contain;"/></span>
         </div>
       </div>
     </div>
   </div>
 </div>
 
-<script>
+<script is:inline>
   // ---- geometry (1024 x 1536) ----
   var ridge=[[348,0],[366,90],[352,170],[404,260],[468,366],[520,474],[548,580],[558,684],[516,772],[446,858],[372,918],[330,986],[366,1086],[438,1188],[462,1176],[470,1198]];
   var panoSeam=[[404,260],[520,250],[660,232],[800,205],[1024,168]];
@@ -275,22 +301,16 @@
   (function(){
     var svg=document.getElementById('seams');
     function add(tag,attr){ var e=document.createElementNS(SVGNS,tag); for(var k in attr) e.setAttribute(k,attr[k]); svg.appendChild(e); return e; }
-    // densifie une polyligne (un point tous les ~step px)
     function densify(pts,step){ var out=[]; for(var i=0;i<pts.length-1;i++){ var a=pts[i],b=pts[i+1],dx=b[0]-a[0],dy=b[1]-a[1],L=Math.hypot(dx,dy),n=Math.max(1,Math.round(L/step)); for(var j=0;j<n;j++) out.push([a[0]+dx*j/n,a[1]+dy*j/n]); } out.push(pts[pts.length-1]); return out; }
-    // lissage léger (arrondit les angles → tracé organique)
     function smooth(pts,passes){ for(var p=0;p<passes;p++){ var o=pts.slice(); for(var i=1;i<pts.length-1;i++){ o[i]=[(pts[i-1][0]+2*pts[i][0]+pts[i+1][0])/4,(pts[i-1][1]+2*pts[i][1]+pts[i+1][1])/4]; } pts=o; } return pts; }
     function arclen(pts){ var s=[0]; for(var i=1;i<pts.length;i++) s[i]=s[i-1]+Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1]); return s; }
     function normals(pts){ var n=[]; for(var i=0;i<pts.length;i++){ var a=pts[Math.max(0,i-1)],b=pts[Math.min(pts.length-1,i+1)],dx=b[0]-a[0],dy=b[1]-a[1],L=Math.hypot(dx,dy)||1; n.push([dy/L,-dx/L]); } return n; }
-    // bruit doux le long de l'abscisse curviligne (propre à chaque strate via seed)
     function noise(s,seed){ return Math.sin(s*0.012+seed*1.7)*0.55+Math.sin(s*0.026+seed*3.1)*0.30+Math.sin(s*0.052+seed*0.6)*0.15; }
-    // polyligne -> chemin lissé (Catmull-Rom -> bézier)
     function toPath(pts){ if(pts.length<3) return 'M'+pts.map(function(p){return p[0].toFixed(1)+' '+p[1].toFixed(1);}).join(' L '); var d='M '+pts[0][0].toFixed(1)+' '+pts[0][1].toFixed(1); for(var i=0;i<pts.length-1;i++){ var p0=pts[i-1]||pts[i],p1=pts[i],p2=pts[i+1],p3=pts[i+2]||pts[i+1]; var c1x=p1[0]+(p2[0]-p0[0])/6,c1y=p1[1]+(p2[1]-p0[1])/6,c2x=p2[0]-(p3[0]-p1[0])/6,c2y=p2[1]-(p3[1]-p1[1])/6; d+=' C '+c1x.toFixed(1)+' '+c1y.toFixed(1)+' '+c2x.toFixed(1)+' '+c2y.toFixed(1)+' '+p2[0].toFixed(1)+' '+p2[1].toFixed(1); } return d; }
     function offPts(pts,nrm,s,d,seed,amp){ return pts.map(function(p,i){ var o=d+amp*noise(s[i],seed); return [p[0]+nrm[i][0]*o, p[1]+nrm[i][1]*o]; }); }
-    // strates de contours irrégulièrement espacées, chacune avec sa propre ondulation
     var OFFS=[0,7,15,23,33,45,58], OPS=[0.5,0.36,0.28,0.2,0.14,0.1,0.06];
     function contourSeam(raw, side){
       var pts=smooth(densify(raw,8),1), s=arclen(pts), nrm=normals(pts);
-      // ombre douce : masque la coupe nette de la photo, sans effet « falaise »
       add('path',{d:toPath(pts),fill:'none',stroke:'rgba(9,12,10,0.7)','stroke-width':6,'stroke-linejoin':'round','stroke-linecap':'round'});
       for(var k=0;k<OFFS.length;k++){
         var pp=offPts(pts,nrm,s,OFFS[k]*side,k*1.37,3.2);
