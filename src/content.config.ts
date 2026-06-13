@@ -17,6 +17,8 @@ const races = defineCollection({
   schema: z.object({
     order: z.number().int(),
     hidden: z.boolean().default(false), // true → l'épreuve n'apparaît pas sur le site
+    poster: z.boolean().default(false), // true → l'épreuve apparaît sur l'affiche
+    posterType: z.string().optional(),  // « type de course » sur l'affiche (ex. « 4 boucles par élimination »)
     title: z.string(),
     type: z.string(),
     description: z.string(),

@@ -4,6 +4,8 @@
 # affichées ; si on les retire, le site recalcule depuis la trace GPX
 # (public/traces/defi-copillos.gpx).
 order: 1
+poster: true                          # afficher cette course sur l'affiche
+posterType: 4 boucles par élimination # « type de course » montré sur l'affiche
 title: Défi de Copillos
 type: L'épreuve reine
 description: >-

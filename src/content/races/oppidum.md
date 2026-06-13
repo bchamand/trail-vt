@@ -3,6 +3,8 @@
 # « distance » (km) et « ascent » (D+ en m) sont les valeurs officielles
 # affichées ; si on les retire, le site recalcule depuis la trace GPX.
 order: 2
+poster: true                  # afficher cette course sur l'affiche
+posterType: 1 boucle chronométrée
 title: L'Oppidum
 type: Chronométrée · classée
 description: >-
