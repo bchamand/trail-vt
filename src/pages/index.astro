@@ -24,7 +24,9 @@ const eventEntry = await getEntry('event', 'main');
 if (!eventEntry) throw new Error('event.yaml: missing "main" entry');
 const derived = deriveEvent(eventEntry.data);
 
-const raceEntries = (await getCollection('races')).sort((a, b) => a.data.order - b.data.order);
+const raceEntries = (await getCollection('races'))
+  .filter(e => !e.data.hidden) // les épreuves « hidden: true » n'apparaissent pas
+  .sort((a, b) => a.data.order - b.data.order);
 
 // Distance et D+ : valeurs officielles du frontmatter si présentes,
 // sinon calculées depuis la trace GPX.

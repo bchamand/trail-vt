@@ -3,6 +3,7 @@
 # « distance » (km) et « ascent » (D+ en m) sont les valeurs officielles
 # affichées ; si on les retire, le site recalcule depuis la trace GPX.
 order: 4
+hidden: true   # masquée sur le site — passer à false pour l'afficher
 title: Marche des Sages
 type: Marche libre
 description: >-

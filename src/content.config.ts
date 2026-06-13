@@ -16,6 +16,7 @@ const races = defineCollection({
   loader: glob({ pattern: '*.md', base: './src/content/races' }),
   schema: z.object({
     order: z.number().int(),
+    hidden: z.boolean().default(false), // true → l'épreuve n'apparaît pas sur le site
     title: z.string(),
     type: z.string(),
     description: z.string(),

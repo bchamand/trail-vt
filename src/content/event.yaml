@@ -31,7 +31,7 @@ main:
   tagline: Sur la trace des Volques Tectosages.
   description: >-
     Vieille-Toulouse fut la capitale des Volques Tectosages il y a 2300 ans.
-    Cinq épreuves, un territoire, une première édition.
+    Deux épreuves chronométrées, un territoire, une première édition.
   heroMedia: /video/hero.mp4   # Vidéo (ou image) plein écran de l'accueil
 
   # Fond de carte. Choix : dark-matter, positron, voyager,
@@ -65,12 +65,12 @@ main:
   # Le contenu de chaque épreuve est dans src/content/races/*.md
   racesSection:
     label: — §01 / LES ÉPREUVES
-    titleLine1: Cinq départs.
+    titleLine1: Deux départs.
     titleLine2: Un seul territoire.
     tagline: >-
-      Du Défi de Copillos à la Tectokids, chacune et chacun trouve sa boucle.
-      La marche dès le matin, les courses l'après-midi — les derniers
-      Héritiers finiront à la frontale.
+      De la Boucle de l'Oppidum au Défi de Copillos, deux courses chronométrées
+      sur un même territoire. L'après-midi venu, les derniers Héritiers
+      finiront à la frontale.
 
   # ── Section « L'histoire » ──────────────────────────────────────────
   storytelling:
@@ -137,9 +137,9 @@ main:
     titleLine1: Une journée,
     titleEmphasis: un village.
     tagline: >-
-      Rassemblement au cœur du village de Vieille-Toulouse. La marche dès
-      10h00, les courses à partir de 15h30, l'arrivée des derniers
-      Héritiers vers 21h45.
+      Rassemblement au cœur du village de Vieille-Toulouse. Les courses
+      s'élancent à partir de 15h30, l'arrivée des derniers Héritiers est
+      attendue vers 21h45.
     meetingPlace:
       label: LIEU DE RENCONTRE
       title: Place du Village
@@ -153,12 +153,10 @@ main:
     schedule:
       label: DÉROULÉ DE LA JOURNÉE
       items:
-        - { time: 10h00, title: 'Départs libres — La Marche des Sages (jusqu''à 13h00)' }
-        - { time: 15h30, title: 'Départ — La Boucle de l''Oppidum'                      }
-        - { time: 15h40, title: 'Départ — L''Oppi-dog'                                  }
-        - { time: 16h00, title: 'Départ — Le Défi de Copillos'                          }
-        - { time: 17h30, title: 'Départ — La Tectokids'                                 }
-        - { time: 21h45, title: 'Arrivée des derniers Héritiers de Copillos'            }
+        - { time: 14h00, title: 'Ouverture du village · retrait des dossards'           }
+        - { time: 15h30, title: 'Départ — La Boucle de l''Oppidum'                       }
+        - { time: 16h00, title: 'Départ — Le Défi de Copillos'                           }
+        - { time: 21h45, title: 'Arrivée des derniers Héritiers de Copillos'             }
 
   # ── Section « Avec le soutien de » ──────────────────────────────────
   supporters:

@@ -3,6 +3,7 @@
 # « distance » (km) et « ascent » (D+ en m) sont les valeurs officielles
 # affichées ; si on les retire, le site recalcule depuis la trace GPX.
 order: 5
+hidden: true   # masquée sur le site — passer à false pour l'afficher
 title: Tectokids
 type: La relève
 description: >-
