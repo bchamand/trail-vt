@@ -15,7 +15,9 @@
   *{margin:0;padding:0;box-sizing:border-box;}
   html,body{height:100%;background:#000;overflow:hidden;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
   #stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#000;}
-  #poster{position:relative;width:1024px;height:1536px;flex:0 0 auto;transform-origin:center center;
+  /* canevas au ratio A4 exact (210:297) → l'écran et le PDF sont identiques,
+     l'impression se fait par mise à l'échelle uniforme (aucune déformation) */
+  #poster{position:relative;width:1024px;height:1448px;flex:0 0 auto;transform-origin:center center;
     background:var(--bg);color:var(--ink);font-family:"JetBrains Mono",monospace;overflow:hidden;
     -webkit-print-color-adjust:exact;print-color-adjust:exact;}
   .abs{position:absolute;}
@@ -51,9 +53,10 @@
   .trail{font-family:"Instrument Serif",serif;font-weight:400;font-size:180px;line-height:.86;letter-spacing:.015em;
     color:#e8e3d3;filter:drop-shadow(0 4px 18px rgba(0,0,0,.6));}
   .parc{display:flex;align-items:flex-end;}
-  .parc .cell{padding:0 12px;border-left:1px solid var(--line);}
-  .parc .cell:first-child{padding-left:0;border-left:none;}
-  .parc .km{font-family:"Instrument Serif",serif;font-weight:400;font-size:60px;line-height:.78;color:var(--ink);}
+  .parc .cell{padding:0;border-left:none;flex:0 0 auto;}
+  /* barres de séparation : items flex à part entière → pile au milieu des espaces */
+  .parc .sep{width:1px;height:120px;background:var(--line);align-self:flex-end;}
+  .parc .km{font-family:"Instrument Serif",serif;font-weight:400;font-size:60px;line-height:.78;color:var(--ink);white-space:nowrap;}
   .parc .u{font-family:"JetBrains Mono",monospace;font-weight:500;font-size:15px;letter-spacing:.12em;color:var(--gold);display:block;margin-top:6px;}
   .parc .d{font-family:"JetBrains Mono",monospace;font-size:11px;letter-spacing:.1em;color:var(--muted);margin-top:12px;white-space:nowrap;}
   .parc .ptype{font-family:"JetBrains Mono",monospace;font-weight:600;font-size:8.5px;letter-spacing:.14em;color:var(--gold);display:block;margin-bottom:16px;white-space:nowrap;}
@@ -64,7 +67,17 @@
   @media print{
     @page{ size:210mm 297mm; margin:0; }
     html,body{ width:210mm; height:297mm; background:#0f1412; overflow:hidden; }
-    #stage{ position:static; display:block; background:#0f1412; padding:0; }
+    /* le clip se fait sur #stage (les moteurs d'impression ignorent parfois
+       overflow:hidden sur body, ce qui créait une 2e page) */
+    #stage{ position:relative; display:block; width:210mm; height:297mm; overflow:hidden; background:#0f1412; padding:0; }
+    /* échelle d'impression en CSS pur, uniforme (canevas déjà au ratio A4 →
+       zéro déformation) : l'affiche est CENTRÉE avec ~0,5mm de débord sur les
+       QUATRE côtés — certains moteurs (PDF macOS notamment) décalent le
+       contenu d'une fraction de mm, le débord symétrique absorbe ce décalage
+       quel que soit son sens. !important pour battre le scale écran inline. */
+    #poster{ position:absolute; left:50%; top:50%;
+             transform-origin:center center !important;
+             transform:translate(-50%,-50%) scale(0.779) !important; }
   }
 </style>
 </head>
@@ -83,12 +96,12 @@
 
     <div class="content">
       <!-- kicker -->
-      <div class="abs" style="left:60px;top:54px;line-height:2;">
+      <div class="abs" style="left:60px;top:51px;line-height:2;">
         <div class="kick">NATURE</div><div class="kick">PARTAGE</div><div class="kick">D&Eacute;PASSEMENT</div>
       </div>
 
       <!-- title · single line · typo site B · centré verticalement dans le creux -->
-      <div class="abs" style="left:56px;top:354px;">
+      <div class="abs" style="left:56px;top:334px;">
         <div style="display:flex;align-items:center;gap:14px;margin:0 0 24px 4px;white-space:nowrap;">
           <span style="display:inline-block;width:46px;height:1px;background:var(--gold);flex:0 0 auto;"></span>
           <span class="mono" style="font-size:14px;letter-spacing:.32em;color:var(--gold);font-weight:600;">&Eacute;DITION&nbsp;I</span>
@@ -101,7 +114,7 @@
         </div>
       </div>
       <!-- tagline (sous le titre) -->
-      <div class="abs" style="left:60px;top:742px;">
+      <div class="abs" style="left:60px;top:700px;">
         <div style="width:54px;height:1px;background:var(--gold);margin-bottom:24px;"></div>
         <div class="serif" style="font-style:italic;font-size:40px;line-height:1.1;color:rgba(232,227,211,.9);">Sur la trace des<br/>Volques Tectosages.</div>
       </div>
@@ -110,40 +123,35 @@
 
       <!-- ===== unified info band (aucun fond ajouté : même arrière-plan que l'affiche) ===== -->
 
-      <!-- dividers entre colonnes -->
-      <div class="vd" style="left:356px;top:1230px;height:186px;"></div>
-      <div class="vd" style="left:781px;top:1230px;height:186px;"></div>
-
-      <!-- col A : DATE (dominante · à gauche) -->
-      <div class="abs" style="left:60px;bottom:150px;">
-        <div class="mono" style="font-size:15px;letter-spacing:.46em;color:var(--gold);">SAMEDI</div>
-        <div class="serif" style="font-size:148px;line-height:.74;margin-top:20px;">17</div>
-        <div class="serif gold" style="font-size:58px;line-height:.9;letter-spacing:.04em;margin-top:18px;">OCTOBRE</div>
-        <div class="mono" style="font-size:14px;letter-spacing:.5em;color:var(--muted);margin-top:20px;">2026</div>
-      </div>
-
-      <!-- col B : parcours (au milieu) · libellé retiré, chiffres ancrés au même niveau que la colonne QR -->
-      <div class="abs" style="left:392px;bottom:150px;">
-        <div class="parc">
-          <div class="cell"><span class="ptype">TECTOKIDS</span><span class="km">1&ndash;3</span><span class="u">KM</span><div class="d">U12 &middot; U14 &middot; U16</div></div>
-          <div class="cell"><span class="ptype">COURSES &amp; MARCHE</span><span class="km">5&ndash;10</span><span class="u">KM</span><div class="d">210&ndash;360 D+</div></div>
-          <div class="cell"><span class="ptype">D&Eacute;FI &middot; 6 BOUCLES</span><span class="km">40</span><span class="u">KM</span><div class="d">1230 D+</div></div>
+      <!-- bande info : date (1/3) + parcours & QR (2/3, espaces égaux,
+           barres de séparation centrées entre les parcours) -->
+      <div class="abs" style="left:60px;right:60px;bottom:141px;display:flex;align-items:flex-end;">
+        <div>
+          <div class="mono" style="font-size:15px;letter-spacing:.46em;color:var(--gold);">SAMEDI</div>
+          <div class="serif" style="font-size:148px;line-height:.74;margin-top:20px;">17</div>
+          <div class="serif gold" style="font-size:58px;line-height:.9;letter-spacing:.04em;margin-top:18px;">OCTOBRE</div>
+          <div class="mono" style="font-size:14px;letter-spacing:.5em;color:var(--muted);margin-top:20px;">2026</div>
         </div>
-      </div>
-
-      <!-- col C : QR (à droite) -->
-      <div class="abs" style="left:716px;width:308px;bottom:150px;display:flex;flex-direction:column;align-items:center;gap:14px;">
-        <a href="https://bchamand.github.io/trail-vt/" target="_blank" rel="noopener" style="display:block;">
-          <span style="background:#fff;border-radius:8px;padding:10px;display:block;"><img src="../assets/qr-trail-vt.png" alt="QR inscriptions" style="width:104px;height:104px;display:block;"/></span>
-        </a>
-        <div style="text-align:center;">
-          <div class="mono" style="font-size:10px;letter-spacing:.24em;color:var(--gold);">INFOS &amp; INSCRIPTIONS</div>
+        <div class="parc" style="margin-left:auto;width:66.666%;justify-content:space-between;">
+          <div class="cell"><span class="ptype">TECTOKIDS</span><span class="km">1&ndash;3</span><span class="u">KM</span><div class="d">&nbsp;</div></div>
+          <span class="sep"></span>
+          <div class="cell"><span class="ptype">COURSES &amp; MARCHE</span><span class="km">5&ndash;10</span><span class="u">KM</span><div class="d">210&ndash;360 D+</div></div>
+          <span class="sep"></span>
+          <div class="cell"><span class="ptype">D&Eacute;FI &middot; 6 BOUCLES</span><span class="km">40</span><span class="u">KM</span><div class="d">1230 D+</div></div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:14px;">
+            <a href="https://bchamand.github.io/trail-vt/" target="_blank" rel="noopener" style="display:block;">
+              <span style="background:#fff;border-radius:8px;padding:10px;display:block;"><img src="../assets/qr-trail-vt.png" alt="QR inscriptions" style="width:104px;height:104px;display:block;"/></span>
+            </a>
+            <div style="text-align:center;">
+              <div class="mono" style="font-size:10px;letter-spacing:.24em;color:var(--gold);line-height:1.8;">INFOS &amp;<br/>INSCRIPTIONS</div>
+            </div>
+          </div>
         </div>
       </div>
 
       <!-- ===== footer · zone partenaires ===== -->
-      <div class="abs" style="left:60px;top:1414px;width:904px;border-top:1px solid var(--line);"></div>
-      <div class="abs" style="left:60px;right:56px;top:1436px;display:flex;align-items:center;justify-content:space-between;gap:24px;">
+      <div class="abs" style="left:60px;top:1333px;width:904px;border-top:1px solid var(--line);"></div>
+      <div class="abs" style="left:60px;right:56px;top:1354px;display:flex;align-items:center;justify-content:space-between;gap:24px;">
         <!-- bénéficiaire (gauche) -->
         <div style="display:flex;align-items:center;gap:16px;">
           <span class="mono" style="font-size:10px;letter-spacing:.26em;color:var(--muted);white-space:nowrap;">AU&nbsp;PROFIT&nbsp;DE</span>
@@ -173,7 +181,11 @@
   var forestPts=[[404,260],[520,250],[660,232],[800,205],[1024,168],[1024,812],[882,856],[710,908],[540,966],[349,1040],[330,986],[372,918],[446,858],[516,772],[558,684],[548,580],[520,474],[468,366]];
   var meadowPts=[[349,1040],[540,966],[710,908],[882,856],[1024,812],[1024,1198],[470,1198],[470,1184],[438,1188],[366,1086]];
 
-  function place(sel,pts){var xs=pts.map(function(p){return p[0];}),ys=pts.map(function(p){return p[1];});var bx=Math.min.apply(null,xs),by=Math.min.apply(null,ys),bw=Math.max.apply(null,xs)-bx,bh=Math.max.apply(null,ys)-by;var e=document.querySelector(sel);e.style.left=bx+'px';e.style.top=by+'px';e.style.width=bw+'px';e.style.height=bh+'px';e.style.clipPath='polygon('+pts.map(function(p){return ((p[0]-bx)/bw*100).toFixed(2)+'% '+((p[1]-by)/bh*100).toFixed(2)+'%';}).join(',')+')';}
+  // géométrie dessinée en 1024×1536 ; le canevas réel est 1024×1448 (ratio A4)
+  // → l'axe vertical est compressé de KY (les % des clip-path et les viewBox
+  //   préservent les proportions relatives, seules les positions px changent)
+  var KY=1448/1536;
+  function place(sel,pts){var xs=pts.map(function(p){return p[0];}),ys=pts.map(function(p){return p[1];});var bx=Math.min.apply(null,xs),by=Math.min.apply(null,ys),bw=Math.max.apply(null,xs)-bx,bh=Math.max.apply(null,ys)-by;var e=document.querySelector(sel);e.style.left=bx+'px';e.style.top=(by*KY)+'px';e.style.width=bw+'px';e.style.height=(bh*KY)+'px';e.style.clipPath='polygon('+pts.map(function(p){return ((p[0]-bx)/bw*100).toFixed(2)+'% '+((p[1]-by)/bh*100).toFixed(2)+'%';}).join(',')+')';}
   place('.ph.pano',panoPts);
   place('.ph.forest',forestPts);
   place('.ph.meadow',meadowPts);
@@ -284,11 +296,10 @@
     contourSeam(ridge.concat(closeSeam.slice(1)),1);   // arête principale (autour du titre)
   })();
 
-  function fit(){var p=document.getElementById('poster');p.style.transformOrigin='center center';var s=Math.min(window.innerWidth/1024,window.innerHeight/1536);p.style.transform='scale('+s+')';}
+  function fit(){var p=document.getElementById('poster');p.style.transformOrigin='center center';var s=Math.min(window.innerWidth/1024,window.innerHeight/1448);p.style.transform='scale('+s+')';}
   window.addEventListener('resize',fit); fit();
-  // export PDF A4 plein cadre, sans marge (étire légèrement pour remplir A4)
-  window.addEventListener('beforeprint',function(){var p=document.getElementById('poster');p.style.transformOrigin='top left';p.style.transform='scale('+((210/25.4*96)/1024)+','+((297/25.4*96)/1536)+')';});
-  window.addEventListener('afterprint',fit);
+  // (l'échelle d'impression est gérée en CSS pur dans @media print — fiable même
+  //  quand le moteur d'impression n'émet pas l'évènement beforeprint)
 </script>
 </body>
 </html>
