@@ -241,6 +241,12 @@
     // ---- aplatir les courbes masquées en PNG pour un export PDF fidèle (Chrome ignore mask-image+blend sur le canvas WebGL à l'impression) ----
     function bakeElev(){
       try{
+        // Ne pas cuire si le conteneur est masqué/minuscule : sinon MapLibre
+        // retombe sur un canvas 400×300 par défaut et la cuisson serait fausse,
+        // écrasant la bonne version. Préserve la dernière bonne cuisson — vaut
+        // pour l'impression (@media print) comme pour l'export PDF.
+        var host=document.getElementById('elevmap');
+        if(!host || host.offsetWidth < 100 || host.offsetHeight < 100) return;
         var src=map.getCanvas(); var w=src.width, h=src.height;
         if(!w||!h) return;
         var c=document.createElement('canvas'); c.width=w; c.height=h;
@@ -259,6 +265,7 @@
         img.src=c.toDataURL('image/png');
       }catch(e){ /* canvas indisponible */ }
     }
+    window.__bakeElev = bakeElev;   // exposé pour l'export PDF (cuisson à la demande)
     var bakeN=0, bakeTimer=setInterval(function(){ bakeElev(); if(++bakeN>=6) clearInterval(bakeTimer); }, 900);
     map.on('idle', bakeElev);
     window.addEventListener('beforeprint', bakeElev);

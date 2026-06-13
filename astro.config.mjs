@@ -12,6 +12,8 @@ export default defineConfig({
   redirects: {
     '/affiche1': `${base}/affiche/affiche1/index.html`,
     '/affiche2': `${base}/affiche/affiche2/index.html`,
+    // export PDF (jsPDF) de l'affiche 1
+    '/affiche1/pdf': `${base}/affiche/affiche1/pdf.html`,
   },
   vite: {
     plugins: [tailwindcss()],
