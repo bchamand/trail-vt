@@ -9,7 +9,7 @@ description: >-
   Boucle unique sur les traces de l'oppidum tectosage — sous-bois, coteaux
   et crêtes au-dessus de la Garonne. 150 dossards, à partir des Cadets
   (coureurs nés en 2010 et avant).
-startTime: 15h30
+startTime: 17h00
 difficulty: 4
 timed: true
 distance: 10.5

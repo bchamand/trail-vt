@@ -11,7 +11,7 @@ description: >-
   selon un temps limite. Seule la dernière boucle est classante : elle
   sacre les Héritiers de Copillos. 100 dossards, à partir des Espoirs
   (coureurs nés en 2006 et avant).
-startTime: 16h00
+startTime: 15h00
 difficulty: 5
 timed: true
 distance: 40.1

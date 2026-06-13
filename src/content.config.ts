@@ -62,7 +62,7 @@ const event = defineCollection({
       label: z.string(),
       titleLine1: z.string(),
       titleLine2: z.string(),
-      tagline: z.string(),
+      tagline: z.string().optional(), // accroche facultative
     }),
     storytelling: z.object({
       label: z.string(),
@@ -79,6 +79,8 @@ const event = defineCollection({
       cta: z.string(),
       ctaUrl: z.string().url(),
       imagePlaceholder: z.string(),
+      // Lignes de soirée ajoutées au déroulé de la journée (généré auto).
+      schedule: z.array(z.object({ time: z.string(), title: z.string() })),
     }),
     engagement: z.object({
       label: z.string(),
@@ -95,16 +97,21 @@ const event = defineCollection({
       titleLine1: z.string(),
       titleEmphasis: z.string(),
       tagline: z.string(),
+      // « Fiche » du point de rencontre : remplit la carte Lieu de rencontre
+      // ET ajoute son ouverture au déroulé de la journée (via time/scheduleLabel).
       meetingPlace: z.object({
         label: z.string(),
         title: z.string(),
         address: z.string(),
         accessNote: z.string(),
         infoTiles: z.array(z.object({ key: z.string(), value: z.string() })),
+        time: z.string(),          // ex. « 13h00 » — ouverture / retrait des dossards
+        scheduleLabel: z.string(), // ex. « Retrait des dossards · ouverture du village »
       }),
+      // Le déroulé est généré automatiquement (point de rencontre + chaque
+      // épreuve visible + banquet, triés par heure) : seul le titre est ici.
       schedule: z.object({
         label: z.string(),
-        items: z.array(z.object({ time: z.string(), title: z.string() })),
       }),
     }),
     supporters: z.object({

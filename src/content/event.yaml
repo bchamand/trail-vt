@@ -13,7 +13,7 @@
 #   {year}            → 2026
 #   {edition}         → I (chiffre romain)
 #   {name}            → Trail des Tectosages
-#   {location}        → Vieille-Toulouse, Haute-Garonne
+#   {location}        → Vieille-Toulouse (31)
 #   {locationCity}    → VIEILLE-TOULOUSE
 #   {raceCount}       → V (nombre d'épreuves, en chiffre romain)
 #   {maxDistance}     → 40,1 (distance de la plus longue épreuve)
@@ -25,13 +25,14 @@ main:
   name: Trail des Tectosages
   nameShort: Trail des      # Première ligne du logo…
   nameEmphasis: Tectosages  # …et seconde ligne (en italique doré)
-  location: Vieille-Toulouse, Haute-Garonne
-  locationShort: VIEILLE-TOULOUSE · HAUTE-GARONNE
+  location: Vieille-Toulouse (31)
+  locationShort: VIEILLE-TOULOUSE (31)
   locationCity: VIEILLE-TOULOUSE
-  tagline: Sur la trace des Volques Tectosages.
+  tagline: Sur la trace des Volques Tectosages
   description: >-
-    Vieille-Toulouse fut la capitale des Volques Tectosages il y a 2300 ans.
-    Deux épreuves chronométrées, un territoire, une première édition.
+    Il y a 2300 ans, les Volques Tectosages, peuple celte en provenance de
+    l'Est, s'installait sur le territoire de l'actuelle commune de
+    Vieille-Toulouse, qui portait alors le nom de Tolosa Tectosagum.
   heroMedia: /video/hero.mp4   # Vidéo (ou image) plein écran de l'accueil
 
   # Fond de carte. Choix : dark-matter, positron, voyager,
@@ -59,7 +60,7 @@ main:
     - { big: '{raceCount}',        small: ÉPREUVES        }
     - { big: '{maxDistance} KM',   small: DÉFI MAX        }
     - { big: '{dateShortMobile}.', small: '{dateWeekday}' }
-    - { big: '{locationCity}',     small: HAUTE-GARONNE   }
+    - { big: '{locationCity}',     small: '(31)'          }
 
   # ── Section « Les épreuves » ────────────────────────────────────────
   # Le contenu de chaque épreuve est dans src/content/races/*.md
@@ -67,10 +68,10 @@ main:
     label: — §01 / LES ÉPREUVES
     titleLine1: Deux départs.
     titleLine2: Un seul territoire.
-    tagline: >-
-      De la Boucle de l'Oppidum au Défi de Copillos, deux courses chronométrées
-      sur un même territoire. L'après-midi venu, les derniers Héritiers
-      finiront à la frontale.
+    # Accroche facultative à droite du titre. Décommenter pour l'afficher :
+    # tagline: >-
+    #   De la Boucle de l'Oppidum au Défi de Copillos, deux courses chronométrées
+    #   sur un même territoire.
 
   # ── Section « L'histoire » ──────────────────────────────────────────
   storytelling:
@@ -81,18 +82,21 @@ main:
       - n: 'I'
         title: L'ESPRIT DE CONQUÊTE
         body: >-
-          Partir à la conquête du territoire de Tolosa — comme nos ancêtres gaulois,
-          il y a 2300 ans.
+          Partir à la conquête du territoire de Tolosa, comme nos ancêtres
+          gaulois il y a 2300 ans.
       - n: 'II'
-        title: SIX BOUCLES, SIX VALEURS
+        title: DES VALEURS ANCRÉES
         body: >-
-          Conquête, honneur, endurance, courage, bravoure, prestige.
-          Chaque passage qualifie ou élimine — seuls les dignes franchiront.
+          La bravoure, l'endurance, l'honneur, l'esprit de communauté
+          caractérisaient le peuple Tectosage. Les mêmes valeurs devront être
+          mobilisées par les coureurs du Trail des Tectosages.
       - n: 'III'
         title: LE DÉFI DE COPILLOS
         body: >-
-          Dernier chef gaulois des Tectosages. Le titre d'Héritier revient
-          à celles et ceux qui enchaînent les six boucles.
+          Copillos, chef des Tectosages, vous lance ce défi : finir 4 boucles
+          dans un temps limité. Seuls les descendants des Tectosages
+          franchiront la ligne d'arrivée — le statut d'héritier de Copillos
+          reviendra au vainqueur.
 
   # ── Section « Le banquet » ──────────────────────────────────────────
   banquet:
@@ -107,6 +111,10 @@ main:
     cta: RÉSERVER SA PLACE →
     ctaUrl: https://chrono-start.com/
     imagePlaceholder: 'PHOTO BANQUET<br/>[À FOURNIR]'
+    # Lignes de soirée ajoutées au déroulé (autant que voulu, même horaire possible)
+    schedule:
+      - { time: 20h00, title: Remise des prix    }
+      - { time: 20h00, title: Banquet des Chefs  }
 
   # ── Section « Notre engagement » ────────────────────────────────────
   engagement:
@@ -122,14 +130,14 @@ main:
         précarité en Haute-Garonne — séjours de répit, matériel adapté,
         soutien aux familles.
       - >-
-        Chaque dossard vendu contribue directement à cet engagement.
-        Courir, marcher, banqueter — c'est aussi donner.
+        10 % du prix de chaque dossard sont reversés à la Fondation
+        Marie-Louise. Courir, marcher, banqueter — c'est aussi donner.
     logo: /images/logo-marie-louise.png
     logoAlt: Fondation Marie-Louise
     stats:
-      - { big: '+30',      small: ANS D'ACTION }
-      - { big: '100%',     small: BÉNÉVOLE     }
-      - { big: 'HAUTE-',   small: GARONNE      }
+      - { big: '+30', small: ANS D'ACTION       }
+      - { big: '10%', small: DE CHAQUE DOSSARD   }
+      - { big: '31',  small: HAUTE-GARONNE       }
 
   # ── Section « Infos pratiques » ─────────────────────────────────────
   practicalInfo:
@@ -140,7 +148,12 @@ main:
       Rassemblement au cœur du village de Vieille-Toulouse. Les courses
       s'élancent à partir de 15h30, l'arrivée des derniers Héritiers est
       attendue vers 21h45.
+    # ── Fiche du point de rencontre ──────────────────────────────────
+    # Remplit la carte « Lieu de rencontre » ET ajoute l'ouverture du
+    # village / retrait des dossards au déroulé de la journée (time).
     meetingPlace:
+      time: 13h00                                   # retrait des dossards
+      scheduleLabel: Retrait des dossards
       label: LIEU DE RENCONTRE
       title: Place du Village
       address: 31320 Vieille-Toulouse · Haute-Garonne
@@ -148,30 +161,31 @@ main:
       infoTiles:
         - { key: PARKING, value: 'Ch. de Lespinas'  }
         - { key: NAVETTE, value: 'Dep. Ramonville'  }
-        - { key: RETRAIT, value: 'Dès 14h00'        }
+        - { key: RETRAIT, value: 'Dès 13h00'        }
         - { key: GPS,     value: '43.526 · 1.445'   }
+    # Déroulé de la journée — GÉNÉRÉ AUTOMATIQUEMENT à partir de l'heure
+    # d'ouverture ci-dessus, de l'heure de départ de chaque épreuve
+    # (src/content/races/*.md) et du banquet, triés par heure.
     schedule:
       label: DÉROULÉ DE LA JOURNÉE
-      items:
-        - { time: 14h00, title: 'Ouverture du village · retrait des dossards'           }
-        - { time: 15h30, title: 'Départ — La Boucle de l''Oppidum'                       }
-        - { time: 16h00, title: 'Départ — Le Défi de Copillos'                           }
-        - { time: 21h45, title: 'Arrivée des derniers Héritiers de Copillos'             }
 
   # ── Section « Avec le soutien de » ──────────────────────────────────
   supporters:
     label: — §05 / AVEC LE SOUTIEN DE
     titleLine1: Un trail rendu possible par
-    titleEmphasis: trois villages, deux partenaires
+    titleEmphasis: deux villages et de nombreux soutiens
     body: >-
-      Ils ont ouvert leurs sentiers, leurs terrains et leurs portes pour que
-      cette première édition prenne vie.
+      Les communes de Vieille-Toulouse et de Pechbusque, le Golf de
+      Vieille-Toulouse et de nombreux propriétaires privés ont ouvert leurs
+      sentiers, leurs terrains et leurs portes — sans leur accord de traverser
+      ces terres, le tracé n'existerait pas. Le Lions Club Toulouse Arènes
+      Romaines, lui, accompagne l'organisation et le banquet. Un grand merci à
+      toutes et à tous.
     partners:
       - { name: Mairie,     sub: Vieille-Toulouse, logo: /images/logo-mairie-vieille-toulouse.png }
-      - { name: Mairie,     sub: Vigoulet-Auzil,   logo: /images/logo-mairie-vigoulet-auzil.png   }
-      - { name: Mairie,     sub: Pechbusque,       logo: /images/logo-mairie-pechbusque.png       }
+      - { name: Mairie,     sub: Pechbusque,       logo: /images/logo-mairie-pechbusque.jpeg      }
+      - { name: Lions Club, sub: Toulouse Arènes,  logo: /images/logo-lionsclubs.png              }
       - { name: Golf de,    sub: Vieille-Toulouse, logo: /images/logo-golf.png                    }
-      - { name: Lions Club, sub: Toulouse Arènes,  logo: /images/logo-lions.png                   }
 
   # ── Bandeau final d'inscription ─────────────────────────────────────
   cta:

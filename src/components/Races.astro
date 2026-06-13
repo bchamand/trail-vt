@@ -37,7 +37,7 @@ interface Props {
     label: string;
     titleLine1: string;
     titleLine2: string;
-    tagline: string;
+    tagline?: string;
   };
   mapStyle: string;
 }
@@ -83,18 +83,22 @@ const clientPayload = {
       <div class="mono-label mb-5">{section.label}</div>
       <h2 class="h2-med">{section.titleLine1}<br/><span class="italic opacity-75">{section.titleLine2}</span></h2>
     </div>
-    <p class="max-w-[460px] text-[15px] sm:text-[17px] leading-[1.55] opacity-75 m-0 lg:mt-[37px]" style="text-wrap: pretty;">
-      {section.tagline}
-    </p>
+    {section.tagline && (
+      <p class="max-w-[460px] text-[15px] sm:text-[17px] leading-[1.55] opacity-75 m-0 lg:mt-[37px]" style="text-wrap: pretty;">
+        {section.tagline}
+      </p>
+    )}
   </div>
 
-  <!-- Carousel / grid of race cards -->
+  <!-- Onglets d'épreuves · modulaires : flex-1 → chaque carte partage la
+       largeur à parts égales ; min-width → plancher lisible ; au-delà, le
+       conteneur déborde en carrousel (overflow-x). Aucun point de rupture figé. -->
   <div id="race-carousel"
-       class="flex lg:grid lg:grid-cols-5 gap-3 lg:gap-px overflow-x-auto lg:overflow-visible snap-x snap-mandatory scrollbar-hide"
+       class="flex gap-px overflow-x-auto snap-x snap-mandatory scrollbar-hide"
        style="background: transparent;">
     {races.map((race, i) => (
       <button
-        class="race-card group text-left cursor-pointer flex-shrink-0 w-[220px] lg:w-auto snap-start transition-colors duration-200"
+        class="race-card group text-left cursor-pointer flex-1 min-w-[200px] snap-start transition-colors duration-200"
         data-race-index={i}
         data-has-segments={race.segments ? 'true' : 'false'}
         style={`padding: 24px 20px; border: 1px solid var(--color-line); background: ${i === 0 ? 'var(--color-accent)' : 'var(--color-bg)'}; color: ${i === 0 ? 'var(--color-bg)' : 'var(--color-ink)'}; font-family: inherit;`}
@@ -380,15 +384,14 @@ const clientPayload = {
     }
   }
 
-  const CAROUSEL_BREAKPOINT = 1024;
-
   cards.forEach(card => {
     card.addEventListener('click', () => {
       const el = card as HTMLElement;
       const i = parseInt(el.dataset.raceIndex!);
       if (i === activeIndex) return;
       showRace(i);
-      if (window.innerWidth < CAROUSEL_BREAKPOINT) {
+      // ne recentre que si les onglets débordent réellement (mode carrousel)
+      if (carousel.scrollWidth > carousel.clientWidth + 1) {
         el.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
       }
     });

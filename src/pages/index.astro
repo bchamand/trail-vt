@@ -86,6 +86,30 @@ const tokens: Record<string, string> = {
 };
 const event = expandTokens(derived, tokens);
 
+// Déroulé de la journée — généré automatiquement à partir des fiches :
+// ouverture du point de rencontre + heure de départ de chaque épreuve visible
+// + banquet, triés par heure. Modifier une fiche met à jour le déroulé.
+const toMinutes = (s: string): number => {
+  const m = String(s).match(/(\d{1,2})\s*h\s*(\d{0,2})/i);
+  return m ? parseInt(m[1], 10) * 60 + (m[2] ? parseInt(m[2], 10) : 0) : 0;
+};
+const mp = event.practicalInfo.meetingPlace;
+const scheduleSorted = [
+  { time: mp.time, title: mp.scheduleLabel },
+  ...races.map(r => ({ time: r.startTime, title: `Départ — ${r.title}` })),
+  ...event.banquet.schedule,
+].sort((a, b) => toMinutes(a.time) - toMinutes(b.time));
+// masque l'heure quand elle est identique à la ligne précédente (lignes groupées)
+const scheduleItems = scheduleSorted.map((it, i) => ({
+  ...it,
+  sameTime: i > 0 && toMinutes(it.time) === toMinutes(scheduleSorted[i - 1].time),
+}));
+
+const practicalInfo = {
+  ...event.practicalInfo,
+  schedule: { ...event.practicalInfo.schedule, items: scheduleItems },
+};
+
 const pageTitle = `${event.name} — ${event.location} · ${event.dateShort.toLowerCase()} ${event.year}`;
 ---
 <Layout title={pageTitle} description={event.description} preconnect={tileHosts(event.mapStyle)}>
@@ -96,7 +120,7 @@ const pageTitle = `${event.name} — ${event.location} · ${event.dateShort.toLo
   <Races races={races} section={event.racesSection} mapStyle={event.mapStyle} />
   <Banquet data={event.banquet} />
   <Engagement data={event.engagement} />
-  <PracticalInfo data={event.practicalInfo} />
+  <PracticalInfo data={practicalInfo} />
   <Supporters data={event.supporters} />
   <CTA data={event.cta} registrationUrl={event.urls.registration} />
   <Footer event={event} />

@@ -14,7 +14,7 @@ interface Props {
     };
     schedule: {
       label: string;
-      items: { time: string; title: string }[];
+      items: { time: string; title: string; sameTime?: boolean }[];
     };
   };
 }
@@ -81,7 +81,7 @@ const { meetingPlace, schedule } = data;
             class="schedule-item grid items-baseline gap-4 py-3.5"
             data-first={i === 0}
           >
-            <span style="font-family: var(--font-serif); font-size: clamp(20px, 2vw, 24px); font-style: italic; color: var(--color-accent); line-height: 1;">{item.time}</span>
+            <span style="font-family: var(--font-serif); font-size: clamp(20px, 2vw, 24px); font-style: italic; color: var(--color-accent); line-height: 1;">{item.sameTime ? '' : item.time}</span>
             <span class="text-[14px] sm:text-[15px] leading-[1.4] opacity-90">{item.title}</span>
           </li>
         ))}
