@@ -83,6 +83,9 @@ const tokens: Record<string, string> = {
   locationCity: derived.locationCity,
   raceCount: toRoman(races.length),
   maxDistance: fmtKm(maxDistance),
+  // En prod, le PDF de l'affiche est pré-généré par la CI (fichier statique) ;
+  // en dev il n'existe pas, on pointe alors vers le générateur côté navigateur.
+  affichePdf: import.meta.env.PROD ? '/affiche.pdf' : '/affiche/pdf',
 };
 const event = expandTokens(derived, tokens);
 

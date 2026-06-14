@@ -17,6 +17,7 @@
 #   {locationCity}    → VIEILLE-TOULOUSE
 #   {raceCount}       → V (nombre d'épreuves, en chiffre romain)
 #   {maxDistance}     → 40,1 (distance de la plus longue épreuve)
+#   {affichePdf}      → lien vers le PDF de l'affiche (/affiche.pdf en prod)
 # ══════════════════════════════════════════════════════════════════════
 main:
   # ── Paramètres généraux ─────────────────────────────────────────────
@@ -202,7 +203,7 @@ main:
     # Les sections du site (Épreuves, Histoire, Banquet, Pratique) ne sont
     # PAS répétées ici : elles sont déjà dans le menu de navigation du haut.
     eventLinks:
-      - { label: Affiche à imprimer, href: '/affiche/pdf' }   # lien route (commence par /) → géré par withBase
+      - { label: Affiche à imprimer, href: '{affichePdf}' }   # PDF statique en prod, générateur en dev
       - { label: Règlement,          href: '#'           }    # placeholder, à brancher plus tard
     contactLinks:
       - { label: contact@tectosages.fr, href: 'mailto:contact@tectosages.fr' }

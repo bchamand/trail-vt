@@ -91,6 +91,7 @@ const afficheUrl = withBase('/affiche');
         var data = canvas.toDataURL('image/jpeg', JPEG_Q);
         var pdf = new window.jspdf.jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4', compress: true });
         pdf.addImage(data, 'JPEG', 0, 0, 210, 297, undefined, 'FAST'); // plein cadre A4
+        window.__affichePdf = pdf.output('datauristring'); // exposé pour la génération headless (CI)
         var url = pdf.output('bloburl');
 
         // remplace TOUT par le PDF (visionneuse du navigateur : impression / téléchargement)

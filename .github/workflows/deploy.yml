@@ -24,7 +24,11 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
+      - run: npx playwright install --with-deps chromium
       - run: npm run build
+      # Pré-génère l'affiche en PDF (dist/affiche.pdf) — échoue le build si KO,
+      # pour ne jamais déployer un site sans son affiche imprimable.
+      - run: npm run render:affiche
       - uses: actions/upload-pages-artifact@v5
         with:
           path: dist
