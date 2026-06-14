@@ -27,6 +27,8 @@ const afficheUrl = withBase('/affiche');
 (async function () {
   try {
     var html = await (await fetch(afficheUrl, { cache: 'no-cache' })).text();
+    // en prod l'affiche se redirige vers le PDF : on retire cette garde avant de capturer
+    html = html.replace(/<script\b[^>]*id="prod-redirect"[\s\S]*?<\/script>/i, '');
     // libs + keyframe du voile dans le <head>
     var head =
       '<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"><\/script>' +
