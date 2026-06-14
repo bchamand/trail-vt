@@ -1,7 +1,8 @@
 ---
 # ── La Boucle de l'Oppidum ── course chronométrée et classée ──
-# « distance » (km) et « ascent » (D+ en m) sont les valeurs officielles
-# affichées ; si on les retire, le site recalcule depuis la trace GPX.
+# Distance et D+ ne sont PAS fixés ici : ils sont calculés automatiquement
+# depuis la trace GPX (public/traces/oppidum.gpx).
+# Pour forcer une valeur officielle, ajouter « distance: » / « ascent: ».
 order: 2
 poster: true                  # afficher cette course sur l'affiche
 posterType: 1 boucle chronométrée
@@ -14,6 +15,4 @@ description: >-
 startTime: 17h00
 difficulty: 4
 timed: true
-distance: 10.5
-ascent: 360
 ---
