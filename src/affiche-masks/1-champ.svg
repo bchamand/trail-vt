@@ -17,7 +17,7 @@
   ═══════════════════════════════════════════════════════════════════════
 -->
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1448" preserveAspectRatio="none"
-     data-photo="champ-clean.jpg" data-scale="1.16" data-origin="42% 48%">
+     data-photo="champ-clean.jpg" data-scale="1.16" data-origin="0% 48%">
   <polygon id="region" fill="#d4a574" fill-opacity="0.25" stroke="#d4a574" stroke-width="3"
     points="348,0 1024,0 1024,445 810,460 670,471 530,481 520,447 468,345 404,245 352,160 366,85"/>
 </svg>

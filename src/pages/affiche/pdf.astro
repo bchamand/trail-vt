@@ -1,0 +1,115 @@
+---
+// Export PDF A4 de l'affiche.
+// On récupère la page /affiche (source unique), on y injecte jsPDF + snapdom, et on la
+// rend dans CE document (les polices sont chargées là où snapdom capture → embarquées
+// fidèlement). Puis on capture, on génère le PDF et on l'AFFICHE directement dans le
+// navigateur (visionneuse intégrée : impression / téléchargement). Aucun clic requis.
+import { withBase } from '../../lib/url';
+const afficheUrl = withBase('/affiche');
+---
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Affiche · Trail des Tectosages (PDF)</title>
+</head>
+<body style="margin:0;background:#0a0e0c;color:#e8e3d3;font-family:ui-monospace,monospace;">
+<p id="boot" style="padding:28px;letter-spacing:.12em;font-size:13px;">Chargement de l'affiche…</p>
+<script is:inline define:vars={{ afficheUrl }}>
+(async function () {
+  try {
+    var html = await (await fetch(afficheUrl, { cache: 'no-cache' })).text();
+    // libs dans le <head>
+    var head =
+      '<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"><\/script>' +
+      '<script src="https://cdn.jsdelivr.net/npm/@zumer/snapdom@2.12.8/dist/snapdom.js"><\/script>';
+    html = html.replace('</head>', head + '</head>');
+    // logique d'export (auto), juste avant </body> donc après les scripts de l'affiche
+    html = html.replace('</body>', '<script>' + exportLogic() + '<\/script></body>');
+    document.open(); document.write(html); document.close();
+  } catch (e) {
+    document.getElementById('boot').textContent = 'Échec du chargement : ' + (e && e.message || e);
+  }
+
+  // logique d'export, sérialisée telle quelle dans le document réécrit
+  function exportLogic() { return '(' + (function () {
+    var W = 1024, H = 1448;   // canevas natif (ratio A4)
+    var SCALE = 2.5;          // 1024×2.5 = 2560 px ≈ 309 DPI sur A4 (qualité print, capture plus rapide)
+    var JPEG_Q = 0.95;
+    var BAKE_TIMEOUT = 12000; // attente max de la « cuisson » de la carte de relief
+
+    var bar = document.createElement('div');
+    bar.style.cssText = 'position:fixed;left:0;right:0;top:0;z-index:99999;padding:10px 14px;' +
+      'background:rgba(10,14,12,.92);color:#d4a574;font:12px/1.4 ui-monospace,monospace;letter-spacing:.08em;' +
+      'border-bottom:1px solid rgba(232,227,211,.16);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);';
+    document.body.appendChild(bar);
+    function set(m) { bar.textContent = m; }
+    function wait(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+
+    // La carte de relief (WebGL, non capturable par snapdom) se construit PROGRESSIVEMENT.
+    // On attend qu'elle soit STABILISÉE (idle + toutes tuiles chargées) avant de la « cuire »
+    // en PNG (#elevbake) puis de basculer dessus pour la capture.
+    async function waitMapSettled() {
+      var elapsed = 0;
+      while (!window.__emap && elapsed < BAKE_TIMEOUT) { await wait(200); elapsed += 200; }
+      var m = window.__emap;
+      if (!m) return false;
+      var idleSeen = false;
+      m.on('idle', function () { idleSeen = true; });
+      while (elapsed < BAKE_TIMEOUT && !(idleSeen && m.areTilesLoaded && m.areTilesLoaded())) {
+        await wait(250); elapsed += 250;
+      }
+      await wait(400); // marge pour le dernier rendu des courbes
+      return true;
+    }
+    // bascule live → PNG cuit, appliquée seulement à la capture
+    var swapStyle = document.createElement('style');
+    swapStyle.textContent = '#elevmap{display:none!important;}#elevbake{display:block!important;}';
+
+    async function run() {
+      var poster = document.getElementById('poster');
+      try {
+        set('Préparation des polices…');
+        if (document.fonts && document.fonts.ready) { try { await document.fonts.ready; } catch (e) {} }
+
+        set('Rendu de la carte de relief…');
+        var settled = await waitMapSettled();
+        if (settled && typeof window.__bakeElev === 'function') {
+          window.__bakeElev(); await wait(250);
+          window.__bakeElev(); await wait(300);   // 2e cuisson = dernier état stabilisé
+        } else if (!settled) {
+          set('Relief indisponible (hors-ligne ?) — capture sans relief…');
+        }
+        if (!swapStyle.parentNode) document.head.appendChild(swapStyle);
+        await wait(120);
+
+        var prev = poster.style.transform;
+        poster.style.transform = 'none';
+        set('Capture du rendu (' + SCALE + '×)…');
+        var canvas = await window.snapdom.toCanvas(poster, {
+          scale: SCALE, dpr: 1, embedFonts: true, backgroundColor: '#0f1412', width: W, height: H
+        });
+        poster.style.transform = prev;
+
+        set('Génération du PDF…');
+        var data = canvas.toDataURL('image/jpeg', JPEG_Q);
+        var pdf = new window.jspdf.jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4', compress: true });
+        pdf.addImage(data, 'JPEG', 0, 0, 210, 297, undefined, 'FAST'); // plein cadre A4
+        var url = pdf.output('bloburl');
+
+        // affichage du PDF dans la visionneuse du navigateur (impression / téléchargement)
+        document.title = 'Affiche · Trail des Tectosages (PDF)';
+        document.body.style.margin = '0';
+        document.body.innerHTML = '<iframe title="Affiche - Trail des Tectosages" src="' + url +
+          '" style="position:fixed;inset:0;width:100%;height:100%;border:0;background:#525659;"></iframe>';
+      } catch (err) {
+        console.error(err); set('Échec : ' + (err && err.message || err) + ' — rechargez la page.');
+      }
+    }
+    if (document.readyState === 'complete') run(); else window.addEventListener('load', run);
+  }).toString() + ')();'; }
+})();
+</script>
+</body>
+</html>

@@ -146,7 +146,7 @@ const img = (name: string) => withBase(`/images/${name}`);
 <div id="stage">
   <div id="poster" data-screen-label="Affiche">
     {posterMasks.map((m) => (
-      <div class="ph" data-i={m.i}><img src={img(m.photo)} alt="" style={`transform:scale(${m.scale});transform-origin:${m.origin};`}/><div class="shade"></div></div>
+      <div class="ph" data-i={m.i}><img src={img(m.photo)} alt="" style={`object-position:${m.origin};transform:scale(${m.scale});transform-origin:${m.origin};`}/><div class="shade"></div></div>
     ))}
 
     <div id="cliff"></div>
