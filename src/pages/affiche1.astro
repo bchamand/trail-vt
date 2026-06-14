@@ -73,7 +73,7 @@ const img = (name: string) => withBase(`/images/${name}`);
   .abs{position:absolute;}
   /* photo strata */
   .ph{position:absolute;z-index:3;}
-  .ph img{display:block;width:100%;height:100%;object-fit:cover;filter:brightness(.84) contrast(1.07) saturate(.7) sepia(.16);}
+  .ph img{display:block;width:100%;height:100%;object-fit:cover;filter:brightness(.84) contrast(1.07) saturate(.7);}
   /* fondu générique : assombrit le bord gauche (vers le titre) + un peu le bas */
   .ph .shade{position:absolute;inset:0;pointer-events:none;
     background:linear-gradient(100deg,rgba(10,14,12,.82) 3%,rgba(10,14,12,.18) 25%,transparent 47%),
@@ -86,8 +86,8 @@ const img = (name: string) => withBase(`/images/${name}`);
   /* vraies courbes de niveau (MapLibre + maplibre-contour, DEM à la volée) en or, derrière le titre */
   #elevmap{position:absolute;inset:0;z-index:2;background:transparent;pointer-events:none;
     mix-blend-mode:screen;opacity:.6;
-    -webkit-mask-image:radial-gradient(100% 60% at 23% 35%, #000 28%, rgba(0,0,0,.45) 60%, transparent 84%);
-            mask-image:radial-gradient(100% 60% at 23% 35%, #000 28%, rgba(0,0,0,.45) 60%, transparent 84%);}
+    -webkit-mask-image:radial-gradient(120% 70% at 23% 35%, #000 28%, rgba(0,0,0,.45) 60%, transparent 84%);
+            mask-image:radial-gradient(120% 70% at 23% 35%, #000 28%, rgba(0,0,0,.45) 60%, transparent 84%);}
   /* version aplatie (masque cuit dans l'alpha du PNG) — utilisée à l'impression où Chrome ignore mask-image+blend sur le canvas WebGL */
   #elevbake{position:absolute;inset:0;z-index:2;width:100%;height:100%;pointer-events:none;opacity:.6;mix-blend-mode:screen;display:none;}
   @media print{ #elevmap{display:none!important;} #elevbake{display:block!important;} }
@@ -146,7 +146,7 @@ const img = (name: string) => withBase(`/images/${name}`);
 
     <div id="cliff"></div>
     <div id="elevmap"></div>
-    <svg id="seams" viewBox="0 0 1024 1536" preserveAspectRatio="none"></svg>
+    <svg id="seams" viewBox="0 0 1024 1448" preserveAspectRatio="none"></svg>
     <div class="grain"></div>
 
     <div class="content">
@@ -240,12 +240,11 @@ const img = (name: string) => withBase(`/images/${name}`);
   function smooth(pts,passes){ for(var p=0;p<passes;p++){ var o=pts.slice(); for(var i=1;i<pts.length-1;i++){ o[i]=[(pts[i-1][0]+2*pts[i][0]+pts[i+1][0])/4,(pts[i-1][1]+2*pts[i][1]+pts[i+1][1])/4]; } pts=o; } return pts; }
   // accroche au cadre les points proches d'un bord (le lissage rabote sinon les coins
   // région↔cadre → bords droits préservés et détection de bord fiable)
-  function snapEdge(p){ var x=p[0],y=p[1]; if(x<8)x=0; else if(x>1016)x=1024; if(y<8)y=0; else if(y>1528)y=1536; return [x,y]; }
+  function snapEdge(p){ var x=p[0],y=p[1]; if(x<8)x=0; else if(x>1016)x=1024; if(y<8)y=0; else if(y>1440)y=1448; return [x,y]; }
   function smoothLine(line){ return line.length<3 ? line : smooth(densify(line,8),1).map(snapEdge); }
 
-  // géométrie dessinée en 1024×1536 ; canevas réel 1024×1448 (ratio A4) → l'axe y est compressé de KY
-  var KY=1448/1536;
-  function place(el,pts){ var xs=pts.map(function(p){return p[0];}),ys=pts.map(function(p){return p[1];}); var bx=Math.min.apply(null,xs),by=Math.min.apply(null,ys),bw=Math.max.apply(null,xs)-bx,bh=Math.max.apply(null,ys)-by; el.style.left=bx+'px'; el.style.top=(by*KY)+'px'; el.style.width=bw+'px'; el.style.height=(bh*KY)+'px'; el.style.clipPath='polygon('+pts.map(function(p){return ((p[0]-bx)/bw*100).toFixed(2)+'% '+((p[1]-by)/bh*100).toFixed(2)+'%';}).join(',')+')'; }
+  // le masque est déjà dans le repère du poster (1024×1448, format A4) → placement 1:1, aucune compression
+  function place(el,pts){ var xs=pts.map(function(p){return p[0];}),ys=pts.map(function(p){return p[1];}); var bx=Math.min.apply(null,xs),by=Math.min.apply(null,ys),bw=Math.max.apply(null,xs)-bx,bh=Math.max.apply(null,ys)-by; el.style.left=bx+'px'; el.style.top=by+'px'; el.style.width=bw+'px'; el.style.height=bh+'px'; el.style.clipPath='polygon('+pts.map(function(p){return ((p[0]-bx)/bw*100).toFixed(2)+'% '+((p[1]-by)/bh*100).toFixed(2)+'%';}).join(',')+')'; }
 
   // lit chaque masque injecté → région lissée, place la photo correspondante, mémorise la région
   var REGIONS=[];
@@ -317,10 +316,10 @@ const img = (name: string) => withBase(`/images/${name}`);
         if(!w||!h) return;
         var c=document.createElement('canvas'); c.width=w; c.height=h;
         var ctx=c.getContext('2d'); ctx.drawImage(src,0,0);
-        // masque radial identique au CSS : 100% 60% at 23% 35%, stops 28%/60%/84%
+        // masque radial identique au CSS : 120% 70% at 23% 35%, stops 28%/60%/84%
         ctx.globalCompositeOperation='destination-in';
-        var cx=0.23*w, cy=0.35*h, R=1.0*w;
-        ctx.save(); ctx.translate(cx,cy); ctx.scale(1,(0.60*h)/R);
+        var cx=0.23*w, cy=0.35*h, R=1.2*w;
+        ctx.save(); ctx.translate(cx,cy); ctx.scale(1,(0.70*h)/R);
         var g=ctx.createRadialGradient(0,0,0,0,0,R);
         g.addColorStop(0,'rgba(0,0,0,1)'); g.addColorStop(0.28,'rgba(0,0,0,1)');
         g.addColorStop(0.60,'rgba(0,0,0,0.45)'); g.addColorStop(0.84,'rgba(0,0,0,0)');
@@ -341,24 +340,23 @@ const img = (name: string) => withBase(`/images/${name}`);
   (function(){
     var svg=document.getElementById('seams');
     function add(tag,attr){ var e=document.createElementNS(SVGNS,tag); for(var k in attr) e.setAttribute(k,attr[k]); svg.appendChild(e); return e; }
-    function arclen(pts){ var s=[0]; for(var i=1;i<pts.length;i++) s[i]=s[i-1]+Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1]); return s; }
     function normals(pts){ var n=[]; for(var i=0;i<pts.length;i++){ var a=pts[Math.max(0,i-1)],b=pts[Math.min(pts.length-1,i+1)],dx=b[0]-a[0],dy=b[1]-a[1],L=Math.hypot(dx,dy)||1; n.push([dy/L,-dx/L]); } return n; }
-    function noise(s,seed){ return Math.sin(s*0.012+seed*1.7)*0.55+Math.sin(s*0.026+seed*3.1)*0.30+Math.sin(s*0.052+seed*0.6)*0.15; }
     function toPath(pts){ if(pts.length<3) return 'M'+pts.map(function(p){return p[0].toFixed(1)+' '+p[1].toFixed(1);}).join(' L '); var d='M '+pts[0][0].toFixed(1)+' '+pts[0][1].toFixed(1); for(var i=0;i<pts.length-1;i++){ var p0=pts[i-1]||pts[i],p1=pts[i],p2=pts[i+1],p3=pts[i+2]||pts[i+1]; var c1x=p1[0]+(p2[0]-p0[0])/6,c1y=p1[1]+(p2[1]-p0[1])/6,c2x=p2[0]-(p3[0]-p1[0])/6,c2y=p2[1]-(p3[1]-p1[1])/6; d+=' C '+c1x.toFixed(1)+' '+c1y.toFixed(1)+' '+c2x.toFixed(1)+' '+c2y.toFixed(1)+' '+p2[0].toFixed(1)+' '+p2[1].toFixed(1); } return d; }
-    function offPts(pts,nrm,s,d,seed,amp){ return pts.map(function(p,i){ var o=d+amp*noise(s[i],seed); return [p[0]+nrm[i][0]*o, p[1]+nrm[i][1]*o]; }); }
-    var OFFS=[0,7,15,23,33,45,58], OPS=[0.5,0.36,0.28,0.2,0.14,0.1,0.06];
+    function offPts(pts,nrm,d){ return pts.map(function(p,i){ return [p[0]+nrm[i][0]*d, p[1]+nrm[i][1]*d]; }); }
+    // éventail SERRÉ et SANS bruit → les lignes dorées épousent précisément l'arête lissée du masque
+    var OFFS=[0,4,9,15], OPS=[0.62,0.42,0.26,0.13];
     function contourSeam(pts, side){
-      var s=arclen(pts), nrm=normals(pts);   // pts déjà lissés = mêmes points que le détourage des photos
-      add('path',{d:toPath(pts),fill:'none',stroke:'rgba(9,12,10,0.7)','stroke-width':6,'stroke-linejoin':'round','stroke-linecap':'round'});
+      var nrm=normals(pts);   // pts déjà lissés = mêmes points que le détourage des photos
+      add('path',{d:toPath(pts),fill:'none',stroke:'rgba(9,12,10,0.7)','stroke-width':4,'stroke-linejoin':'round','stroke-linecap':'round'});
       for(var k=0;k<OFFS.length;k++){
-        var pp=offPts(pts,nrm,s,OFFS[k]*side,k*1.37,3.2);
-        add('path',{d:toPath(pp),fill:'none',stroke:'#d4a574','stroke-width':k===0?1.2:1,opacity:OPS[k],'stroke-linejoin':'round','stroke-linecap':'round'});
+        var pp=offPts(pts,nrm,OFFS[k]*side);
+        add('path',{d:toPath(pp),fill:'none',stroke:'#d4a574','stroke-width':k===0?1.5:1,opacity:OPS[k],'stroke-linejoin':'round','stroke-linecap':'round'});
       }
     }
     // contours dorés sur les bords ORGANIQUES (hors cadre du poster) de chaque région.
     // Chaque photo évase ses lignes de niveau vers son intérieur → la séparation, bord
     // commun aux 2 photos, est habillée symétriquement de part et d'autre.
-    function borderEdge(a,b){ return (a[0]<=1&&b[0]<=1)||(a[0]>=1023&&b[0]>=1023)||(a[1]<=1&&b[1]<=1)||(a[1]>=1535&&b[1]>=1535); }
+    function borderEdge(a,b){ return (a[0]<=1&&b[0]<=1)||(a[0]>=1023&&b[0]>=1023)||(a[1]<=1&&b[1]<=1)||(a[1]>=1447&&b[1]>=1447); }
     function isCW(p){ var s=0; for(var i=0;i<p.length-1;i++) s+=(p[i+1][0]-p[i][0])*(p[i+1][1]+p[i][1]); return s>0; }
     REGIONS.forEach(function(region){
       var ring = isCW(region) ? region.slice().reverse() : region;   // CCW → intérieur à gauche

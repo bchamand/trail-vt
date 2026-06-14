@@ -2,13 +2,14 @@
   ═══════════════════════════════════════════════════════════════════════
    MASQUE PHOTO 2 — « forêt » (photo du bas)
   ═══════════════════════════════════════════════════════════════════════
-   Voir 1-champ.svg pour le mode d'emploi. Le bord du HAUT de cette région
-   (la séparation) doit coïncider avec le bord du BAS de la photo 1 pour
-   que les deux photos se touchent sans trou ni recouvrement visible.
+   Voir 1-champ.svg pour le mode d'emploi (repère 1024×1448 = format A4 du
+   poster, échelle 1:1). Le bord du HAUT de cette région (la séparation)
+   doit coïncider avec le bord du BAS de la photo 1 pour que les deux
+   photos se touchent sans trou ni recouvrement visible.
   ═══════════════════════════════════════════════════════════════════════
 -->
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1536" preserveAspectRatio="none"
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1448" preserveAspectRatio="none"
      data-photo="foret-clean.jpg" data-scale="1.08" data-origin="52% 50%">
   <polygon id="region" fill="#9da36a" fill-opacity="0.25" stroke="#9da36a" stroke-width="3"
-    points="530,510 670,500 810,488 1024,472 1024,1004 860,1016 680,1026 500,1022 339,1008 330,986 372,918 446,858 516,772 558,684 548,580"/>
+    points="530,481 670,471 810,460 1024,445 1024,946 860,958 680,967 500,963 339,950 330,930 372,865 446,809 516,728 558,645 548,547"/>
 </svg>

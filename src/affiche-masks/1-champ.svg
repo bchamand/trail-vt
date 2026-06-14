@@ -7,15 +7,17 @@
    dans ce dossier → l'affiche n'a ni photo, ni contour, ni séparation.
 
    • data-photo  : nom de l'image associée (dans public/images/).
+   • data-scale / data-origin : cadrage de l'image dans la région.
    • <polygon>   : la RÉGION FERMÉE que la photo doit remplir. Tu déplaces
-                   ses points (x,y dans le repère 1024×1536). Les bords qui
-                   longent le cadre (x=0/1024, y=0/1536) sont les bords du
-                   poster ; les autres bords portent les contours dorés.
+                   ses points (x,y dans le repère 1024×1448 = LE FORMAT A4
+                   du poster, à l'échelle 1:1). Les bords qui longent le
+                   cadre (x=0/1024, y=0/1448) sont les bords du poster ;
+                   les autres bords portent les contours dorés.
    L'ordre des fichiers (1-…, 2-…) = l'ordre d'empilement des photos.
   ═══════════════════════════════════════════════════════════════════════
 -->
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1536" preserveAspectRatio="none"
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1448" preserveAspectRatio="none"
      data-photo="champ-clean.jpg" data-scale="1.16" data-origin="42% 48%">
   <polygon id="region" fill="#d4a574" fill-opacity="0.25" stroke="#d4a574" stroke-width="3"
-    points="348,0 1024,0 1024,472 810,488 670,500 530,510 520,474 468,366 404,260 352,170 366,90"/>
+    points="348,0 1024,0 1024,445 810,460 670,471 530,481 520,447 468,345 404,245 352,160 366,85"/>
 </svg>
