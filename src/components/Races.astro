@@ -18,6 +18,7 @@ export interface RaceViewModel {
   roman: string;
   title: string;
   type: string;
+  posterType?: string;
   description: string;
   startTime: string;
   difficulty: number;
@@ -140,9 +141,9 @@ const clientPayload = {
     <div>
       {races.map((race, i) => (
         <div class:list={['race-info', i === 0 ? '' : 'hidden']} data-info-index={i}>
-          <div class="mono-label mb-5">{race.roman} / {race.title.toUpperCase()}</div>
+          <div class="mono-label mb-5">{race.roman} / {(race.posterType ?? race.type).replace(/^\d+\s+/, '').toUpperCase()}</div>
           <h3 class="mb-5" style="font-family: var(--font-serif); font-weight: 400; line-height: 0.95; letter-spacing: -0.025em; font-size: clamp(44px, 5vw, 68px); margin: 0 0 20px;">
-            <em style="font-style: italic;">{race.type}</em>
+            <em style="font-style: italic;">{race.title}</em>
           </h3>
           <p class="text-[15px] sm:text-[17px] leading-[1.55] opacity-85 m-0" style="text-wrap: pretty;">{race.description}</p>
 
