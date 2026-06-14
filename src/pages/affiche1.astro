@@ -4,6 +4,17 @@
 import { getEntry, getCollection } from 'astro:content';
 import { deriveEvent, fmtKm } from '../lib/event';
 import { withBase } from '../lib/url';
+// Masques des photos : 1 SVG par photo dans src/affiche-masks/ (chacun déclare sa photo
+// via data-photo, + cadrage data-scale/data-origin). Chargés tous, triés par nom de fichier.
+// Zéro masque valide → l'affiche n'affiche ni photo, ni contour, ni séparation.
+const maskModules = import.meta.glob('../affiche-masks/*.svg', { query: '?raw', import: 'default', eager: true });
+const posterMasks = Object.keys(maskModules).sort().map((path, i) => {
+  const svg = maskModules[path] as string;
+  const m1 = svg.match(/data-photo\s*=\s*["']([^"']+)["']/);
+  const m2 = svg.match(/data-scale\s*=\s*["']([^"']+)["']/);
+  const m3 = svg.match(/data-origin\s*=\s*["']([^"']+)["']/);
+  return { i, svg, photo: m1 ? m1[1] : '', scale: m2 ? m2[1] : '1', origin: m3 ? m3[1] : '50% 50%' };
+}).filter((m) => m.photo);
 
 const ev = await getEntry('event', 'main');
 if (!ev) throw new Error('event.yaml: entrée "main" manquante');
@@ -50,7 +61,7 @@ const img = (name: string) => withBase(`/images/${name}`);
 <script is:inline src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
 <script is:inline src="https://unpkg.com/maplibre-contour@0.1.0/dist/index.min.js"></script>
 <style is:global>
-  :root{ --bg:#0f1412; --bg2:#0a0e0c; --ink:#e8e3d3; --gold:#d4a574; --gold-d:#b8915f; --olive:#9da36a; --muted:#8a8576; --line:rgba(232,227,211,0.16); }
+  :root{ --bg:#0f1412; --ink:#e8e3d3; --gold:#d4a574; --muted:#8a8576; --line:rgba(232,227,211,0.16); }
   *{margin:0;padding:0;box-sizing:border-box;}
   html,body{height:100%;background:#000;overflow:hidden;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
   #stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#000;}
@@ -61,15 +72,17 @@ const img = (name: string) => withBase(`/images/${name}`);
     -webkit-print-color-adjust:exact;print-color-adjust:exact;}
   .abs{position:absolute;}
   /* photo strata */
-  .ph{position:absolute;z-index:1;}
+  .ph{position:absolute;z-index:3;}
   .ph img{display:block;width:100%;height:100%;object-fit:cover;filter:brightness(.84) contrast(1.07) saturate(.7) sepia(.16);}
-  .ph .shade{position:absolute;inset:0;pointer-events:none;}
+  /* fondu générique : assombrit le bord gauche (vers le titre) + un peu le bas */
+  .ph .shade{position:absolute;inset:0;pointer-events:none;
+    background:linear-gradient(100deg,rgba(10,14,12,.82) 3%,rgba(10,14,12,.18) 25%,transparent 47%),
+               linear-gradient(0deg,rgba(10,14,12,.5) 0%,transparent 20%);}
   /* cliff */
   #cliff{position:absolute;inset:0;z-index:2;
     background:
       radial-gradient(120% 80% at 12% 12%, rgba(40,46,40,.55), rgba(10,13,11,0) 60%),
       linear-gradient(105deg,#11160f 0%,#0c100c 46%,#161b13 60%,#0d1110 72%);}
-  #cliffSvg{position:absolute;inset:0;z-index:2;pointer-events:none;}
   /* vraies courbes de niveau (MapLibre + maplibre-contour, DEM à la volée) en or, derrière le titre */
   #elevmap{position:absolute;inset:0;z-index:2;background:transparent;pointer-events:none;
     mix-blend-mode:screen;opacity:.6;
@@ -82,7 +95,7 @@ const img = (name: string) => withBase(`/images/${name}`);
   .maplibregl-ctrl-attribution{background:rgba(10,14,12,.5)!important;color:rgba(232,227,211,.4)!important;font-size:7px!important;}
   .maplibregl-ctrl-attribution a{color:rgba(212,165,116,.65)!important;}
   .maplibregl-ctrl-attribution.maplibregl-compact{min-height:20px;}
-  #seams{position:absolute;inset:0;z-index:3;pointer-events:none;}
+  #seams{position:absolute;inset:0;z-index:4;pointer-events:none;}
   .grain{position:absolute;inset:0;z-index:6;pointer-events:none;opacity:.05;mix-blend-mode:overlay;
     background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");}
   .content{position:absolute;inset:0;z-index:5;}
@@ -98,14 +111,11 @@ const img = (name: string) => withBase(`/images/${name}`);
   .parc .km{font-family:"Instrument Serif",serif;font-weight:400;font-size:72px;line-height:.78;color:var(--ink);white-space:nowrap;}
   .parc .u{font-family:"JetBrains Mono",monospace;font-weight:500;font-size:20px;letter-spacing:.12em;color:var(--gold);display:block;margin-top:8px;}
   .parc .d{font-family:"JetBrains Mono",monospace;font-size:16px;letter-spacing:.1em;color:var(--muted);margin-top:16px;white-space:nowrap;}
-  .parc .ptype{font-family:"JetBrains Mono",monospace;font-weight:600;font-size:8.5px;letter-spacing:.14em;color:var(--gold);display:block;margin-bottom:16px;white-space:nowrap;}
   /* nom de la course (haut de la cellule) et « type de course » (bas) */
   .parc .rname{font-family:"JetBrains Mono",monospace;font-weight:600;font-size:15px;letter-spacing:.1em;color:var(--gold);display:block;margin-bottom:18px;line-height:1.3;max-width:230px;}
   .parc .rtype{font-family:"JetBrains Mono",monospace;font-weight:500;font-size:13px;letter-spacing:.06em;color:rgba(232,227,211,.6);margin-top:14px;line-height:1.35;max-width:215px;}
   .ico{stroke:var(--gold);fill:none;stroke-width:1.6;}
   a{color:inherit;text-decoration:none;}
-  .vd{position:absolute;width:1px;background:var(--line);}
-  .smallcap{font-family:"JetBrains Mono",monospace;font-weight:500;letter-spacing:.14em;}
   @media print{
     @page{ size:210mm 297mm; margin:0; }
     html,body{ width:210mm; height:297mm; background:#0f1412; overflow:hidden; }
@@ -124,15 +134,18 @@ const img = (name: string) => withBase(`/images/${name}`);
 </style>
 </head>
 <body>
+<!-- masques des photos (src/affiche-masks/*.svg) injectés, invisibles : source géométrique de chaque photo -->
+{posterMasks.map((m) => (
+  <div class="mask-src" data-i={m.i} aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden;pointer-events:none;" set:html={m.svg}></div>
+))}
 <div id="stage">
   <div id="poster" data-screen-label="Affiche">
-    <div class="ph pano"><img src={img('vue-clean.jpg')} alt="" style="transform:scale(1.34);transform-origin:56% 44%;"/><div class="shade" style="background:linear-gradient(180deg,rgba(10,14,12,.35),transparent 40%,transparent 70%,rgba(10,14,12,.55));"></div></div>
-    <div class="ph forest"><img src={img('foret-clean.jpg')} alt="" style="transform:scale(1.06);transform-origin:54% 46%;"/><div class="shade" style="background:linear-gradient(100deg,rgba(10,14,12,.85) 4%,rgba(10,14,12,.2) 26%,transparent 50%);"></div></div>
-    <div class="ph meadow"><img src={img('champ-clean.jpg')} alt="" style="transform:scale(1.42);transform-origin:34% 52%;"/><div class="shade" style="background:linear-gradient(95deg,rgba(10,14,12,.8) 2%,rgba(10,14,12,.15) 24%,transparent 46%),linear-gradient(0deg,rgba(10,14,12,.98) 0%,rgba(10,14,12,.62) 13%,rgba(10,14,12,.18) 30%,transparent 44%);"></div></div>
+    {posterMasks.map((m) => (
+      <div class="ph" data-i={m.i}><img src={img(m.photo)} alt="" style={`transform:scale(${m.scale});transform-origin:${m.origin};`}/><div class="shade"></div></div>
+    ))}
 
     <div id="cliff"></div>
     <div id="elevmap"></div>
-    <svg id="cliffSvg" viewBox="0 0 1024 1536" preserveAspectRatio="none"></svg>
     <svg id="seams" viewBox="0 0 1024 1536" preserveAspectRatio="none"></svg>
     <div class="grain"></div>
 
@@ -143,7 +156,7 @@ const img = (name: string) => withBase(`/images/${name}`);
       </div>
 
       <!-- title · single line · typo site B · centré verticalement dans le creux -->
-      <div class="abs" style="left:56px;top:334px;">
+      <div class="abs" style="left:56px;top:298px;">
         <div style="display:flex;align-items:center;gap:14px;margin:0 0 24px 4px;white-space:nowrap;">
           <span style="display:inline-block;width:46px;height:1px;background:var(--gold);flex:0 0 auto;"></span>
           <span class="mono" style="font-size:14px;letter-spacing:.32em;color:var(--gold);font-weight:600;">ÉDITION&nbsp;{event.edition}</span>
@@ -156,7 +169,7 @@ const img = (name: string) => withBase(`/images/${name}`);
         </div>
       </div>
       <!-- tagline (sous le titre) -->
-      <div class="abs" style="left:60px;top:700px;">
+      <div class="abs" style="left:60px;top:664px;">
         <div style="width:54px;height:1px;background:var(--gold);margin-bottom:24px;"></div>
         <div class="serif" style="font-style:italic;font-size:40px;line-height:1.1;color:rgba(232,227,211,.9);max-width:360px;">{event.tagline}</div>
       </div>
@@ -217,34 +230,39 @@ const img = (name: string) => withBase(`/images/${name}`);
 </div>
 
 <script is:inline>
-  // ---- geometry (1024 x 1536) ----
-  var ridge=[[348,0],[366,90],[352,170],[404,260],[468,366],[520,474],[548,580],[558,684],[516,772],[446,858],[372,918],[330,986],[366,1086],[438,1188],[462,1176],[470,1198]];
-  var panoSeam=[[404,260],[520,250],[660,232],[800,205],[1024,168]];
-  var meadowSeam=[[349,1040],[540,966],[710,908],[882,856],[1024,812]];
+  // ---- masques des photos : 1 région fermée par photo (src/affiche-masks/*.svg) ----
+  // Chaque photo se détoure EXACTEMENT sur sa région ; les contours dorés et le fond
+  // en sont dérivés. Aucun masque → aucune photo, aucun contour, aucune séparation.
+  // échantillonne une forme SVG (polygon/polyline/path) en points, dans le repère du viewBox
+  function readShape(el){ if(!el||!el.getTotalLength) return []; var L=el.getTotalLength(), n=Math.max(3,Math.round(L/8)), out=[]; for(var i=0;i<=n;i++){ var p=el.getPointAtLength(L*i/n); out.push([p.x,p.y]); } return out; }
+  // lissage organique PARTAGÉ : détourage des photos ET contours dorés = la même courbe lissée
+  function densify(pts,step){ var out=[]; for(var i=0;i<pts.length-1;i++){ var a=pts[i],b=pts[i+1],dx=b[0]-a[0],dy=b[1]-a[1],L=Math.hypot(dx,dy),n=Math.max(1,Math.round(L/step)); for(var j=0;j<n;j++) out.push([a[0]+dx*j/n,a[1]+dy*j/n]); } out.push(pts[pts.length-1]); return out; }
+  function smooth(pts,passes){ for(var p=0;p<passes;p++){ var o=pts.slice(); for(var i=1;i<pts.length-1;i++){ o[i]=[(pts[i-1][0]+2*pts[i][0]+pts[i+1][0])/4,(pts[i-1][1]+2*pts[i][1]+pts[i+1][1])/4]; } pts=o; } return pts; }
+  // accroche au cadre les points proches d'un bord (le lissage rabote sinon les coins
+  // région↔cadre → bords droits préservés et détection de bord fiable)
+  function snapEdge(p){ var x=p[0],y=p[1]; if(x<8)x=0; else if(x>1016)x=1024; if(y<8)y=0; else if(y>1528)y=1536; return [x,y]; }
+  function smoothLine(line){ return line.length<3 ? line : smooth(densify(line,8),1).map(snapEdge); }
 
-  function poly(pts){ return 'polygon(' + pts.map(function(p){return (p[0]/1024*100).toFixed(2)+'% '+(p[1]/1536*100).toFixed(2)+'%';}).join(',') + ')'; }
-
-  var cliffPts=[[0,0],[348,0]].concat(ridge).concat([[470,1198],[1024,1198],[1024,1536],[0,1536]]);
-  var panoPts=[[348,0],[1024,0],[1024,168],[800,205],[660,232],[520,250],[404,260],[352,170],[366,90]];
-  var forestPts=[[404,260],[520,250],[660,232],[800,205],[1024,168],[1024,812],[882,856],[710,908],[540,966],[349,1040],[330,986],[372,918],[446,858],[516,772],[558,684],[548,580],[520,474],[468,366]];
-  var meadowPts=[[349,1040],[540,966],[710,908],[882,856],[1024,812],[1024,1198],[470,1198],[470,1184],[438,1188],[366,1086]];
-
-  // géométrie dessinée en 1024×1536 ; le canevas réel est 1024×1448 (ratio A4)
-  // → l'axe vertical est compressé de KY (les % des clip-path et les viewBox
-  //   préservent les proportions relatives, seules les positions px changent)
+  // géométrie dessinée en 1024×1536 ; canevas réel 1024×1448 (ratio A4) → l'axe y est compressé de KY
   var KY=1448/1536;
-  function place(sel,pts){var xs=pts.map(function(p){return p[0];}),ys=pts.map(function(p){return p[1];});var bx=Math.min.apply(null,xs),by=Math.min.apply(null,ys),bw=Math.max.apply(null,xs)-bx,bh=Math.max.apply(null,ys)-by;var e=document.querySelector(sel);e.style.left=bx+'px';e.style.top=(by*KY)+'px';e.style.width=bw+'px';e.style.height=(bh*KY)+'px';e.style.clipPath='polygon('+pts.map(function(p){return ((p[0]-bx)/bw*100).toFixed(2)+'% '+((p[1]-by)/bh*100).toFixed(2)+'%';}).join(',')+')';}
-  place('.ph.pano',panoPts);
-  place('.ph.forest',forestPts);
-  place('.ph.meadow',meadowPts);
-  document.getElementById('cliff').style.clipPath=poly(cliffPts);
-  document.getElementById('cliffSvg').style.clipPath=poly(cliffPts);
-  document.getElementById('elevmap').style.clipPath=poly(cliffPts);
+  function place(el,pts){ var xs=pts.map(function(p){return p[0];}),ys=pts.map(function(p){return p[1];}); var bx=Math.min.apply(null,xs),by=Math.min.apply(null,ys),bw=Math.max.apply(null,xs)-bx,bh=Math.max.apply(null,ys)-by; el.style.left=bx+'px'; el.style.top=(by*KY)+'px'; el.style.width=bw+'px'; el.style.height=(bh*KY)+'px'; el.style.clipPath='polygon('+pts.map(function(p){return ((p[0]-bx)/bw*100).toFixed(2)+'% '+((p[1]-by)/bh*100).toFixed(2)+'%';}).join(',')+')'; }
 
-  var SVGNS='http://www.w3.org/2000/svg';
-  function el(n,a){var e=document.createElementNS(SVGNS,n);for(var k in a)e.setAttribute(k,a[k]);return e;}
-  function ptsStr(p){return p.map(function(q){return q[0]+','+q[1];}).join(' ');}
-  function offset(p,dx,dy){return p.map(function(q){return [q[0]+dx,q[1]+dy];});}
+  // lit chaque masque injecté → région lissée, place la photo correspondante, mémorise la région
+  var REGIONS=[];
+  [].forEach.call(document.querySelectorAll('.mask-src'), function(holder){
+    var shape=holder.querySelector('polygon,polyline,path'); if(!shape) return;
+    var region=smoothLine(readShape(shape)); if(region.length<3) return;
+    var photo=document.querySelector('.ph[data-i="'+holder.getAttribute('data-i')+'"]');
+    if(photo) place(photo,region);
+    REGIONS.push(region);
+  });
+
+  // Fond sombre : #cliff remplit tout le canevas, les photos passent par-dessus (z-index).
+  // Relief (courbes d'altitude) : AUCUN détourage — il s'estompe via son seul masque radial
+  // (CSS à l'écran, cuit dans le PNG à l'impression), et les photos le recouvrent là où elles
+  // sont. Il reste donc continu et indépendant des masques (plus de coupure « masque fantôme »).
+
+  var SVGNS='http://www.w3.org/2000/svg';   // utilisé par le tracé des contours dorés (#seams)
 
   // ---- vraies courbes de niveau d'altitude : MapLibre + maplibre-contour (DEM relief), centrées sur la colline de Vieille-Toulouse ----
   (function(){
@@ -323,26 +341,37 @@ const img = (name: string) => withBase(`/images/${name}`);
   (function(){
     var svg=document.getElementById('seams');
     function add(tag,attr){ var e=document.createElementNS(SVGNS,tag); for(var k in attr) e.setAttribute(k,attr[k]); svg.appendChild(e); return e; }
-    function densify(pts,step){ var out=[]; for(var i=0;i<pts.length-1;i++){ var a=pts[i],b=pts[i+1],dx=b[0]-a[0],dy=b[1]-a[1],L=Math.hypot(dx,dy),n=Math.max(1,Math.round(L/step)); for(var j=0;j<n;j++) out.push([a[0]+dx*j/n,a[1]+dy*j/n]); } out.push(pts[pts.length-1]); return out; }
-    function smooth(pts,passes){ for(var p=0;p<passes;p++){ var o=pts.slice(); for(var i=1;i<pts.length-1;i++){ o[i]=[(pts[i-1][0]+2*pts[i][0]+pts[i+1][0])/4,(pts[i-1][1]+2*pts[i][1]+pts[i+1][1])/4]; } pts=o; } return pts; }
     function arclen(pts){ var s=[0]; for(var i=1;i<pts.length;i++) s[i]=s[i-1]+Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1]); return s; }
     function normals(pts){ var n=[]; for(var i=0;i<pts.length;i++){ var a=pts[Math.max(0,i-1)],b=pts[Math.min(pts.length-1,i+1)],dx=b[0]-a[0],dy=b[1]-a[1],L=Math.hypot(dx,dy)||1; n.push([dy/L,-dx/L]); } return n; }
     function noise(s,seed){ return Math.sin(s*0.012+seed*1.7)*0.55+Math.sin(s*0.026+seed*3.1)*0.30+Math.sin(s*0.052+seed*0.6)*0.15; }
     function toPath(pts){ if(pts.length<3) return 'M'+pts.map(function(p){return p[0].toFixed(1)+' '+p[1].toFixed(1);}).join(' L '); var d='M '+pts[0][0].toFixed(1)+' '+pts[0][1].toFixed(1); for(var i=0;i<pts.length-1;i++){ var p0=pts[i-1]||pts[i],p1=pts[i],p2=pts[i+1],p3=pts[i+2]||pts[i+1]; var c1x=p1[0]+(p2[0]-p0[0])/6,c1y=p1[1]+(p2[1]-p0[1])/6,c2x=p2[0]-(p3[0]-p1[0])/6,c2y=p2[1]-(p3[1]-p1[1])/6; d+=' C '+c1x.toFixed(1)+' '+c1y.toFixed(1)+' '+c2x.toFixed(1)+' '+c2y.toFixed(1)+' '+p2[0].toFixed(1)+' '+p2[1].toFixed(1); } return d; }
     function offPts(pts,nrm,s,d,seed,amp){ return pts.map(function(p,i){ var o=d+amp*noise(s[i],seed); return [p[0]+nrm[i][0]*o, p[1]+nrm[i][1]*o]; }); }
     var OFFS=[0,7,15,23,33,45,58], OPS=[0.5,0.36,0.28,0.2,0.14,0.1,0.06];
-    function contourSeam(raw, side){
-      var pts=smooth(densify(raw,8),1), s=arclen(pts), nrm=normals(pts);
+    function contourSeam(pts, side){
+      var s=arclen(pts), nrm=normals(pts);   // pts déjà lissés = mêmes points que le détourage des photos
       add('path',{d:toPath(pts),fill:'none',stroke:'rgba(9,12,10,0.7)','stroke-width':6,'stroke-linejoin':'round','stroke-linecap':'round'});
       for(var k=0;k<OFFS.length;k++){
         var pp=offPts(pts,nrm,s,OFFS[k]*side,k*1.37,3.2);
         add('path',{d:toPath(pp),fill:'none',stroke:'#d4a574','stroke-width':k===0?1.2:1,opacity:OPS[k],'stroke-linejoin':'round','stroke-linecap':'round'});
       }
     }
-    var closeSeam=[[470,1198],[481,1207],[502,1210],[540,1210],[602,1207],[684,1201],[784,1193],[896,1186],[1024,1179]];
-    contourSeam(panoSeam,-1);                          // pano / forêt
-    contourSeam(meadowSeam,-1);                        // forêt / prairie
-    contourSeam(ridge.concat(closeSeam.slice(1)),1);   // arête principale (autour du titre)
+    // contours dorés sur les bords ORGANIQUES (hors cadre du poster) de chaque région.
+    // Chaque photo évase ses lignes de niveau vers son intérieur → la séparation, bord
+    // commun aux 2 photos, est habillée symétriquement de part et d'autre.
+    function borderEdge(a,b){ return (a[0]<=1&&b[0]<=1)||(a[0]>=1023&&b[0]>=1023)||(a[1]<=1&&b[1]<=1)||(a[1]>=1535&&b[1]>=1535); }
+    function isCW(p){ var s=0; for(var i=0;i<p.length-1;i++) s+=(p[i+1][0]-p[i][0])*(p[i+1][1]+p[i][1]); return s>0; }
+    REGIONS.forEach(function(region){
+      var ring = isCW(region) ? region.slice().reverse() : region;   // CCW → intérieur à gauche
+      var run=[];
+      function flush(){ if(run.length>=2) contourSeam(run,-1); run=[]; }   // -1 = éventail vers l'intérieur (la photo)
+      for(var i=0;i<ring.length-1;i++){
+        var a=ring[i], b=ring[i+1];
+        if(borderEdge(a,b)){ flush(); continue; }
+        if(!run.length) run.push(a);
+        run.push(b);
+      }
+      flush();
+    });
   })();
 
   function fit(){var p=document.getElementById('poster');p.style.transformOrigin='center center';var s=Math.min(window.innerWidth/1024,window.innerHeight/1448);p.style.transform='scale('+s+')';}
