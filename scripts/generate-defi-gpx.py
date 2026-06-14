@@ -2,23 +2,26 @@
 """
 Génère le fichier GPX multi-boucles du Défi de Copillos.
 
-Structure officielle (synopsis du 01.05.2026) — 40,1 km / D+ 1230 m :
-  Boucle 1 — La Conquête   : Auzil + Pechbusque (11,1 km / D+ 370 m)
-  Boucle 2 — L'Honneur     : Pechbusque         (6,2 km  / D+ 220 m)
-  Boucle 3 — L'Endurance   : Pechbusque         (6,2 km  / D+ 220 m)
-  Boucle 4 — Le Courage    : Pechbusque         (6,2 km  / D+ 220 m)
-  Boucle 5 — La Bravoure   : Golf               (5,2 km  / D+ 100 m)
-  Boucle 6 — Le Prestige   : Golf               (5,2 km  / D+ 100 m)
+Structure — 4 boucles à élimination :
+  Boucle 1 — La Conquête  : Auzil + Pechbusque  (temps : H 1h20 · F 1h30)
+  Boucle 2 — L'Endurance  : Auzil + Pechbusque  (temps : H 1h20 · F 1h30)
+  Boucle 3 — La Bravoure  : Golf                (temps : H 45' · F 50')
+  Boucle 4 — L'Honneur    : Golf                (temps : H 45' · F 50')
 
-⚠ La trace de la Boucle du Golf n'existe pas encore : en attendant,
-  la boucle Pechbusque sert de remplacement. Quand la vraie trace
-  arrive, la déposer dans scripts/gpx-sources/boucle-golf.gpx et
-  mettre à jour SOURCE_GOLF ci-dessous.
+À chaque passage il faut tenir le temps limite (hommes / femmes) pour être
+sélectionné pour la boucle suivante.
+
+Sources (une trace par type de boucle) : scripts/gpx-sources/
+  - boucle-auzil-pechbusque.gpx  (faite 2 fois)
+  - boucle-golf.gpx              (faite 2 fois)
+
+Distance et D+ ne sont PAS écrits ici : ils sont calculés depuis la trace par
+le site (lib/gpx.ts), un <trk> = un segment.
 
 Usage :
   python3 scripts/generate-defi-gpx.py
 
-Produit : public/traces/defi-copillos.gpx
+Produit : public/traces/defi-copillos.gpx (un <trk> par boucle, dans l'ordre).
 """
 
 import xml.etree.ElementTree as ET
@@ -29,19 +32,17 @@ PROJECT_ROOT = os.path.dirname(SCRIPT_DIR)
 SOURCES = os.path.join(SCRIPT_DIR, 'gpx-sources')
 
 SOURCE_AUZIL_PECHBUSQUE = os.path.join(SOURCES, 'boucle-auzil-pechbusque.gpx')
-SOURCE_PECHBUSQUE = os.path.join(SOURCES, 'boucle-pechbusque.gpx')
-SOURCE_GOLF = SOURCE_PECHBUSQUE  # ← remplacer par boucle-golf.gpx dès réception
+SOURCE_GOLF = os.path.join(SOURCES, 'boucle-golf.gpx')
 OUTPUT = os.path.join(PROJECT_ROOT, 'public', 'traces', 'defi-copillos.gpx')
 
 NS = {'gpx': 'http://www.topografix.com/GPX/1/1'}
 
+# Ordre des boucles = ordre des segments dans src/content/races/defi-copillos.md
 BOUCLES = [
     {'source': SOURCE_AUZIL_PECHBUSQUE, 'name': "Boucle 1 — La Conquête"},
-    {'source': SOURCE_PECHBUSQUE,       'name': "Boucle 2 — L'Honneur"},
-    {'source': SOURCE_PECHBUSQUE,       'name': "Boucle 3 — L'Endurance"},
-    {'source': SOURCE_PECHBUSQUE,       'name': "Boucle 4 — Le Courage"},
-    {'source': SOURCE_GOLF,             'name': "Boucle 5 — La Bravoure"},
-    {'source': SOURCE_GOLF,             'name': "Boucle 6 — Le Prestige"},
+    {'source': SOURCE_AUZIL_PECHBUSQUE, 'name': "Boucle 2 — L'Endurance"},
+    {'source': SOURCE_GOLF,             'name': "Boucle 3 — La Bravoure"},
+    {'source': SOURCE_GOLF,             'name': "Boucle 4 — L'Honneur"},
 ]
 
 
@@ -63,7 +64,7 @@ def build_multi_track_gpx():
 
     meta = ET.SubElement(gpx, 'metadata')
     name = ET.SubElement(meta, 'name')
-    name.text = 'Le Défi de Copillos — 6 boucles'
+    name.text = 'Le Défi de Copillos — 4 boucles'
 
     for boucle in BOUCLES:
         print(f"Traitement : {boucle['name']}")

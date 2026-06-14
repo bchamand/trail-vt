@@ -2,8 +2,10 @@
 // Affiche imprimable A4 — page du site (synchronisée avec event.yaml + les courses).
 // Les valeurs dynamiques (édition, lieu, dates, valeurs du Défi) viennent des données.
 import { getEntry, getCollection } from 'astro:content';
+import { join } from 'node:path';
 import { deriveEvent } from '../lib/event';
 import { withBase } from '../lib/url';
+import { parseGpxFile } from '../lib/gpx';
 // Masques des photos : 1 SVG par photo dans src/affiche-masks/ (chacun déclare sa photo
 // via data-photo, + cadrage data-scale/data-origin). Chargés tous, triés par nom de fichier.
 // Zéro masque valide → l'affiche n'affiche ni photo, ni contour, ni séparation.
@@ -34,17 +36,23 @@ const kicker = (defi?.segments ?? []).map((s) =>
 );
 
 // Courses montrées sur l'affiche : flag « poster », même ordre que le site (order).
-// Chaque course apporte : nom, distance, unité, D+ et « type de course ».
-const posterRaces = (await getCollection('races'))
+// Distance et D+ : valeurs du frontmatter si présentes, sinon calculées depuis la
+// trace GPX (public/traces/<id>.gpx) — exactement comme sur le site.
+const posterEntries = (await getCollection('races'))
   .filter((r) => r.data.poster)
-  .sort((a, b) => a.data.order - b.data.order)
-  .map((r) => ({
+  .sort((a, b) => a.data.order - b.data.order);
+const posterRaces = await Promise.all(posterEntries.map(async (r) => {
+  const tracks = await parseGpxFile(join('public/traces', `${r.id}.gpx`));
+  const dist = r.data.distance ?? tracks.reduce((s, t) => s + t.totalDistance, 0);
+  const asc = r.data.ascent ?? tracks.reduce((s, t) => s + t.totalAscent, 0);
+  return {
     title: r.data.title,
-    distance: r.data.distance ? String(Math.floor(r.data.distance)) : '', // tronqué à l'entier inférieur (40,1 → 40)
+    distance: dist ? String(Math.floor(dist)) : '', // tronqué à l'entier inférieur (40,1 → 40)
     unit: r.data.unit,
-    ascent: r.data.ascent ?? '',
+    ascent: asc ? String(Math.round(asc)) : '',
     posterType: r.data.posterType ?? '',
-  }));
+  };
+}));
 
 const img = (name: string) => withBase(`/images/${name}`);
 
