@@ -6,6 +6,7 @@ import { join } from 'node:path';
 import { deriveEvent } from '../lib/event';
 import { withBase } from '../lib/url';
 import { parseGpxFile } from '../lib/gpx';
+import QRCode from 'qrcode';
 // Masques des photos : 1 SVG par photo dans src/affiche-masks/ (chacun déclare sa photo
 // via data-photo, + cadrage data-scale/data-origin). Chargés tous, triés par nom de fichier.
 // Zéro masque valide → l'affiche n'affiche ni photo, ni contour, ni séparation.
@@ -60,6 +61,16 @@ const img = (name: string) => withBase(`/images/${name}`);
 // taille d'affiche (posterWidth/posterPad). Ajouter/retirer un partenaire = un seul endroit.
 const eng = event.engagement;
 const posterPartners = event.supporters.partners;
+
+// QR « Infos & inscriptions » : généré au build depuis le lien d'inscription
+// (SVG inline → net dans le PDF, plus aucune image à régénérer si l'URL change).
+const qrRaw = await QRCode.toString(event.urls.registration, {
+  type: 'svg', margin: 1, color: { dark: '#0f1412', light: '#ffffff' },
+});
+// taille fixe 128 px : on retire les dimensions par défaut du SVG et on fixe les nôtres
+const qrSvg = qrRaw
+  .replace(/\s(?:width|height)="[^"]*"/g, '')
+  .replace('<svg', '<svg width="128" height="128" style="display:block"');
 
 // L'affiche HTML sert à générer le PDF (en CI via /affiche/pdf) et au debug en dev.
 // Elle n'est PAS déployée en prod : seul le PDF pré-généré (/affiche.pdf) y est public.
@@ -218,7 +229,7 @@ const posterPartners = event.supporters.partners;
           <span class="sep ghost"></span>
           <div class="cell qrcell">
             <a href={withBase('/')} target="_blank" rel="noopener" style="display:block;">
-              <span style="background:#fff;border-radius:9px;padding:12px;display:block;"><img src={img('qr-trail-vt.png')} alt="QR inscriptions" style="width:128px;height:128px;display:block;"/></span>
+              <span style="background:#fff;border-radius:9px;padding:12px;display:block;" set:html={qrSvg}></span>
             </a>
             <div class="mono qrtext" style="font-size:13px;letter-spacing:.2em;color:var(--gold);line-height:1.7;text-align:center;">INFOS&nbsp;&amp;<br/>INSCRIPTIONS</div>
           </div>
@@ -283,10 +294,10 @@ const posterPartners = event.supporters.partners;
 
   // le QR (cadre blanc + libellé) est ramené à la MÊME HAUTEUR qu'une cellule de boucle
   function sizeQR(){
-    var cell=document.querySelector('.parc .cell:not(.qrcell)'), img=document.querySelector('img[alt="QR inscriptions"]'), txt=document.querySelector('.qrtext');
-    if(!cell||!img||!txt) return;
+    var cell=document.querySelector('.parc .cell:not(.qrcell)'), svg=document.querySelector('.qrcell svg'), txt=document.querySelector('.qrtext');
+    if(!cell||!svg||!txt) return;
     var s=Math.round(cell.offsetHeight - 24 - 16 - txt.offsetHeight);   // 24 = cadre blanc (2×12px), 16 = gap QR/texte
-    if(s>60 && Math.abs(s-img.offsetWidth)>1){ img.style.width=s+'px'; img.style.height=s+'px'; }
+    if(s>60){ svg.style.width=s+'px'; svg.style.height=s+'px'; }
   }
   (function(){
     var cell=document.querySelector('.parc .cell:not(.qrcell)');
