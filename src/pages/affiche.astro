@@ -49,7 +49,7 @@ const posterRaces = await Promise.all(posterEntries.map(async (r) => {
     title: r.data.title,
     distance: dist ? String(Math.floor(dist)) : '', // tronqué à l'entier inférieur (40,1 → 40)
     unit: r.data.unit,
-    ascent: asc ? String(Math.round(asc)) : '',
+    ascent: asc ? String(Math.floor(asc / 100) * 100) : '', // arrondi à la centaine inférieure (1208 → 1200)
     posterType: r.data.posterType ?? '',
   };
 }));
