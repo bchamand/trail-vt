@@ -56,6 +56,11 @@ const posterRaces = await Promise.all(posterEntries.map(async (r) => {
 
 const img = (name: string) => withBase(`/images/${name}`);
 
+// Logos partenaires : tirés de event.yaml (mêmes données que le site), avec leur
+// taille d'affiche (posterWidth/posterPad). Ajouter/retirer un partenaire = un seul endroit.
+const eng = event.engagement;
+const posterPartners = event.supporters.partners;
+
 // L'affiche HTML sert à générer le PDF (en CI via /affiche/pdf) et au debug en dev.
 // Elle n'est PAS déployée en prod : seul le PDF pré-généré (/affiche.pdf) y est public.
 ---
@@ -223,20 +228,20 @@ const img = (name: string) => withBase(`/images/${name}`);
       <!-- ===== footer · zone partenaires (agrandie pour l'impression A5) ===== -->
       <div class="abs" style="left:60px;right:60px;bottom:186px;border-top:1px solid var(--line);"></div>
       <div class="abs" style="left:60px;right:56px;bottom:24px;display:flex;align-items:flex-start;justify-content:space-between;gap:28px;">
-        <!-- bénéficiaire : libellé au-dessus du logo -->
+        <!-- bénéficiaire : logo « au profit de » (engagement.posterLogo) -->
         <div style="display:flex;flex-direction:column;align-items:flex-start;gap:16px;">
           <span class="mono" style="font-size:14px;letter-spacing:.26em;color:var(--muted);white-space:nowrap;">AU&nbsp;PROFIT&nbsp;DE</span>
-          <span style="background:#fff;border-radius:12px;width:215px;height:114px;display:flex;align-items:center;justify-content:center;padding:16px 22px;"><img src={img('logo-marie-louise-rect.png')} style="max-width:100%;max-height:100%;object-fit:contain;"/></span>
+          {eng.posterLogo && (
+            <span style={`background:#fff;border-radius:12px;width:${eng.posterWidth ?? 200}px;height:114px;display:flex;align-items:center;justify-content:center;padding:${eng.posterPad ?? '16px'};`}><img src={withBase(eng.posterLogo)} alt={eng.logoAlt} style="max-width:100%;max-height:100%;object-fit:contain;"/></span>
+          )}
         </div>
-        <!-- soutiens : libellé au-dessus de la rangée (même ligne que « AU PROFIT DE »,
-             aligné sur le 1er logo) ; le dernier logo est collé à droite -->
+        <!-- soutiens : logos itérés depuis supporters.partners (même source que le site) -->
         <div style="display:flex;flex-direction:column;align-items:flex-start;gap:16px;">
           <span class="mono" style="font-size:14px;letter-spacing:.26em;color:var(--muted);white-space:nowrap;">AVEC&nbsp;LE&nbsp;SOUTIEN&nbsp;DE</span>
           <div style="display:flex;align-items:center;gap:14px;">
-            <span style="background:#fff;border-radius:12px;width:170px;height:114px;display:flex;align-items:center;justify-content:center;padding:14px 20px;"><img src={img('logo-mairie-vieille-toulouse.png')} style="max-width:100%;max-height:100%;object-fit:contain;"/></span>
-            <span style="background:#fff;border-radius:12px;width:135px;height:114px;display:flex;align-items:center;justify-content:center;padding:13px 16px;"><img src={img('logo-mairie-pechbusque.jpeg')} style="max-width:100%;max-height:100%;object-fit:contain;"/></span>
-            <span style="background:#fff;border-radius:12px;width:105px;height:114px;display:flex;align-items:center;justify-content:center;padding:14px;"><img src={img('logo-lionsclubs.png')} style="max-width:100%;max-height:100%;object-fit:contain;"/></span>
-            <span style="background:#fff;border-radius:12px;width:105px;height:114px;display:flex;align-items:center;justify-content:center;padding:14px;"><img src={img('logo-golf.png')} style="max-width:100%;max-height:100%;object-fit:contain;"/></span>
+            {posterPartners.map((p) => (
+              <span style={`background:#fff;border-radius:12px;width:${p.posterWidth ?? 130}px;height:114px;display:flex;align-items:center;justify-content:center;padding:${p.posterPad ?? '14px'};`}><img src={withBase(p.logo)} alt={`${p.name} ${p.sub}`} style="max-width:100%;max-height:100%;object-fit:contain;"/></span>
+            ))}
           </div>
         </div>
       </div>

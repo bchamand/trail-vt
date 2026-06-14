@@ -93,6 +93,9 @@ const event = defineCollection({
       logo: z.string(),
       logoAlt: z.string(),
       url: z.string().url().optional(),
+      posterLogo: z.string().optional(),  // variante du logo pour l'affiche (bloc « AU PROFIT DE »)
+      posterWidth: z.number().optional(),
+      posterPad: z.string().optional(),
       stats: z.array(z.object({ big: z.string(), small: z.string() })).optional(),
     }),
     practicalInfo: z.object({
@@ -126,6 +129,8 @@ const event = defineCollection({
         name: z.string(),
         sub: z.string(),
         logo: z.string(),
+        posterWidth: z.number().optional(), // largeur du logo sur l'affiche (px)
+        posterPad: z.string().optional(),   // padding interne du logo sur l'affiche (CSS)
       })),
     }),
     cta: z.object({
