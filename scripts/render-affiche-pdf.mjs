@@ -30,6 +30,7 @@ function startPreview() {
       cwd: ROOT,
       env: process.env,
       stdio: ['ignore', 'pipe', 'pipe'],
+      detached: true, // groupe de processus dédié → on pourra tuer npm ET astro d'un coup
     });
     let out = '';
     const onData = (buf) => {
@@ -44,8 +45,15 @@ function startPreview() {
   });
 }
 
+// Tue le serveur de preview ET son sous-processus astro (groupe de processus complet).
+function stopPreview(proc) {
+  if (!proc?.pid) return;
+  try { process.kill(-proc.pid, 'SIGTERM'); } catch { try { proc.kill('SIGTERM'); } catch {} }
+}
+
 let preview;
 let browser;
+let code = 0;
 try {
   preview = await startPreview();
   const pageUrl = preview.baseUrl + 'affiche/pdf';
@@ -87,7 +95,14 @@ try {
   const bytes = Buffer.from(base64, 'base64');
   await writeFile(OUT, bytes);
   console.log(`[affiche] PDF écrit → ${OUT} (${Math.round(bytes.length / 1024)} Ko)`);
+} catch (err) {
+  console.error('[affiche] échec :', err && err.message ? err.message : err);
+  code = 1;
 } finally {
-  if (browser) await browser.close().catch(() => {});
-  if (preview?.proc) preview.proc.kill('SIGTERM');
+  // close() peut traîner avec SwiftShader : on le borne pour ne jamais bloquer.
+  if (browser) await Promise.race([browser.close(), new Promise((r) => setTimeout(r, 5000))]).catch(() => {});
+  stopPreview(preview?.proc);
 }
+
+// Sortie explicite : un sous-processus survivant ne doit jamais garder ce process en vie.
+process.exit(code);
