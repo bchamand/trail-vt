@@ -30,6 +30,9 @@ jobs:
       # Pré-génère l'affiche en PDF (dist/affiche.pdf) — échoue le build si KO,
       # pour ne jamais déployer un site sans son affiche imprimable.
       - run: npm run render:affiche
+      # /affiche (HTML) et /affiche/pdf (générateur client) n'ont servi qu'à produire le
+      # PDF ci-dessus : on ne les publie pas, seul dist/affiche.pdf est déployé.
+      - run: rm -rf dist/affiche
       - uses: actions/upload-pages-artifact@v5
         with:
           path: dist

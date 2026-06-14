@@ -48,21 +48,13 @@ const posterRaces = (await getCollection('races'))
 
 const img = (name: string) => withBase(`/images/${name}`);
 
-// L'affiche HTML ne sert qu'à générer le PDF et au debug : en prod, une visite directe
-// est redirigée vers le PDF (cf. le <script id="prod-redirect"> dans le <head>).
-const isProd = import.meta.env.PROD;
-const pdfUrl = withBase('/affiche/pdf');
+// L'affiche HTML sert à générer le PDF (en CI via /affiche/pdf) et au debug en dev.
+// Elle n'est PAS déployée en prod : seul le PDF pré-généré (/affiche.pdf) y est public.
 ---
 <!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8"/>
-<script is:inline id="prod-redirect" define:vars={{ isProd, pdfUrl }}>
-  // En prod, le HTML brut n'est pas destiné aux visiteurs → redirection vers le PDF.
-  // En dev (ou avec ?debug) on le laisse pour peaufiner le design. L'export PDF retire
-  // ce script avant de capturer (cf. src/pages/affiche/pdf.astro).
-  if (isProd && !new URLSearchParams(location.search).has('debug')) location.replace(pdfUrl);
-</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Affiche · {event.name}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
