@@ -1,0 +1,188 @@
+---
+import { getEntry } from 'astro:content';
+import { deriveEvent, expandTokens } from '../lib/event';
+import { withBase } from '../lib/url';
+import Layout from '../layouts/Layout.astro';
+import Footer from '../components/Footer.astro';
+import '../styles/global.css';
+
+// ── Informations légales — à modifier ICI si besoin ──────────────────────
+// (l'e-mail vient de event.yaml › urls.contactEmail, pas besoin de le répéter)
+const legal = {
+  publisher: 'Chloé Corbière (présidente) et Amaël Chesneau (secrétaire)', // direction de la publication
+  developer: 'Benjamin Chamand',                                          // conception et développement du site
+  legalForm: 'association déclarée régie par la loi du 1er juillet 1901',
+  created: '23 avril 2026',
+  address: '2 chemin de Carrière Basse, 31320 Vieille-Toulouse',
+  siren: '104 997 218',
+  siret: '104 997 218 00011',
+  photoCredit: "avec l'aimable autorisation de leur auteur",
+  updated: 'juin 2026',
+};
+
+const eventEntry = await getEntry('event', 'main');
+if (!eventEntry) throw new Error('event.yaml: entrée "main" manquante');
+const derived = deriveEvent(eventEntry.data);
+// Tokens minimaux : seuls le footer (© {year}) et le lien affiche en ont besoin.
+const tokens: Record<string, string> = {
+  name: derived.name,
+  year: String(derived.year),
+  affichePdf: import.meta.env.PROD ? '/affiche.pdf' : '/affiche/pdf',
+  email: derived.urls.contactEmail,
+};
+const event = expandTokens(derived, tokens);
+
+const home = withBase('/');
+const email = event.urls.contactEmail;
+const domain = 'traildestectosages.fr';
+---
+<Layout
+  title={`Mentions légales · ${event.name}`}
+  description={`Mentions légales et politique de confidentialité du site ${domain}.`}
+>
+  <!-- En-tête minimal : ramène à l'accueil (pas de menu d'ancres ici) -->
+  <header class="lg-header">
+    <a href={home} class="lg-brand">
+      <span class="lg-badge">{event.initial}</span>
+      <span>
+        <span class="lg-name">{event.nameShort} <em>{event.nameEmphasis}</em></span>
+        <span class="lg-city">{event.locationCity}</span>
+      </span>
+    </a>
+    <a href={home} class="lg-back">← Accueil</a>
+  </header>
+
+  <main class="lg">
+    <div class="lg-inner">
+      <div class="mono-label" style="margin-bottom: 18px;">— INFORMATIONS LÉGALES</div>
+      <h1>Mentions légales</h1>
+
+      <h2>Éditeur du site</h2>
+      <p>
+        Le site <strong>{domain}</strong> est édité par l'<strong>Association {event.name}</strong>,
+        {' '}{legal.legalForm}, créée le {legal.created}.
+      </p>
+      <ul>
+        <li>Siège social : {legal.address}</li>
+        <li>SIREN : {legal.siren} — SIRET : {legal.siret}</li>
+        <li>Contact : <a href={`mailto:${email}`}>{email}</a></li>
+      </ul>
+      <p>Direction de la publication : {legal.publisher}.</p>
+      <p>Conception et développement du site : {legal.developer}.</p>
+
+      <h2>Hébergement</h2>
+      <p>
+        Le site est hébergé par <strong>GitHub, Inc.</strong> (service GitHub Pages),
+        88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, États-Unis —
+        <a href="https://github.com" target="_blank" rel="noopener noreferrer">github.com</a>.
+        Le nom de domaine est enregistré auprès de <strong>Gandi SAS</strong>,
+        63-65 boulevard Masséna, 75013 Paris, France —
+        <a href="https://www.gandi.net" target="_blank" rel="noopener noreferrer">gandi.net</a>.
+      </p>
+
+      <h2>Propriété intellectuelle</h2>
+      <p>
+        La structure, les textes, l'identité visuelle, le logo et l'ensemble des éléments
+        graphiques du site ont été réalisés par l'association {event.name} et restent sa
+        propriété, sauf mention contraire. Toute reproduction, totale ou partielle, sans
+        autorisation écrite préalable, est interdite. Les photographies et vidéos sont
+        publiées {legal.photoCredit}.
+      </p>
+
+      <h2>Données cartographiques</h2>
+      <p>Les fonds de carte et les données altimétriques sont fournis par l'IGN — © IGN / Géoplateforme.</p>
+
+      <h2>Inscriptions</h2>
+      <p>
+        Les inscriptions aux épreuves sont opérées par la plateforme tierce
+        <strong> Chrono-Start</strong> (<a href="https://chrono-start.com" target="_blank" rel="noopener noreferrer">chrono-start.com</a>),
+        soumise à ses propres conditions d'utilisation et de confidentialité.
+      </p>
+
+      <h2>Responsabilité</h2>
+      <p>
+        L'association veille à l'exactitude des informations publiées mais ne saurait être
+        tenue responsable d'éventuelles erreurs, omissions, ou du contenu des sites tiers
+        accessibles par des liens.
+      </p>
+
+      <hr/>
+
+      <h2>Confidentialité et données personnelles</h2>
+      <p><strong>Responsable du traitement</strong> — Association {event.name}, <a href={`mailto:${email}`}>{email}</a>.</p>
+      <p>
+        <strong>Collecte</strong> — ce site est un site vitrine statique : il ne comporte aucun
+        formulaire, ne crée aucun compte et ne collecte aucune donnée personnelle directement.
+        Il n'utilise aucun outil de mesure d'audience ni aucun cookie de suivi ou publicitaire.
+      </p>
+      <p>
+        <strong>Services tiers</strong> — pour fonctionner, le site fait appel à des services
+        extérieurs susceptibles de recevoir votre adresse IP au chargement des pages : les
+        polices d'écriture (Google Fonts), les fonds de carte (IGN / Géoplateforme) et
+        l'hébergement (GitHub Pages, États-Unis), ce dernier pouvant journaliser des données
+        techniques à des fins de sécurité — un transfert hors Union européenne est donc possible.
+      </p>
+      <p>
+        <strong>Inscriptions</strong> — gérées par Chrono-Start selon sa propre politique de
+        confidentialité. L'association ne reçoit ces données que pour l'organisation et le bon
+        déroulement des épreuves (listes de départ, classements, sécurité).
+      </p>
+      <p><strong>Cookies</strong> — le site ne dépose aucun cookie de suivi ni publicitaire.</p>
+      <p>
+        <strong>Vos droits</strong> — conformément au RGPD et à la loi « Informatique et Libertés »,
+        vous disposez d'un droit d'accès, de rectification, d'effacement, de limitation et
+        d'opposition sur vos données. Pour les exercer, écrivez à
+        <a href={`mailto:${email}`}> {email}</a>. Vous pouvez également introduire une réclamation
+        auprès de la <a href="https://www.cnil.fr" target="_blank" rel="noopener noreferrer">CNIL</a>.
+      </p>
+
+      <p class="lg-updated">Dernière mise à jour : {legal.updated}.</p>
+    </div>
+  </main>
+
+  <Footer event={event} />
+</Layout>
+
+<style>
+  .lg-header {
+    display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    padding: 16px clamp(20px, 4vw, 80px);
+    border-bottom: 1px solid var(--color-line-soft);
+    background: var(--color-bg-deep);
+  }
+  .lg-brand { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--color-ink); }
+  .lg-badge {
+    display: flex; align-items: center; justify-content: center;
+    width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
+    border: 1.5px solid var(--color-accent); color: var(--color-accent);
+    font-family: var(--font-serif); font-style: italic; font-size: 15px;
+  }
+  .lg-name { font-family: var(--font-serif); font-size: 19px; font-weight: 400; line-height: 1; }
+  .lg-name em { color: var(--color-accent); font-style: italic; }
+  .lg-city { display: block; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.24em; opacity: 0.6; margin-top: 4px; }
+  .lg-back { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.16em; color: var(--color-accent); text-decoration: none; white-space: nowrap; transition: opacity 0.2s ease; }
+  .lg-back:hover { opacity: 0.65; }
+
+  .lg {
+    background: var(--color-bg-deep); min-height: 72vh;
+    padding: clamp(40px, 7vw, 80px) clamp(20px, 4vw, 80px) clamp(56px, 9vw, 96px);
+  }
+  .lg-inner { max-width: 720px; margin: 0 auto; }
+  .lg h1 {
+    font-family: var(--font-serif); font-weight: 400;
+    font-size: clamp(36px, 5vw, 52px); line-height: 1.05; margin: 0 0 28px;
+  }
+  .lg h2 {
+    font-family: var(--font-serif); font-weight: 400; color: var(--color-accent);
+    font-size: clamp(20px, 2.4vw, 26px); margin: 36px 0 10px;
+  }
+  .lg p, .lg li { font-size: 15px; line-height: 1.7; opacity: 0.82; text-wrap: pretty; }
+  .lg p { margin: 0 0 14px; }
+  .lg ul { margin: 0 0 14px; padding-left: 18px; }
+  .lg li { margin-bottom: 4px; }
+  .lg strong { font-weight: 600; opacity: 1; }
+  .lg a { color: var(--color-accent); text-decoration: none; border-bottom: 1px solid rgba(212, 165, 116, 0.4); }
+  .lg a:hover { border-bottom-color: var(--color-accent); }
+  .lg hr { border: none; border-top: 1px solid var(--color-line); margin: 42px 0 8px; }
+  .lg-updated { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.1em; opacity: 0.5; margin-top: 26px; }
+</style>

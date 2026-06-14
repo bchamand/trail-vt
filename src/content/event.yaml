@@ -18,6 +18,7 @@
 #   {raceCount}       → V (nombre d'épreuves, en chiffre romain)
 #   {maxDistance}     → 40,1 (distance de la plus longue épreuve)
 #   {affichePdf}      → lien vers le PDF de l'affiche (/affiche.pdf en prod)
+#   {email}           → adresse de contact (définie dans urls.contactEmail)
 # ══════════════════════════════════════════════════════════════════════
 main:
   # ── Paramètres généraux ─────────────────────────────────────────────
@@ -43,7 +44,7 @@ main:
 
   urls:
     registration: https://chrono-start.com/
-    contactEmail: contact@tectosages.fr
+    contactEmail: contact@traildestectosages.fr
 
   # ── Menu de navigation ──────────────────────────────────────────────
   nav:
@@ -136,6 +137,10 @@ main:
     logo: /images/logo-marie-louise.png
     logoAlt: Fondation Marie-Louise
     url: https://www.fondation-marie-louise.org   # site officiel (lien « Site de la Fondation »)
+    # Logo tel qu'il apparaît sur l'AFFICHE (bloc « au profit de ») — variante rectangulaire.
+    posterLogo: /images/logo-marie-louise-rect.png
+    posterWidth: 215
+    posterPad: '16px 22px'
     stats:
       - { big: '+30', small: ANS D'ACTION       }
       - { big: '10%', small: DE CHAQUE DOSSARD   }
@@ -182,11 +187,12 @@ main:
       ces terres, le tracé n'existerait pas. Le Lions Club Toulouse Arènes
       Romaines, lui, accompagne l'organisation. Un grand merci à
       toutes et à tous.
+    # posterWidth / posterPad : taille du logo sur l'AFFICHE (le site se débrouille seul).
     partners:
-      - { name: Mairie,     sub: Vieille-Toulouse, logo: /images/logo-mairie-vieille-toulouse.png }
-      - { name: Mairie,     sub: Pechbusque,       logo: /images/logo-mairie-pechbusque.jpeg      }
-      - { name: Lions Club, sub: Toulouse Arènes,  logo: /images/logo-lionsclubs.png              }
-      - { name: Golf de,    sub: Vieille-Toulouse, logo: /images/logo-golf.png                    }
+      - { name: Mairie,     sub: Vieille-Toulouse, logo: /images/logo-mairie-vieille-toulouse.png, posterWidth: 170, posterPad: '14px 20px' }
+      - { name: Mairie,     sub: Pechbusque,       logo: /images/logo-mairie-pechbusque.jpeg,      posterWidth: 135, posterPad: '13px 16px' }
+      - { name: Lions Club, sub: Toulouse Arènes,  logo: /images/logo-lionsclubs.png,              posterWidth: 105, posterPad: '14px'      }
+      - { name: Golf de,    sub: Vieille-Toulouse, logo: /images/logo-golf.png,                    posterWidth: 105, posterPad: '14px'      }
 
   # ── Bandeau final d'inscription ─────────────────────────────────────
   cta:
@@ -203,12 +209,12 @@ main:
     # Les sections du site (Épreuves, Histoire, Banquet, Pratique) ne sont
     # PAS répétées ici : elles sont déjà dans le menu de navigation du haut.
     eventLinks:
-      - { label: Affiche à imprimer, href: '{affichePdf}' }   # PDF statique en prod, générateur en dev
+      - { label: "Affiche de l'événement", href: '{affichePdf}' }   # PDF statique en prod, générateur en dev
       - { label: Règlement,          href: '#'           }    # placeholder, à brancher plus tard
     contactLinks:
-      - { label: contact@tectosages.fr, href: 'mailto:contact@tectosages.fr' }
+      - { label: '{email}', href: 'mailto:{email}' }
       - { label: Instagram,             href: '#' }
     # Une seule page légale (les mentions légales couvrent aussi la confidentialité).
     legalLinks:
-      - { label: MENTIONS LÉGALES, href: '#' }
+      - { label: MENTIONS LÉGALES, href: '/mentions-legales' }
     # (bloc « partenaire en vedette » retiré du footer)
