@@ -135,10 +135,10 @@ main:
         Marie-Louise. Courir, marcher, banqueter — c'est aussi donner.
     logo: /images/logo-marie-louise.png
     logoAlt: Fondation Marie-Louise
+    url: https://www.fondation-marie-louise.org   # site officiel (lien « Site de la Fondation »)
     stats:
       - { big: '+30', small: ANS D'ACTION       }
       - { big: '10%', small: DE CHAQUE DOSSARD   }
-      - { big: '31',  small: HAUTE-GARONNE       }
 
   # ── Section « Infos pratiques » ─────────────────────────────────────
   practicalInfo:
@@ -208,7 +208,6 @@ main:
     contactLinks:
       - { label: contact@tectosages.fr, href: 'mailto:contact@tectosages.fr' }
       - { label: Instagram,             href: '#' }
-      - { label: Presse & médias,       href: '#' }
     legalLinks:
       - { label: MENTIONS LÉGALES,  href: '#' }
       - { label: CGV,               href: '#' }

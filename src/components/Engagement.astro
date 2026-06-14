@@ -10,6 +10,7 @@ interface Props {
     body: string[];
     logo: string;
     logoAlt: string;
+    url?: string;
     stats?: { big: string; small: string }[];
   };
 }
@@ -36,8 +37,16 @@ const logoUrl = withBase(data.logo);
         <p class="text-[14px] sm:text-[15px] leading-[1.65] opacity-80 m-0 max-w-[680px] mb-5 last:mb-6" style="text-wrap: pretty;" set:html={p} />
       ))}
 
+      {data.url && (
+        <a href={data.url} target="_blank" rel="noopener noreferrer"
+           class="inline-block mb-6 transition-opacity hover:opacity-70"
+           style="font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.18em; color: var(--color-accent); text-decoration: none; border-bottom: 1px solid var(--color-accent); padding-bottom: 2px;">
+          SITE DE LA FONDATION →
+        </a>
+      )}
+
       {data.stats && data.stats.length > 0 && (
-        <div class="grid grid-cols-2 lg:grid-cols-3 pt-6 max-w-[680px]"
+        <div class="grid grid-cols-2 pt-6 max-w-[680px]"
              style="gap: clamp(14px, 2vw, 36px); border-top: 1px solid var(--color-line);">
           {data.stats.map((s) => (
             <div>

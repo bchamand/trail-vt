@@ -92,6 +92,7 @@ const event = defineCollection({
       body: z.array(z.string()),
       logo: z.string(),
       logoAlt: z.string(),
+      url: z.string().url().optional(),
       stats: z.array(z.object({ big: z.string(), small: z.string() })).optional(),
     }),
     practicalInfo: z.object({
