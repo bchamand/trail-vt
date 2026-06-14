@@ -25,6 +25,7 @@ export interface RaceViewModel {
   unit: string;
   color: string;
   distanceDisplay: string;
+  distanceDisplayInt: string;
   ascentDisplay: string;
   gpxUrl: string;
   tracks: Track[];
@@ -107,7 +108,7 @@ const clientPayload = {
           {race.roman} / {race.title.toUpperCase()}
         </div>
         <div class="flex items-baseline gap-1 mb-3">
-          <span style="font-family: var(--font-serif); font-size: clamp(36px, 4.5vw, 44px); line-height: 0.9;">{race.distanceDisplay}</span>
+          <span style="font-family: var(--font-serif); font-size: clamp(36px, 4.5vw, 44px); line-height: 0.9;">{race.distanceDisplayInt}</span>
           <span class="text-[10px] sm:text-[11px] tracking-[0.15em] opacity-70" style="font-family: var(--font-mono);">{race.unit}</span>
         </div>
         <div class="flex gap-[3px] mt-3">
@@ -204,20 +205,17 @@ const clientPayload = {
   .race-card:not(.is-active):hover { background: rgba(212,165,116,0.05) !important; }
 
   /* « VUE COMPLÈTE » occupe toute la première ligne ; les boucles se
-     répartissent dessous (3 par ligne en mobile, une seule ligne en desktop —
-     --seg-cols est posé en JS selon le nombre de boucles). */
+     répartissent dessous en lignes équilibrées — --seg-cols est posé en JS
+     (1-3 boucles : une ligne ; 4 : 2+2 ; 5 : 3+2 ; 6 : 3+3). */
   #segment-selector {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(var(--seg-cols, 3), 1fr);
     gap: 1px;
     background: var(--color-line);
     border-bottom: 1px solid var(--color-line);
   }
   #segment-selector.hidden { display: none; }
   #segment-selector > button:first-child { grid-column: 1 / -1; }
-  @media (min-width: 720px) {
-    #segment-selector { grid-template-columns: repeat(var(--seg-cols, 4), 1fr); }
-  }
   #segment-selector button {
     padding: 12px 8px; min-width: 0;
     background: var(--color-bg); color: var(--color-ink);
@@ -298,7 +296,10 @@ const clientPayload = {
       return;
     }
     segmentSelector.classList.remove('hidden');
-    segmentSelector.style.setProperty('--seg-cols', String(race.segments.length));
+    // Lignes équilibrées : 1-3 boucles sur une ligne ; au-delà, deux lignes
+    // aussi égales que possible (4 → 2+2, 5 → 3+2, 6 → 3+3).
+    const segN = race.segments.length;
+    segmentSelector.style.setProperty('--seg-cols', String(segN <= 3 ? segN : Math.ceil(segN / 2)));
 
     const allBtn = document.createElement('button');
     allBtn.dataset.seg = 'all';
@@ -364,7 +365,7 @@ const clientPayload = {
         container: elevContainer,
         segments: race.tracks,
         segmentColors: colors,
-        gpxHref: race.gpxUrl,
+        // gpxHref: race.gpxUrl, // téléchargement GPX masqué (accord orga en attente)
         activeSeg: null,
         onHover: onElevationHover,
         onLeave: onElevationLeave,
@@ -376,7 +377,7 @@ const clientPayload = {
         container: elevContainer,
         segments: race.tracks,
         segmentColors: [race.color],
-        gpxHref: race.gpxUrl,
+        // gpxHref: race.gpxUrl, // téléchargement GPX masqué (accord orga en attente)
         activeSeg: null,
         onHover: onElevationHover,
         onLeave: onElevationLeave,

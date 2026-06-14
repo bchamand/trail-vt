@@ -58,6 +58,7 @@ const raceData = await Promise.all(
       unit: d.unit,
       color: d.color,
       distanceDisplay: fmtKm(totalDistance),
+      distanceDisplayInt: String(Math.floor(totalDistance)), // km tronqués pour le carrousel
       ascentDisplay: String(Math.round(totalAscent)),
       gpxUrl: withBase(`/traces/${entry.id}.gpx`),
       tracks,
