@@ -7,19 +7,18 @@ interface Props {
 }
 const { event } = Astro.props;
 const { footer } = event;
-const partner = footer.featuredPartner;
+// liens de route (commençant par /) → withBase ; ancres (#) et mailto inchangés
+const linkHref = (h: string) => (h.startsWith('/') ? withBase(h) : h);
 ---
 <footer
   class="border-t border-[color:var(--color-line-soft)]"
-  style="background: var(--color-bg-deep); padding: clamp(36px, 5vw, 48px) clamp(20px, 4vw, 80px) clamp(24px, 3vw, 28px);">
+  style="background: var(--color-bg-deep); padding: clamp(40px, 5vw, 56px) clamp(20px, 4vw, 80px) clamp(24px, 3vw, 28px);">
 
-  <div
-    class="grid grid-cols-1 items-start"
-    style={`grid-template-columns: 1fr; gap: clamp(32px, 4vw, 48px); margin-bottom: clamp(32px, 4vw, 40px); --cols-lg: ${partner ? '1.4fr 1fr 1fr 1fr' : '1.6fr 1fr 1fr'};`}
-  >
+  <!-- Marque à gauche · groupes de liens à droite (desktop) -->
+  <div class="ft-top">
 
-    <!-- Col 1 — Identity -->
-    <div>
+    <!-- Identité -->
+    <div class="ft-brand">
       <div class="flex items-center gap-3 mb-4">
         <span class="flex items-center justify-center rounded-full border shrink-0"
               style="width: 30px; height: 30px; border-color: var(--color-accent); border-width: 1.5px; color: var(--color-accent); font-family: var(--font-serif); font-size: 14px; font-style: italic;">{event.initial}</span>
@@ -30,68 +29,71 @@ const partner = footer.featuredPartner;
           <span class="text-[10px] mt-[5px] opacity-60 tracking-[0.24em]" style="font-family: var(--font-mono);">{event.locationCity}</span>
         </span>
       </div>
-      <p class="text-[13px] leading-[1.55] opacity-65 m-0 max-w-[340px]" style="text-wrap: pretty;">
+      <p class="text-[13px] leading-[1.55] opacity-65 m-0 max-w-[320px]" style="text-wrap: pretty;">
         {event.dateFull} · {event.location}.
       </p>
     </div>
 
-    <!-- Col 2 — Event -->
-    <div>
-      <div class="text-[10px] tracking-[0.26em] mb-4" style="font-family: var(--font-mono); color: var(--color-accent); opacity: 0.85;">
-        ÉVÉNEMENT
-      </div>
-      <ul class="list-none p-0 m-0 flex flex-col gap-2.5">
-        {footer.eventLinks.map(l => (
-          <li><a href={l.href} class="footer-link">{l.label}</a></li>
-        ))}
-      </ul>
-    </div>
-
-    <!-- Col 3 — Contact -->
-    <div>
-      <div class="text-[10px] tracking-[0.26em] mb-4" style="font-family: var(--font-mono); color: var(--color-accent); opacity: 0.85;">
-        CONTACT
-      </div>
-      <ul class="list-none p-0 m-0 flex flex-col gap-2.5">
-        {footer.contactLinks.map(l => (
-          <li><a href={l.href} class="footer-link">{l.label}</a></li>
-        ))}
-      </ul>
-    </div>
-
-    {partner && (
-      <!-- Col 4 — Featured partner -->
+    <!-- Groupes de liens -->
+    <div class="ft-cols">
       <div>
-        <div class="text-[10px] tracking-[0.26em] mb-4" style="font-family: var(--font-mono); color: var(--color-accent); opacity: 0.85;">
-          {partner.label}
-        </div>
-        <div class="flex flex-col items-start gap-2.5">
-          <div class="flex items-center justify-center bg-white p-2.5"
-               style="width: 100%; max-width: 180px; aspect-ratio: 1.3 / 1;">
-            <img src={withBase(partner.logo)} alt={partner.logoAlt}
-                 style="max-width: 100%; max-height: 100%; object-fit: contain; display: block;" />
-          </div>
-          <div class="text-[10px] tracking-[0.12em] opacity-70 leading-[1.5]"
-               style="font-family: var(--font-mono);">
-            {partner.name}<br/><span style="opacity: 0.7;">{partner.sub}</span>
-          </div>
-        </div>
+        <div class="ft-h">RESSOURCES</div>
+        <ul class="ft-list">
+          {footer.eventLinks.map(l => (
+            <li><a href={linkHref(l.href)} class="footer-link">{l.label}</a></li>
+          ))}
+        </ul>
       </div>
-    )}
+      <div>
+        <div class="ft-h">CONTACT</div>
+        <ul class="ft-list">
+          {footer.contactLinks.map(l => (
+            <li><a href={linkHref(l.href)} class="footer-link">{l.label}</a></li>
+          ))}
+        </ul>
+      </div>
+    </div>
   </div>
 
-  <div class="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-2.5 lg:gap-5 text-[10px] tracking-[0.2em] opacity-45"
-       style="font-family: var(--font-mono); padding-top: clamp(20px, 2.5vw, 24px); border-top: 1px solid rgba(232,227,211,0.08);">
+  <!-- Bas de page · mentions légales -->
+  <div class="ft-legal">
     <div>{footer.legal}</div>
     <div class="flex gap-6">
       {footer.legalLinks.map(l => (
-        <a href={l.href} class="no-underline" style="color: inherit;">{l.label}</a>
+        <a href={linkHref(l.href)} class="no-underline" style="color: inherit;">{l.label}</a>
       ))}
     </div>
   </div>
 </footer>
 
 <style>
+  .ft-top {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(32px, 4vw, 44px);
+    margin-bottom: clamp(32px, 4vw, 44px);
+  }
+  .ft-cols {
+    display: flex;
+    flex-wrap: wrap;
+    gap: clamp(40px, 7vw, 104px);
+  }
+  .ft-h {
+    font-family: var(--font-mono);
+    color: var(--color-accent);
+    opacity: 0.85;
+    font-size: 10px;
+    letter-spacing: 0.26em;
+    margin-bottom: 16px;
+  }
+  .ft-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
   .footer-link {
     color: var(--color-ink);
     text-decoration: none;
@@ -103,9 +105,35 @@ const partner = footer.featuredPartner;
     color: var(--color-accent);
     opacity: 1;
   }
+  .ft-legal {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-top: clamp(20px, 2.5vw, 24px);
+    border-top: 1px solid rgba(232, 227, 211, 0.08);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    opacity: 0.45;
+  }
+
+  /* Desktop : marque à gauche, liens alignés à droite */
   @media (min-width: 1024px) {
-    footer > div:first-child {
-      grid-template-columns: var(--cols-lg) !important;
+    .ft-top {
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: clamp(48px, 6vw, 120px);
+    }
+    .ft-cols {
+      flex-wrap: nowrap;
+      justify-content: flex-end;
+    }
+    .ft-legal {
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
     }
   }
 </style>

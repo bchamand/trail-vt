@@ -198,13 +198,12 @@ main:
   # ── Pied de page ────────────────────────────────────────────────────
   footer:
     legal: '© {year} · ASSOCIATION TRAIL DES TECTOSAGES'
+    # Colonne « Ressources » du footer.
+    # Les sections du site (Épreuves, Histoire, Banquet, Pratique) ne sont
+    # PAS répétées ici : elles sont déjà dans le menu de navigation du haut.
     eventLinks:
-      - { label: Les épreuves, href: '#epreuves' }
-      - { label: L'histoire,   href: '#histoire' }
-      - { label: Le banquet,   href: '#banquet'  }
-      - { label: Pratique,     href: '#pratique' }
-      - { label: Règlement,    href: '#'         }
-      - { label: FAQ,          href: '#'         }
+      - { label: Affiche à imprimer, href: '/affiche/pdf' }   # lien route (commence par /) → géré par withBase
+      - { label: Règlement,          href: '#'           }    # placeholder, à brancher plus tard
     contactLinks:
       - { label: contact@tectosages.fr, href: 'mailto:contact@tectosages.fr' }
       - { label: Instagram,             href: '#' }
@@ -213,9 +212,4 @@ main:
       - { label: MENTIONS LÉGALES,  href: '#' }
       - { label: CGV,               href: '#' }
       - { label: CONFIDENTIALITÉ,   href: '#' }
-    featuredPartner:
-      label: PARTENAIRE
-      name: Fondation
-      sub: Marie-Louise · Lions Club
-      logo: /images/logo-marie-louise.png
-      logoAlt: Fondation Marie-Louise
+    # (bloc « partenaire en vedette » retiré du footer)
