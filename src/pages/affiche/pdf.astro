@@ -36,8 +36,8 @@ const afficheUrl = withBase('/affiche');
     // VOILE opaque (cache l'affiche pendant toute la génération) + logique, avant </body>
     var over =
       '<div id="xover" style="position:fixed;inset:0;z-index:2147483647;background:#0a0e0c;color:#8a8576;' +
-      'display:flex;align-items:center;justify-content:center;font:13px/1.5 ui-monospace,monospace;' +
-      'letter-spacing:.18em;animation:xpulse 1.6s ease-in-out infinite;">Génération du PDF…</div>';
+      'display:flex;align-items:center;justify-content:center;font:13px/1.5 ui-monospace,monospace;letter-spacing:.18em;">' +
+      '<span style="animation:xpulse 1.6s ease-in-out infinite;">Génération du PDF…</span></div>';
     html = html.replace('</body>', over + '<script>' + exportLogic() + '<\/script></body>');
     document.open(); document.write(html); document.close();
   } catch (e) {
