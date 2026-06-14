@@ -208,7 +208,7 @@ main:
     contactLinks:
       - { label: contact@tectosages.fr, href: 'mailto:contact@tectosages.fr' }
       - { label: Instagram,             href: '#' }
+    # Une seule page légale (les mentions légales couvrent aussi la confidentialité).
     legalLinks:
-      - { label: MENTIONS LÉGALES,  href: '#' }
-      - { label: CONFIDENTIALITÉ,   href: '#' }
+      - { label: MENTIONS LÉGALES, href: '#' }
     # (bloc « partenaire en vedette » retiré du footer)
