@@ -117,8 +117,8 @@ const linkHref = (h: string) => (h.startsWith('/') ? withBase(h) : h);
     opacity: 0.45;
   }
 
-  /* Desktop : marque à gauche, liens alignés à droite */
-  @media (min-width: 1024px) {
+  /* Tablette + desktop : marque à gauche, liens alignés à droite */
+  @media (min-width: 768px) {
     .ft-top {
       flex-direction: row;
       justify-content: space-between;

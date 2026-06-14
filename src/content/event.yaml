@@ -210,6 +210,5 @@ main:
       - { label: Instagram,             href: '#' }
     legalLinks:
       - { label: MENTIONS LÉGALES,  href: '#' }
-      - { label: CGV,               href: '#' }
       - { label: CONFIDENTIALITÉ,   href: '#' }
     # (bloc « partenaire en vedette » retiré du footer)
