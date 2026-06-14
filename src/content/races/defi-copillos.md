@@ -27,39 +27,25 @@ segments:
     distance: 11.1
     ascent: 370
     color: '#d4a574'
-  - label: L'Honneur
-    value: Boucle Pechbusque
+  - label: L'Endurance
+    value: Boucle Auzil + Pechbusque
     status: Éliminatoire
     timeLimit: H 45' · F 50'
     distance: 6.2
     ascent: 220
     color: '#a67a4a'
-  - label: L'Endurance
-    value: Boucle Pechbusque
+  - label: La Bravoure
+    value: Boucle du Golf
     status: Éliminatoire
     timeLimit: H 45' · F 50'
     distance: 6.2
     ascent: 220
     color: '#7a5a6b'
-  - label: Le Courage
-    value: Boucle Pechbusque
+  - label: L'Honneur
+    value: Boucle du Golf
     status: Éliminatoire
     timeLimit: H 45' · F 50'
     distance: 6.2
     ascent: 220
     color: '#5a7a5a'
-  - label: La Bravoure
-    value: Boucle du Golf
-    status: Éliminatoire
-    timeLimit: H 45' · F 50'
-    distance: 5.2
-    ascent: 100
-    color: '#5a6b7a'
-  - label: Le Prestige
-    value: Boucle du Golf
-    status: Classante
-    timeLimit: H 45' · F 50'
-    distance: 5.2
-    ascent: 100
-    color: '#e8c891'
 ---

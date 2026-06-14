@@ -5,7 +5,7 @@
 order: 2
 poster: true                  # afficher cette course sur l'affiche
 posterType: 1 boucle chronométrée
-title: L'Oppidum
+title: Boucle de l'Oppidum
 type: Chronométrée · classée
 description: >-
   Boucle unique sur les traces de l'oppidum tectosage — sous-bois, coteaux
