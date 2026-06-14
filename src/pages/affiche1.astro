@@ -2,7 +2,7 @@
 // Affiche imprimable A4 — page du site (synchronisée avec event.yaml + les courses).
 // Les valeurs dynamiques (édition, lieu, dates, valeurs du Défi) viennent des données.
 import { getEntry, getCollection } from 'astro:content';
-import { deriveEvent, fmtKm } from '../lib/event';
+import { deriveEvent } from '../lib/event';
 import { withBase } from '../lib/url';
 // Masques des photos : 1 SVG par photo dans src/affiche-masks/ (chacun déclare sa photo
 // via data-photo, + cadrage data-scale/data-origin). Chargés tous, triés par nom de fichier.
@@ -40,7 +40,7 @@ const posterRaces = (await getCollection('races'))
   .sort((a, b) => a.data.order - b.data.order)
   .map((r) => ({
     title: r.data.title,
-    distance: r.data.distance ? fmtKm(r.data.distance) : '',
+    distance: r.data.distance ? String(Math.floor(r.data.distance)) : '', // tronqué à l'entier inférieur (40,1 → 40)
     unit: r.data.unit,
     ascent: r.data.ascent ?? '',
     posterType: r.data.posterType ?? '',
