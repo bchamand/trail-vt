@@ -170,7 +170,10 @@ export function createRaceMap(container: HTMLElement, mapStyle: string): RaceMap
   function drawCurrent(endLabels?: string[]) {
     tracks.forEach((t, i) => {
       const id = trackId(i);
-      const color = colors[i];
+      // Une trace GPX peut compter plus de boucles que de segments déclarés
+      // (donc plus de tracks que de couleurs) : on retombe sur la couleur
+      // d'accent pour ne jamais passer « undefined » — refusé par MapLibre.
+      const color = colors[i] ?? ACCENT;
       const active = activeSeg == null || activeSeg === i;
       map.addSource(id, {
         type: 'geojson',
@@ -209,7 +212,7 @@ export function createRaceMap(container: HTMLElement, mapStyle: string): RaceMap
         return;
       }
       const label = endLabels?.[i] ?? 'A';
-      endMarkers[i] = new maplibregl.Marker({ element: mkEndMarker(label, colors[i]) })
+      endMarkers[i] = new maplibregl.Marker({ element: mkEndMarker(label, colors[i] ?? ACCENT) })
         .setLngLat(last).addTo(map);
     });
   }
