@@ -206,8 +206,9 @@ const clientPayload = {
   .race-card:not(.is-active):hover { background: rgba(212,165,116,0.05) !important; }
 
   /* « VUE COMPLÈTE » occupe toute la première ligne ; les boucles se
-     répartissent dessous en lignes équilibrées — --seg-cols est posé en JS
-     (1-3 boucles : une ligne ; 4 : 2+2 ; 5 : 3+2 ; 6 : 3+3). */
+     répartissent dessous — --seg-cols est posé en JS selon la largeur
+     réellement disponible : tout sur une ligne si ça tient, sinon deux
+     lignes aussi équilibrées que possible (4 → 2+2, 5 → 3+2, 6 → 3+3). */
   #segment-selector {
     display: grid;
     grid-template-columns: repeat(var(--seg-cols, 3), 1fr);
@@ -265,6 +266,21 @@ const clientPayload = {
   let currentElev: ElevationHandle | null = null;
   let activeIndex = 0;
   let activeSeg: number | null = null;
+  let currentSegN = 0; // nombre de boucles de l'épreuve affichée (0 = pas de sélecteur)
+
+  // Largeur mini pour qu'un bouton boucle garde son sous-titre (« 11,8 KM · 461M »)
+  // sur une seule ligne. Sert à décider : une ligne si tout tient, sinon deux.
+  const MIN_SEG_BTN = 118;
+
+  // Choisit le nombre de colonnes du sélecteur selon la place disponible :
+  // tout sur une ligne si ça rentre, sinon deux lignes équilibrées.
+  function applySegLayout() {
+    if (currentSegN === 0 || segmentSelector.classList.contains('hidden')) return;
+    const width = segmentSelector.clientWidth;
+    const oneRow = width >= currentSegN * MIN_SEG_BTN;
+    const cols = oneRow ? currentSegN : Math.ceil(currentSegN / 2);
+    segmentSelector.style.setProperty('--seg-cols', String(cols));
+  }
 
   const fmt1 = (v: number) => v.toFixed(1);
   const fmtI = (v: number) => String(Math.round(v));
@@ -294,13 +310,11 @@ const clientPayload = {
     segmentSelector.innerHTML = '';
     if (!race.segments) {
       segmentSelector.classList.add('hidden');
+      currentSegN = 0;
       return;
     }
     segmentSelector.classList.remove('hidden');
-    // Lignes équilibrées : 1-3 boucles sur une ligne ; au-delà, deux lignes
-    // aussi égales que possible (4 → 2+2, 5 → 3+2, 6 → 3+3).
-    const segN = race.segments.length;
-    segmentSelector.style.setProperty('--seg-cols', String(segN <= 3 ? segN : Math.ceil(segN / 2)));
+    currentSegN = race.segments.length;
 
     const allBtn = document.createElement('button');
     allBtn.dataset.seg = 'all';
@@ -317,6 +331,8 @@ const clientPayload = {
       btn.addEventListener('click', () => selectSeg(i));
       segmentSelector.appendChild(btn);
     });
+
+    applySegLayout();
   }
 
   function selectSeg(i: number | null) {
@@ -373,6 +389,7 @@ const clientPayload = {
       });
     } else {
       segmentSelector.classList.add('hidden');
+      currentSegN = 0;
       raceMap.setRace(race.tracks, { colors: [race.color] });
       currentElev = renderElevation({
         container: elevContainer,
@@ -397,6 +414,13 @@ const clientPayload = {
         el.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
       }
     });
+  });
+
+  // Recalcule la disposition du sélecteur quand la largeur disponible change.
+  let segRaf = 0;
+  window.addEventListener('resize', () => {
+    cancelAnimationFrame(segRaf);
+    segRaf = requestAnimationFrame(applySegLayout);
   });
 
   showRace(0);
