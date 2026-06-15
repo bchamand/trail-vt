@@ -52,6 +52,7 @@ const event = defineCollection({
     heroMedia: z.string(),
     mapStyle: z.string().default('dark-matter'),
     urls: z.object({
+      website: z.string().url(),
       registration: z.string().url(),
       contactEmail: z.string(),
       instagram: z.string().optional(),

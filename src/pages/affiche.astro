@@ -62,9 +62,9 @@ const img = (name: string) => withBase(`/images/${name}`);
 const eng = event.engagement;
 const posterPartners = event.supporters.partners;
 
-// QR « Infos & inscriptions » : généré au build depuis le lien d'inscription
+// QR « Infos & inscriptions » : généré au build depuis l'URL du site officiel
 // (SVG inline → net dans le PDF, plus aucune image à régénérer si l'URL change).
-const qrRaw = await QRCode.toString(event.urls.registration, {
+const qrRaw = await QRCode.toString(event.urls.website, {
   type: 'svg', margin: 1, color: { dark: '#0f1412', light: '#ffffff' },
 });
 // taille fixe 128 px : on retire les dimensions par défaut du SVG et on fixe les nôtres
