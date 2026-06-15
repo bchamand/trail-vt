@@ -49,11 +49,11 @@ main:
 
   # ── Menu de navigation ──────────────────────────────────────────────
   nav:
-    - { label: ÉPREUVES,   href: '#epreuves'   }
-    - { label: HISTOIRE,   href: '#histoire'   }
-    - { label: BANQUET,    href: '#banquet'    }
-    - { label: PRATIQUE,   href: '#pratique'   }
-    - { label: ENGAGEMENT, href: '#engagement' }
+    - { label: ÉPREUVES,        href: '#epreuves'   }
+    - { label: HISTOIRE,        href: '#histoire'   }
+    - { label: BANQUET,         href: '#banquet'    }
+    - { label: INFOS PRATIQUES, href: '#pratique'   }
+    - { label: SOLIDARITÉ,      href: '#engagement' }
 
   ctaLabel: S'INSCRIRE
   heroCtaLabel: PRENDRE SON DOSSARD →
@@ -119,9 +119,9 @@ main:
       - { time: 20h00, title: Remise des prix    }
       - { time: 20h00, title: Banquet des Chefs  }
 
-  # ── Section « Notre engagement » ────────────────────────────────────
+  # ── Section « Notre solidarité » ────────────────────────────────────
   engagement:
-    label: — §03 / NOTRE ENGAGEMENT
+    label: — §03 / NOTRE SOLIDARITÉ
     titleLine1: Une part des inscriptions
     titleLine2: 'pour la '
     titleEmphasis: Fondation Marie-Louise
@@ -207,7 +207,7 @@ main:
   footer:
     legal: '© {year} · ASSOCIATION TRAIL DES TECTOSAGES'
     # Colonne « Ressources » du footer.
-    # Les sections du site (Épreuves, Histoire, Banquet, Pratique) ne sont
+    # Les sections du site (Épreuves, Histoire, Banquet, Infos pratiques, Solidarité) ne sont
     # PAS répétées ici : elles sont déjà dans le menu de navigation du haut.
     eventLinks:
       - { label: "Affiche de l'événement", href: '{affichePdf}' }   # PDF statique en prod, générateur en dev
