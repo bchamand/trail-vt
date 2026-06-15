@@ -10,7 +10,6 @@
     "build": "astro build",
     "preview": "astro preview",
     "render:affiche": "node scripts/render-affiche-pdf.mjs",
-    "affiche:editor": "node scripts/affiche-editor.mjs",
     "astro": "astro"
   },
   "dependencies": {

@@ -16,7 +16,7 @@ const posterMasks = Object.keys(maskModules).sort().map((path, i) => {
   const m1 = svg.match(/data-photo\s*=\s*["']([^"']+)["']/);
   const m2 = svg.match(/data-scale\s*=\s*["']([^"']+)["']/);
   const m3 = svg.match(/data-origin\s*=\s*["']([^"']+)["']/);
-  return { i, svg, photo: m1 ? m1[1] : '', scale: m2 ? m2[1] : '1', origin: m3 ? m3[1] : '50% 50%' };
+  return { i, file: path.split('/').pop() ?? '', svg, photo: m1 ? m1[1] : '', scale: m2 ? m2[1] : '1', origin: m3 ? m3[1] : '50% 50%' };
 }).filter((m) => m.photo);
 
 const ev = await getEntry('event', 'main');
@@ -181,7 +181,7 @@ const qrSvg = qrRaw
 <div id="stage">
   <div id="poster" data-screen-label="Affiche">
     {posterMasks.map((m) => (
-      <div class="ph" data-i={m.i}><img src={img(m.photo)} alt="" style={`object-position:${m.origin};transform:scale(${m.scale});transform-origin:${m.origin};`}/><div class="shade"></div></div>
+      <div class="ph" data-i={m.i} data-file={m.file} data-scale={m.scale} data-origin={m.origin}><img src={img(m.photo)} alt="" style={`object-position:${m.origin};transform:scale(${m.scale});transform-origin:${m.origin};`}/><div class="shade"></div></div>
     ))}
 
     <div id="cliff"></div>
@@ -294,6 +294,9 @@ const qrSvg = qrRaw
     if(photo) place(photo,region);
     REGIONS.push(region);
   });
+
+  // exposé pour l'éditeur de masques en dev (/affiche?edit-mask) — inerte en prod
+  window.__affMask = { place: place, smoothLine: smoothLine, readShape: readShape };
 
   // Fond sombre : #cliff remplit tout le canevas, les photos passent par-dessus (z-index).
   // Relief (courbes d'altitude) : AUCUN détourage — il s'estompe via son seul masque radial
@@ -432,5 +435,9 @@ const qrSvg = qrRaw
   // (l'échelle d'impression est gérée en CSS pur dans @media print — fiable même
   //  quand le moteur d'impression n'émet pas l'évènement beforeprint)
 </script>
+
+{/* Éditeur de masques — DEV UNIQUEMENT (/affiche?edit-mask) ; import.meta.env.DEV
+    vaut false au build, donc le script n'est pas rendu en prod. */}
+{import.meta.env.DEV && <script src="../scripts/affiche-edit.ts"></script>}
 </body>
 </html>

@@ -116,26 +116,33 @@ En local :
 > fabriquer le PDF : elles ne sont **pas** publiées en prod, seul
 > `/affiche.pdf` l'est.
 
-### 6. Cadrer les photos de l'affiche (éditeur visuel)
+### 6. Cadrer les photos de l'affiche (éditeur intégré, dev)
 
 Les photos de l'affiche sont détourées par des **masques** :
 [`src/affiche-masks/`](src/affiche-masks) contient un `.svg` par photo, qui
 décrit sa zone (un polygone) et son cadrage — `data-photo` (l'image utilisée),
 `data-scale` (le zoom) et `data-origin` (le recadrage). Pour régler tout ça à
-la souris plutôt qu'à la main, un petit éditeur visuel local est fourni :
+la souris plutôt qu'à la main, un éditeur visuel est intégré **directement sur
+l'affiche, en dev uniquement** :
 
 ```sh
-npm run affiche:editor   # ouvre http://localhost:4330
+npm run dev      # puis ouvrir http://localhost:4321/affiche?edit-mask
 ```
 
-Dans l'interface : on choisit un masque et une photo (ou on **importe** une
-nouvelle image dans `public/images/`), on **déplace** la photo en la glissant,
-on **zoome** à la molette, et — en cochant « Éditer la zone » — on déplace les
-sommets du contour. Le bouton **Enregistrer** réécrit le fichier `.svg`.
+Un panneau apparaît sur le poster : on choisit un masque et une photo (ou on
+**importe** une nouvelle image dans `public/images/`), on **déplace** la photo
+en la glissant sur le poster, on **zoome** à la molette, et — en cochant
+« Éditer la zone » — on déplace les sommets du contour. **Enregistrer** réécrit
+le `.svg` (et le poster se recharge tout seul pour montrer le résultat).
 
-> Le cadrage est fidèle à l'affiche (WYSIWYG), mais l'éditeur montre la zone en
-> polygone droit alors que l'affiche en lisse les bords. Après enregistrement,
-> rafraîchir `/affiche` (`npm run dev`) pour voir le rendu final.
+C'est du **vrai WYSIWYG** : on édite sur le poster réel, avec le lissage
+organique des bords. L'éditeur n'existe qu'au `astro dev` — l'overlay
+([`src/scripts/affiche-edit.ts`](src/scripts/affiche-edit.ts)) est élagué du
+build, et la sauvegarde passe par un middleware Vite dev-only
+(dans [`astro.config.mjs`](astro.config.mjs)). **Zéro empreinte en prod.**
+
+> Les contours dorés ne se rafraîchissent qu'au rechargement après une
+> modification de la *zone* ; le détourage de la photo, lui, est mis à jour en direct.
 
 ## 🌍 Mise en ligne
 
@@ -158,8 +165,7 @@ Le site est servi sur le domaine **<https://www.traildestectosages.fr>**
 ├── scripts/               → outils (lancés à la main ou en CI, hors site)
 │   ├── gpx-sources/          → boucles GPX sources (Auzil+Pechbusque, Golf…)
 │   ├── generate-defi-gpx.py  → assemble la trace du Défi (4 boucles)
-│   ├── render-affiche-pdf.mjs → génère dist/affiche.pdf (Playwright, en CI)
-│   └── affiche-editor.mjs     → éditeur visuel des photos de l'affiche
+│   └── render-affiche-pdf.mjs → génère dist/affiche.pdf (Playwright, en CI)
 ├── src/
 │   ├── content/
 │   │   ├── event.yaml     → ⭐ CONFIGURATION + tous les textes
@@ -174,7 +180,7 @@ Le site est servi sur le domaine **<https://www.traildestectosages.fr>**
 │   │   ├── affiche.astro          → l'affiche (source du PDF, dev/CI)
 │   │   ├── affiche/pdf.astro      → générateur PDF côté navigateur (dev/CI)
 │   │   └── mentions-legales.astro → mentions légales + confidentialité
-│   ├── scripts/           → scripts client (carte, profil altimétrique)
+│   ├── scripts/           → scripts client (carte, profil, éditeur de masques dev)
 │   └── styles/global.css  → styles globaux
 ├── astro.config.mjs       → config Astro (site = www.traildestectosages.fr)
 └── .github/workflows/     → déploiement GitHub Pages (deploy.yml)
