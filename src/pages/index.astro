@@ -28,15 +28,14 @@ const raceEntries = (await getCollection('races'))
   .filter(e => !e.data.hidden) // les épreuves « hidden: true » n'apparaissent pas
   .sort((a, b) => a.data.order - b.data.order);
 
-// Distance et D+ : valeurs officielles du frontmatter si présentes,
-// sinon calculées depuis la trace GPX.
+// Distance et D+ : valeurs fournies dans le frontmatter en priorité, sinon
+// calcul depuis le GPX. Pour une épreuve à boucles, le total = somme des
+// boucles (chacune avec sa valeur fournie ou, à défaut, calculée du GPX).
 const raceData = await Promise.all(
   raceEntries.map(async (entry, i) => {
     const d = entry.data;
     const gpxPath = join('public/traces', `${entry.id}.gpx`);
     const tracks = await parseGpxFile(gpxPath);
-    const totalDistance = d.distance ?? tracks.reduce((s, t) => s + t.totalDistance, 0);
-    const totalAscent = d.ascent ?? tracks.reduce((s, t) => s + t.totalAscent, 0);
 
     const segments = d.segments?.map((seg, si) => ({
       ...seg,
@@ -44,6 +43,13 @@ const raceData = await Promise.all(
       distance: seg.distance ?? Math.round((tracks[si]?.totalDistance ?? 0) * 10) / 10,
       ascent: seg.ascent ?? Math.round(tracks[si]?.totalAscent ?? 0),
     }));
+
+    const totalDistance = d.distance
+      ?? (segments ? segments.reduce((s, seg) => s + seg.distance, 0)
+                   : tracks.reduce((s, t) => s + t.totalDistance, 0));
+    const totalAscent = d.ascent
+      ?? (segments ? segments.reduce((s, seg) => s + seg.ascent, 0)
+                   : tracks.reduce((s, t) => s + t.totalAscent, 0));
 
     const vm: RaceViewModel = {
       id: entry.id,
@@ -60,6 +66,7 @@ const raceData = await Promise.all(
       color: d.color,
       distanceDisplay: fmtKm(totalDistance),
       distanceDisplayInt: String(Math.floor(totalDistance)), // km tronqués pour le carrousel
+      distanceKm: totalDistance, // distance officielle (override ?? somme boucles ?? GPX), pour l'axe du profil
       ascentDisplay: String(Math.round(totalAscent)),
       gpxUrl: withBase(`/traces/${entry.id}.gpx`),
       tracks,

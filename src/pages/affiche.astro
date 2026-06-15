@@ -44,8 +44,16 @@ const posterEntries = (await getCollection('races'))
   .sort((a, b) => a.data.order - b.data.order);
 const posterRaces = await Promise.all(posterEntries.map(async (r) => {
   const tracks = await parseGpxFile(join('public/traces', `${r.id}.gpx`));
-  const dist = r.data.distance ?? tracks.reduce((s, t) => s + t.totalDistance, 0);
-  const asc = r.data.ascent ?? tracks.reduce((s, t) => s + t.totalAscent, 0);
+  // Distance / D+ : valeur fournie en priorité, sinon somme des boucles
+  // (chacune avec sa valeur fournie ou GPX), sinon calcul GPX direct.
+  const segs = r.data.segments?.map((seg, si) => ({
+    distance: seg.distance ?? (tracks[si]?.totalDistance ?? 0),
+    ascent: seg.ascent ?? (tracks[si]?.totalAscent ?? 0),
+  }));
+  const dist = r.data.distance
+    ?? (segs ? segs.reduce((s, x) => s + x.distance, 0) : tracks.reduce((s, t) => s + t.totalDistance, 0));
+  const asc = r.data.ascent
+    ?? (segs ? segs.reduce((s, x) => s + x.ascent, 0) : tracks.reduce((s, t) => s + t.totalAscent, 0));
   return {
     title: r.data.title,
     distance: dist ? String(Math.floor(dist)) : '', // tronqué à l'entier inférieur (40,1 → 40)

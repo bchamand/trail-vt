@@ -19,6 +19,8 @@ export interface ElevationOptions {
   segments: Track[];
   segmentColors: string[];
   gpxHref?: string;
+  /** Distance officielle affichée sur l'axe (km) ; à défaut, distance GPX. */
+  totalLabelKm?: number;
   /** null = show all (or for single-track). Otherwise index of active segment. */
   activeSeg?: number | null;
   onHover?: (segIdx: number, ptIdx: number) => void;
@@ -42,7 +44,7 @@ interface ProjectedPoint {
 }
 
 export function renderElevation(opts: ElevationOptions): ElevationHandle {
-  const { container, segments, segmentColors, gpxHref, onHover, onLeave } = opts;
+  const { container, segments, segmentColors, gpxHref, totalLabelKm, onHover, onLeave } = opts;
   let activeSeg: number | null = opts.activeSeg ?? null;
 
   // Reset container
@@ -200,9 +202,12 @@ export function renderElevation(opts: ElevationOptions): ElevationHandle {
     return t;
   }
 
-  svg.appendChild(mkText(PAD, PAD - 4, `${Math.round(maxEle)}m`));
-  svg.appendChild(mkText(PAD, EH - PAD + 10, `${Math.round(minEle)}m`));
-  svg.appendChild(mkText(EW - PAD, EH - PAD + 10, `${totalKm.toFixed(1)} km`, 'end'));
+  // Distance de l'axe : valeur officielle si fournie, sinon distance GPX ;
+  // format français (virgule + espace avant l'unité) comme le reste du site.
+  const axisKm = (totalLabelKm ?? totalKm).toFixed(1).replace('.', ',');
+  svg.appendChild(mkText(PAD, PAD - 4, `${Math.round(maxEle)} m`));
+  svg.appendChild(mkText(PAD, EH - PAD + 10, `${Math.round(minEle)} m`));
+  svg.appendChild(mkText(EW - PAD, EH - PAD + 10, `${axisKm} km`, 'end'));
 
   // Hover layer (line + dot)
   const hoverLine = document.createElementNS(SVG_NS, 'line');
@@ -228,10 +233,9 @@ export function renderElevation(opts: ElevationOptions): ElevationHandle {
       const active = activeSeg == null || activeSeg === i;
       g.setAttribute('opacity', active ? '1' : '0.25');
     });
-    const dplus = activeSeg == null
-      ? segments.reduce((s, d) => s + d.totalAscent, 0)
-      : segments[activeSeg].totalAscent;
-    headerLabel.textContent = `PROFIL ALTIMÉTRIQUE · +${Math.round(dplus)}M`;
+    // Pas de D+ chiffré ici : il viendrait du GPX brut et contredirait la
+    // valeur officielle affichée ailleurs (cf. distance/ascent des fiches).
+    headerLabel.textContent = 'PROFIL ALTIMÉTRIQUE';
   }
   applyActive();
 

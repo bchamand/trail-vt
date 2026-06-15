@@ -27,6 +27,7 @@ export interface RaceViewModel {
   color: string;
   distanceDisplay: string;
   distanceDisplayInt: string;
+  distanceKm: number;
   ascentDisplay: string;
   gpxUrl: string;
   tracks: Track[];
@@ -51,6 +52,7 @@ const clientPayload = {
   races: races.map(r => ({
     id: r.id,
     color: r.color,
+    distanceKm: Math.round(r.distanceKm * 10) / 10,
     segments: r.segments?.map(s => ({
       roman: s.roman,
       label: s.label,
@@ -244,6 +246,7 @@ const clientPayload = {
   interface ClientRace {
     id: string;
     color: string;
+    distanceKm: number;
     segments?: ClientSegment[];
     tracks: Track[];
     gpxUrl: string;
@@ -382,6 +385,7 @@ const clientPayload = {
         container: elevContainer,
         segments: race.tracks,
         segmentColors: colors,
+        totalLabelKm: race.distanceKm,
         // gpxHref: race.gpxUrl, // téléchargement GPX masqué (accord orga en attente)
         activeSeg: null,
         onHover: onElevationHover,
@@ -395,6 +399,7 @@ const clientPayload = {
         container: elevContainer,
         segments: race.tracks,
         segmentColors: [race.color],
+        totalLabelKm: race.distanceKm,
         // gpxHref: race.gpxUrl, // téléchargement GPX masqué (accord orga en attente)
         activeSeg: null,
         onHover: onElevationHover,
