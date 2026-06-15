@@ -52,7 +52,7 @@ const event = defineCollection({
     heroMedia: z.string(),
     mapStyle: z.string().default('dark-matter'),
     urls: z.object({
-      website: z.string(), // adresse du site encodée dans le QR de l'affiche (peut être sans schéma)
+      website: z.string().url(), // URL du site (cible du QR de l'affiche)
       registration: z.string().url(),
       contactEmail: z.string(),
       instagram: z.string().optional(),

@@ -43,7 +43,7 @@ main:
   mapStyle: ign-plan-v2
 
   urls:
-    website: www.traildestectosages.fr          # adresse encodée dans le QR de l'affiche (sans https:// : plus court donc QR moins dense, et scanné comme un lien)
+    website: https://www.traildestectosages.fr  # site officiel (cible du QR de l'affiche)
     registration: https://chrono-start.com/
     contactEmail: contact@traildestectosages.fr
 
@@ -192,7 +192,7 @@ main:
     partners:
       - { name: Mairie,     sub: Vieille-Toulouse, logo: /images/logo-mairie-vieille-toulouse.png, posterWidth: 170, posterPad: '14px 20px' }
       - { name: Mairie,     sub: Pechbusque,       logo: /images/logo-mairie-pechbusque.jpeg,      posterWidth: 135, posterPad: '13px 16px' }
-      - { name: Lions Club, sub: Toulouse Arènes,  logo: /images/logo-lionsclubstoulouse.jpg,              posterWidth: 105, posterPad: '14px'      }
+      - { name: Lions Club, sub: Toulouse Arènes,  logo: /images/logo-lionsclubstoulouse.jpg,      posterWidth: 105, posterPad: '14px'      }
       - { name: Golf de,    sub: Vieille-Toulouse, logo: /images/logo-golf.png,                    posterWidth: 105, posterPad: '14px'      }
 
   # ── Bandeau final d'inscription ─────────────────────────────────────
