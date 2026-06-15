@@ -1,8 +1,8 @@
 ---
 # ── La Boucle de l'Oppidum ── course chronométrée et classée ──
-# Distance et D+ ne sont PAS fixés ici : ils sont calculés automatiquement
-# depuis la trace GPX (public/traces/oppidum.gpx).
-# Pour forcer une valeur officielle, ajouter « distance: » / « ascent: ».
+# Distance et D+ ci-dessous = valeurs officielles arrondies (même boucle que
+# l'Auzil + Pechbusque du Défi). Sans elles, calcul automatique depuis le GPX
+# (public/traces/oppidum.gpx).
 order: 2
 poster: true                  # afficher cette course sur l'affiche
 posterType: 1 boucle chronométrée
@@ -15,4 +15,6 @@ description: >-
 startTime: 17h00
 difficulty: 4
 timed: true
+distance: 11.6                # km (valeur officielle, sinon GPX) — boucle Auzil + Pechbusque
+ascent: 400                   # D+ en m (valeur officielle, sinon GPX)
 ---

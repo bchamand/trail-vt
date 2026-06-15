@@ -1,8 +1,9 @@
 ---
 # ── Le Défi de Copillos ── épreuve reine, 4 boucles à élimination ──
-# Distance et D+ ne sont PAS fixés ici : ils sont calculés automatiquement
-# depuis la trace GPX (public/traces/defi-copillos.gpx, un <trk> par boucle).
-# Pour forcer une valeur officielle, ajouter « distance: » / « ascent: ».
+# Distance et D+ de chaque boucle = valeurs officielles arrondies (ci-dessous) ;
+# le total de l'épreuve est la somme des boucles. Sans « distance: » / « ascent: »
+# sur une boucle, la valeur serait calculée depuis le GPX
+# (public/traces/defi-copillos.gpx, un <trk> par boucle).
 order: 1
 poster: true                          # afficher cette course sur l'affiche
 posterType: 4 boucles par élimination # « type de course » montré sur l'affiche
@@ -22,20 +23,28 @@ segments:
     value: Boucle Auzil + Pechbusque
     status: Éliminatoire
     timeLimit: H 1h20 · F 1h30
+    distance: 11.6  # km — boucle Auzil + Pechbusque (valeur officielle, sinon GPX)
+    ascent: 400     # D+ en m
     color: '#d4a574'
   - label: L'Endurance
     value: Boucle Auzil + Pechbusque
     status: Éliminatoire
     timeLimit: H 1h20 · F 1h30
+    distance: 11.6
+    ascent: 400
     color: '#a67a4a'
   - label: La Bravoure
     value: Boucle du Golf
     status: Éliminatoire
     timeLimit: H 45' · F 50'
+    distance: 5.2   # km — boucle du Golf
+    ascent: 100     # D+ en m
     color: '#7a5a6b'
   - label: L'Honneur
     value: Boucle du Golf
     status: Éliminatoire
     timeLimit: H 45' · F 50'
+    distance: 5.2
+    ascent: 100
     color: '#5a7a5a'
 ---
