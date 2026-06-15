@@ -43,7 +43,7 @@ main:
   mapStyle: ign-plan-v2
 
   urls:
-    website: https://traildestectosages.fr      # site officiel (cible du QR code de l'affiche)
+    website: www.traildestectosages.fr          # adresse encodée dans le QR de l'affiche (sans https:// : plus court donc QR moins dense, et scanné comme un lien)
     registration: https://chrono-start.com/
     contactEmail: contact@traildestectosages.fr
 
