@@ -6,7 +6,7 @@ export interface RaceSegment {
   label: string;
   value: string;
   status: string;
-  timeLimit: string;
+  timeLimit: { men: string; women: string };
   color: string;
   distance: number;
   ascent: number;
@@ -166,15 +166,29 @@ const clientPayload = {
 
           {race.segments && (
             <div class="mt-8">
-              <div class="text-[10px] tracking-[0.3em] opacity-50 mb-3" style="font-family: var(--font-mono);">
-                {race.segments.length} BOUCLES · {race.segments.length} VALEURS
+              <div class="text-[10px] tracking-[0.3em] opacity-50 mb-2" style="font-family: var(--font-mono);">
+                {race.segments.length} BOUCLES · TEMPS LIMITE
+              </div>
+              {/* En-tête : colonnes de largeur FIXE + même écart que les lignes ci-dessous
+                  → HOMMES/FEMMES tombent exactement au-dessus des valeurs (alignées) */}
+              <div class="grid items-end pb-1.5" style="grid-template-columns: 34px 1fr auto; gap: 16px; font-family: var(--font-mono);">
+                <span></span><span></span>
+                <div class="flex" style="gap: 30px;">
+                  <span class="text-[9px] sm:text-[10px] tracking-[0.12em] text-right text-[color:var(--color-accent)]" style="width: 58px;">HOMMES</span>
+                  <span class="text-[9px] sm:text-[10px] tracking-[0.12em] text-right text-[color:var(--color-accent)]" style="width: 58px;">FEMMES</span>
+                </div>
               </div>
               {race.segments.map((seg) => (
-                <div class="grid items-baseline py-2.5 border-t border-[color:var(--color-line-soft)]" style="grid-template-columns: 40px 1fr auto auto; gap: 12px;">
+                <div class="grid items-baseline py-2.5 border-t border-[color:var(--color-line-soft)]" style="grid-template-columns: 34px 1fr auto; gap: 16px;">
                   <span class="text-[color:var(--color-accent)]" style="font-family: var(--font-serif); font-style: italic; font-size: clamp(18px, 1.8vw, 22px);">{seg.roman}</span>
-                  <span class="text-[13px] sm:text-[15px] italic">« {seg.label} »</span>
-                  <span class="text-[10px] sm:text-[11px] opacity-70" style="font-family: var(--font-mono);">{seg.distance.toLocaleString('fr-FR')} km · +{seg.ascent} m</span>
-                  <span class="hidden sm:inline text-[11px] opacity-70" style="font-family: var(--font-mono);">lim. {seg.timeLimit}</span>
+                  <div>
+                    <span class="block text-[13px] sm:text-[15px] italic">« {seg.label} »</span>
+                    <span class="block text-[10px] opacity-50 mt-0.5" style="font-family: var(--font-mono);">{seg.distance.toLocaleString('fr-FR')} km · +{seg.ascent} m</span>
+                  </div>
+                  <div class="flex" style="gap: 30px; font-family: var(--font-mono);">
+                    <span class="text-[12px] sm:text-[13px] text-right whitespace-nowrap" style="width: 58px;">{seg.timeLimit.men}</span>
+                    <span class="text-[12px] sm:text-[13px] text-right whitespace-nowrap opacity-90" style="width: 58px;">{seg.timeLimit.women}</span>
+                  </div>
                 </div>
               ))}
             </div>

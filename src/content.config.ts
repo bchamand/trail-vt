@@ -5,7 +5,7 @@ const segment = z.object({
   label: z.string(),
   value: z.string(),
   status: z.string(),
-  timeLimit: z.string(),
+  timeLimit: z.object({ men: z.string(), women: z.string() }), // temps limite par sexe
   color: z.string(),
   // Valeurs officielles affichées ; à défaut, calculées depuis la trace GPX.
   distance: z.number().positive().optional(), // km
