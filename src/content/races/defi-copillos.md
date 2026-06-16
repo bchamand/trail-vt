@@ -30,21 +30,21 @@ segments:
   - label: L'Endurance
     value: Boucle Auzil + Pechbusque
     status: Éliminatoire
-    timeLimit: { men: '1h30', women: '1h40' }
+    timeLimit: { men: '1h20', women: '1h30' }
     distance: 11.6
     ascent: 400
     color: '#a67a4a'
   - label: La Bravoure
     value: Boucle du Golf
     status: Éliminatoire
-    timeLimit: { men: '45 min', women: '50 min' }
+    timeLimit: { men: '40 min', women: '45 min' }
     distance: 5.2   # km — boucle du Golf
     ascent: 100     # D+ en m
     color: '#7a5a6b'
   - label: L'Honneur
     value: Boucle du Golf
     status: Éliminatoire
-    timeLimit: { men: '45 min', women: '50 min' }
+    timeLimit: { men: '40 min', women: '45 min' }
     distance: 5.2
     ascent: 100
     color: '#5a7a5a'
