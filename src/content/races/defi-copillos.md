@@ -12,8 +12,9 @@ type: L'épreuve reine
 description: >-
   Quatre boucles enchaînées — qualification ou élimination à chaque passage
   selon un temps limite. Seule la dernière boucle est classante : elle
-  sacre les Héritiers de Copillos. 100 dossards, à partir des Espoirs
-  (coureurs nés en 2006 et avant).
+  sacre les Héritiers de Copillos.
+bibs: 100                 # nombre de dossards (limite)
+eligibility: À partir des Espoirs (nés en 2006 et avant)
 startTime: 15h00
 difficulty: 5
 timed: true

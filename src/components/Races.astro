@@ -20,6 +20,8 @@ export interface RaceViewModel {
   type: string;
   posterType?: string;
   description: string;
+  bibs?: number;
+  eligibility?: string;
   startTime: string;
   difficulty: number;
   timed: boolean;
@@ -148,6 +150,16 @@ const clientPayload = {
             <em style="font-style: italic;">{race.title}</em>
           </h3>
           <p class="text-[15px] sm:text-[17px] leading-[1.55] opacity-85 m-0" style="text-wrap: pretty;">{race.description}</p>
+
+          {race.bibs && (
+            <div class="flex items-center gap-4 sm:gap-5 mt-7 pl-4 sm:pl-5 border-l-2 border-[color:var(--color-accent)]">
+              <span class="text-[color:var(--color-accent)] shrink-0" style="font-family: var(--font-serif); font-size: clamp(28px, 3vw, 38px); line-height: 0.85;">{race.bibs}</span>
+              <span class="block">
+                <span class="block text-[10px] tracking-[0.24em] opacity-55 mb-1" style="font-family: var(--font-mono);">DOSSARDS</span>
+                {race.eligibility && <span class="block text-[13px] sm:text-[14px] opacity-80" style="text-wrap: pretty;">{race.eligibility}</span>}
+              </span>
+            </div>
+          )}
 
           <div class="grid grid-cols-3 gap-px mt-8 border border-[color:var(--color-line)]" style="background: var(--color-line);">
             <div class="p-4 sm:p-5" style="background: var(--color-bg);">

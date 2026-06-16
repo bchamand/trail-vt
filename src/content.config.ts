@@ -31,6 +31,8 @@ const races = defineCollection({
     distance: z.number().positive().optional(), // km
     ascent: z.number().int().nonnegative().optional(), // D+ en m
     segments: z.array(segment).optional(),
+    bibs: z.number().int().positive().optional(), // nombre de dossards (limite)
+    eligibility: z.string().optional(), // catégorie d'âge minimale (affichée sous le compteur de dossards)
   }),
 });
 
