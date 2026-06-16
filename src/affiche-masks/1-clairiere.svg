@@ -1,6 +1,6 @@
 <!--
   ═══════════════════════════════════════════════════════════════════════
-   MASQUE PHOTO 1 — « champ » (photo du haut)
+   MASQUE PHOTO 1 — « clairière » (photo du haut)
   ═══════════════════════════════════════════════════════════════════════
    Un fichier = une photo. Dépose un masque ici (src/affiche-masks/) avec
    son image associée pour qu'elle apparaisse sur l'affiche. Aucun masque
@@ -17,7 +17,7 @@
   ═══════════════════════════════════════════════════════════════════════
 -->
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1448" preserveAspectRatio="none"
-     data-photo="champ-clean.jpg" data-scale="1.07" data-origin="7% 100%">
+     data-photo="clairiere-clean.jpg" data-scale="1.33" data-origin="0% 100%">
   <polygon id="region" fill="#d4a574" fill-opacity="0.25" stroke="#d4a574" stroke-width="3"
     points="348,0 1024,0 1024,445 810,460 670,471 530,481 520,447 468,345 404,245 352,160 366,85"/>
 </svg>
