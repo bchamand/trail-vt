@@ -44,7 +44,7 @@ main:
 
   urls:
     website: https://www.traildestectosages.fr  # site officiel (cible du QR de l'affiche)
-    registration: https://chrono-start.com/
+    registration: https://chrono-start.fr/Inscription/Course/detail/c/5448  # page d'inscription Chrono-Start de l'événement
     contactEmail: traildestectosages@gmail.com
 
   # ── Menu de navigation ──────────────────────────────────────────────
