@@ -45,7 +45,7 @@ main:
   urls:
     website: https://www.traildestectosages.fr  # site officiel (cible du QR de l'affiche)
     registration: https://chrono-start.com/
-    contactEmail: contact@traildestectosages.fr
+    contactEmail: traildestectosages@gmail.com
 
   # ── Menu de navigation ──────────────────────────────────────────────
   nav:
