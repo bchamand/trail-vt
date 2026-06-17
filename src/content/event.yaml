@@ -15,8 +15,8 @@
 #   {name}            → Trail des Tectosages
 #   {location}        → Vieille-Toulouse (31)
 #   {locationCity}    → VIEILLE-TOULOUSE
-#   {raceCount}       → V (nombre d'épreuves, en chiffre romain)
-#   {maxDistance}     → 40,1 (distance de la plus longue épreuve)
+#   {raceCount}       → II (nombre d'épreuves, en chiffre romain)
+#   {maxDistance}     → 33 (distance de la plus longue épreuve)
 #   {affichePdf}      → lien vers le PDF de l'affiche (/affiche.pdf en prod)
 #   {email}           → adresse de contact (définie dans urls.contactEmail)
 # ══════════════════════════════════════════════════════════════════════
@@ -33,8 +33,10 @@ main:
   tagline: Sur la trace des Volques Tectosages
   description: >-
     Il y a 2300 ans, les Volques Tectosages, peuple celte en provenance de
-    l'Est, s'installait sur le territoire de l'actuelle commune de
+    l'Est, s'installaient sur le territoire de l'actuelle commune de
     Vieille-Toulouse, qui portait alors le nom de Tolosa Tectosagum.
+    Ce territoire sera le théâtre de deux courses : le Défi de Copillos
+    (33 km) et la Boucle de l'Oppidum (11 km).
   heroMedia: /video/hero.mp4   # Vidéo (ou image) plein écran de l'accueil
 
   # Fond de carte. Choix : dark-matter, positron, voyager,
@@ -49,11 +51,12 @@ main:
 
   # ── Menu de navigation ──────────────────────────────────────────────
   nav:
-    - { label: ÉPREUVES,        href: '#epreuves'   }
     - { label: HISTOIRE,        href: '#histoire'   }
+    - { label: ÉPREUVES,        href: '#epreuves'   }
     - { label: BANQUET,         href: '#banquet'    }
-    - { label: INFOS PRATIQUES, href: '#pratique'   }
     - { label: SOLIDARITÉ,      href: '#engagement' }
+    - { label: INFOS PRATIQUES, href: '#pratique'   }
+    - { label: SOUTIENS,        href: '#soutiens'   }
 
   ctaLabel: S'INSCRIRE
   heroCtaLabel: PRENDRE SON DOSSARD →
@@ -69,7 +72,7 @@ main:
   # Le contenu de chaque épreuve est dans src/content/races/*.md
   racesSection:
     label: — §01 / LES ÉPREUVES
-    titleLine1: Deux départs.
+    titleLine1: Deux courses.
     titleLine2: Un seul territoire.
     # Accroche facultative à droite du titre. Décommenter pour l'afficher :
     # tagline: >-
@@ -109,15 +112,17 @@ main:
     titleLine2: des Chefs.
     body: >-
       La nuit tombée, le village se rassemble. Banquet organisé par le
-      <em>Golf de Vieille-Toulouse</em> — tables longues, produits du Lauragais,
-      breuvage des conquérants. Inscription séparée.
+      <em>Golf de Vieille-Toulouse</em>. Inscription séparée.
+    places: 200                       # nombre de places au banquet
+    registrationOpen: false           # inscriptions ouvertes ? false → affiche « à venir »
+    soonLabel: Inscriptions à venir   # affiché tant que les inscriptions ne sont pas ouvertes
     cta: RÉSERVER SA PLACE →
     ctaUrl: https://chrono-start.com/
-    imagePlaceholder: 'PHOTO BANQUET<br/>[À FOURNIR]'
     # Lignes de soirée ajoutées au déroulé (autant que voulu, même horaire possible)
     schedule:
-      - { time: 20h00, title: Remise des prix    }
-      - { time: 20h00, title: Banquet des Chefs  }
+      - { time: 18h30, title: Animation enfants }
+      - { time: 19h45, title: Remise des prix   }
+      - { time: 20h00, title: Banquet des Chefs }
 
   # ── Section « Notre solidarité » ────────────────────────────────────
   engagement:
@@ -184,7 +189,7 @@ main:
     body: >-
       Les communes de Vieille-Toulouse et de Pechbusque, le Golf de
       Vieille-Toulouse et de nombreux propriétaires privés ont ouvert leurs
-      sentiers, leurs terrains et leurs portes — sans leur accord de traverser
+      sentiers, leurs terrains et leurs portes — sans leur accord pour traverser
       ces terres, le tracé n'existerait pas. Le Lions Club Toulouse Arènes
       Romaines, lui, accompagne l'organisation. Un grand merci à
       toutes et à tous.

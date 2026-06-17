@@ -10,13 +10,12 @@ posterType: 4 boucles par élimination # « type de course » montré sur l'affi
 title: Défi de Copillos
 type: L'épreuve reine
 description: >-
-  Quatre boucles enchaînées — qualification ou élimination à chaque passage
+  Quatre boucles successives avec départ groupé — qualification ou élimination à chaque passage
   selon un temps limite. Seule la dernière boucle est classante : elle
   sacre les Héritiers de Copillos.
 bibs: 100                 # nombre de dossards (limite)
-eligibility: À partir des Espoirs (nés en 2006 et avant)
+eligibility: À partir des Espoirs
 startTime: 15h00
-difficulty: 5
 timed: true
 color: '#d4a574'
 segments:

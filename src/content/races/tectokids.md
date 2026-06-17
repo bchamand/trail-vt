@@ -8,10 +8,9 @@ title: Tectokids
 type: La relève
 description: >-
   Trois boucles selon la catégorie — 0,84, 1,17 ou 2,4 km. Dossard,
-  classement et médaille pour les U12, U14 et U16 (nés de 2011 à 2016).
+  classement et médaille pour les U12, U14 et U16.
   50 dossards. La relève des Tectosages.
 startTime: 17h30
-difficulty: 1
 timed: true
 distance: 2.4
 ascent: 90

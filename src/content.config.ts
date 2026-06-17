@@ -23,7 +23,6 @@ const races = defineCollection({
     type: z.string(),
     description: z.string(),
     startTime: z.string(),
-    difficulty: z.number().int().min(1).max(5),
     timed: z.boolean().default(true),
     unit: z.string().default('KM'),
     color: z.string().default('#d4a574'),
@@ -83,7 +82,9 @@ const event = defineCollection({
       body: z.string(),
       cta: z.string(),
       ctaUrl: z.string().url(),
-      imagePlaceholder: z.string(),
+      places: z.number().int().positive(),
+      registrationOpen: z.boolean(),
+      soonLabel: z.string(),
       // Lignes de soirée ajoutées au déroulé de la journée (généré auto).
       schedule: z.array(z.object({ time: z.string(), title: z.string() })),
     }),

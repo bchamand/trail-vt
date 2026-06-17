@@ -23,7 +23,6 @@ export interface RaceViewModel {
   bibs?: number;
   eligibility?: string;
   startTime: string;
-  difficulty: number;
   timed: boolean;
   unit: string;
   color: string;
@@ -116,11 +115,7 @@ const clientPayload = {
           <span style="font-family: var(--font-serif); font-size: clamp(36px, 4.5vw, 44px); line-height: 0.9;">{race.distanceDisplayInt}</span>
           <span class="text-[10px] sm:text-[11px] tracking-[0.15em] opacity-70" style="font-family: var(--font-mono);">{race.unit}</span>
         </div>
-        <div class="flex gap-[3px] mt-3">
-          {Array.from({ length: 5 }).map((_, n) => (
-            <span class="race-diff-bar" data-filled={n < race.difficulty ? '1' : '0'} style="width: 14px; height: 3px; display: block;"></span>
-          ))}
-        </div>
+        <div class="text-[10px] sm:text-[11px] opacity-70" style="font-family: var(--font-mono); letter-spacing: 0.02em; line-height: 1.35;">{race.posterType ?? race.type}</div>
       </button>
     ))}
   </div>
@@ -227,10 +222,6 @@ const clientPayload = {
     }
   }
 
-  .race-card .race-diff-bar[data-filled="1"] { background: var(--color-accent); }
-  .race-card .race-diff-bar[data-filled="0"] { background: rgba(232,227,211,0.15); }
-  .race-card.is-active .race-diff-bar[data-filled="1"] { background: var(--color-bg); }
-  .race-card.is-active .race-diff-bar[data-filled="0"] { background: rgba(15,20,18,0.2); }
   .race-card:not(.is-active):hover { background: rgba(212,165,116,0.05) !important; }
 
   /* « VUE COMPLÈTE » occupe toute la première ligne ; les boucles se

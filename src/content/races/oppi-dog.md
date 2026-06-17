@@ -8,10 +8,8 @@ title: Oppi-Dog
 type: Canicross chronométré
 description: >-
   Une boucle avec son chien — sol forestier, points d'eau, équipement
-  canicross réglementaire. 30 dossards, à partir des Cadets
-  (coureurs nés en 2010 et avant).
+  canicross réglementaire. 30 dossards, à partir des Cadets.
 startTime: 15h40
-difficulty: 3
 timed: true
 distance: 5.6
 ascent: 210

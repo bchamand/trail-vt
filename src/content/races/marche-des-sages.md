@@ -11,7 +11,6 @@ description: >-
   départ libre entre 10h00 et 13h00 sur les sentiers historiques du
   village. 50 dossards.
 startTime: 10h–13h
-difficulty: 2
 timed: false
 distance: 10.5
 ascent: 360

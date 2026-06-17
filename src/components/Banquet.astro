@@ -6,30 +6,50 @@ interface Props {
     titleEmphasis: string;
     titleLine2: string;
     body: string;
+    places: number;
+    registrationOpen: boolean;
+    soonLabel: string;
     cta: string;
     ctaUrl: string;
-    imagePlaceholder: string;
   };
 }
 const { data } = Astro.props;
 ---
 <section id="banquet"
-  class="border-t border-[color:var(--color-line-soft)] grid grid-cols-1 lg:grid-cols-2 items-center"
-  style="padding: clamp(72px, 10vw, 120px) clamp(20px, 4vw, 80px); gap: clamp(32px, 5vw, 80px);">
+  class="border-t border-[color:var(--color-line-soft)]"
+  style="padding: clamp(72px, 10vw, 120px) clamp(20px, 4vw, 80px);">
 
-  <div>
-    <div class="mono-label mb-5">{data.label}</div>
-    <h2 class="h2-big">{data.titleLine1}<em style="color: var(--color-accent); font-style: italic;">{data.titleEmphasis}</em><br/>{data.titleLine2}</h2>
-    <p class="mt-6 text-[15px] sm:text-[16px] leading-[1.6] opacity-85 max-w-[460px]" style="text-wrap: pretty;" set:html={data.body} />
-    <a href={data.ctaUrl} target="_blank" rel="noopener noreferrer"
-       class="btn-gold mt-6 w-full sm:w-auto"
-       style="padding: 14px 28px; letter-spacing: 0.2em;">{data.cta}</a>
-  </div>
+  <div class="grid grid-cols-1 lg:grid-cols-2" style="gap: clamp(28px, 4vw, 56px);">
 
-  <div class="relative border border-[color:var(--color-line)] flex items-center justify-center"
-       style="background: var(--color-bg-elev); height: clamp(260px, 40vw, 480px);">
-    <div class="text-center opacity-40 text-[11px] tracking-[0.22em] leading-[1.8]"
-         style="font-family: var(--font-mono);" set:html={data.imagePlaceholder} />
-    <div class="absolute pointer-events-none" style="inset: 16px; border: 1px solid rgba(212,165,116,0.2);"></div>
+    <!-- Titre de la section (à gauche) -->
+    <div>
+      <div class="mono-label mb-5">{data.label}</div>
+      <h2 class="h2-big">{data.titleLine1}<em style="color: var(--color-accent); font-style: italic;">{data.titleEmphasis}</em><br/>{data.titleLine2}</h2>
+    </div>
+
+    <!-- Descriptif (à droite, là où se trouvait la photo) — séparé par un filet vertical -->
+    <div class="flex flex-col items-start justify-center lg:border-l border-[color:var(--color-line)] lg:pl-[clamp(28px,4vw,56px)]">
+      <p class="text-[16px] sm:text-[17px] leading-[1.7] opacity-85 max-w-[480px] m-0"
+         style="text-wrap: pretty;" set:html={data.body} />
+
+      <!-- Nombre de places (même habillage que le callout DOSSARDS des épreuves) -->
+      <div class="flex items-center gap-4 sm:gap-5 mt-7 pl-4 sm:pl-5 border-l-2 border-[color:var(--color-accent)]">
+        <span class="text-[color:var(--color-accent)] shrink-0" style="font-family: var(--font-serif); font-size: clamp(28px, 3vw, 38px); line-height: 0.85;">{data.places}</span>
+        <span class="block text-[10px] tracking-[0.24em] opacity-55" style="font-family: var(--font-mono);">PLACES</span>
+      </div>
+
+      <!-- État des inscriptions : bouton actif si ouvertes, sinon mention « à venir » -->
+      {data.registrationOpen ? (
+        <a href={data.ctaUrl} target="_blank" rel="noopener noreferrer"
+           class="btn-gold mt-7 w-full sm:w-auto"
+           style="padding: 14px 28px; letter-spacing: 0.2em;">{data.cta}</a>
+      ) : (
+        <span class="inline-flex items-center gap-2.5 mt-7"
+              style="font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(232,227,211,0.7); border: 1px solid var(--color-line); padding: 13px 24px;">
+          <span style="width: 7px; height: 7px; border-radius: 9999px; background: var(--color-accent); flex-shrink: 0;"></span>
+          {data.soonLabel}
+        </span>
+      )}
+    </div>
   </div>
 </section>
