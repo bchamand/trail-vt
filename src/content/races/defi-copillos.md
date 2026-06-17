@@ -1,5 +1,5 @@
 ---
-# ── Le Défi de Copillos ── épreuve reine, 4 boucles à élimination ──
+# ── Le Défi de Copillos ── course reine, 4 boucles à élimination ──
 # Distance et D+ de chaque boucle = valeurs officielles arrondies (ci-dessous) ;
 # le total de l'épreuve est la somme des boucles. Sans « distance: » / « ascent: »
 # sur une boucle, la valeur serait calculée depuis le GPX
@@ -8,7 +8,7 @@ order: 1
 poster: true                          # afficher cette course sur l'affiche
 posterType: 4 boucles par élimination # « type de course » montré sur l'affiche
 title: Défi de Copillos
-type: L'épreuve reine
+type: La course reine
 description: >-
   Quatre boucles successives avec départ groupé — qualification ou élimination à chaque passage
   selon un temps limite. Seule la dernière boucle est classante : elle

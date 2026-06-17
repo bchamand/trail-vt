@@ -15,8 +15,10 @@
 #   {name}            → Trail des Tectosages
 #   {location}        → Vieille-Toulouse (31)
 #   {locationCity}    → VIEILLE-TOULOUSE
-#   {raceCount}       → II (nombre d'épreuves, en chiffre romain)
-#   {maxDistance}     → 33 (distance de la plus longue épreuve)
+#   {raceCount}       → II (nombre de courses, en chiffre romain)
+#   {maxDistance}     → 33 (distance de la plus longue course)
+#   {course1Distance}/{course1Ascent} → 33 / 1000 (km tronqués et D+ de la 1re course)
+#   {course2Distance}/{course2Ascent} → 11 / 400  (km tronqués et D+ de la 2e course)
 #   {affichePdf}      → lien vers le PDF de l'affiche (/affiche.pdf en prod)
 #   {email}           → adresse de contact (définie dans urls.contactEmail)
 # ══════════════════════════════════════════════════════════════════════
@@ -33,10 +35,10 @@ main:
   tagline: Sur la trace des Volques Tectosages
   description: >-
     Il y a 2300 ans, les Volques Tectosages, peuple celte en provenance de
-    l'Est, s'installaient sur le territoire de l'actuelle commune de
+    l'Est, s'installèrent sur le territoire de l'actuelle commune de
     Vieille-Toulouse, qui portait alors le nom de Tolosa Tectosagum.
     Ce territoire sera le théâtre de deux courses : le Défi de Copillos
-    (33 km) et la Boucle de l'Oppidum (11 km).
+    (33 km) et la Boucle de l'Oppidum (11 km).
   heroMedia: /video/hero.mp4   # Vidéo (ou image) plein écran de l'accueil
 
   # Fond de carte. Choix : dark-matter, positron, voyager,
@@ -52,7 +54,7 @@ main:
   # ── Menu de navigation ──────────────────────────────────────────────
   nav:
     - { label: HISTOIRE,        href: '#histoire'   }
-    - { label: ÉPREUVES,        href: '#epreuves'   }
+    - { label: COURSES,         href: '#epreuves'   }
     - { label: BANQUET,         href: '#banquet'    }
     - { label: SOLIDARITÉ,      href: '#engagement' }
     - { label: INFOS PRATIQUES, href: '#pratique'   }
@@ -63,17 +65,17 @@ main:
 
   # ── Bandeau de chiffres sous l'accueil ──────────────────────────────
   stats:
-    - { big: '{raceCount}',        small: ÉPREUVES        }
-    - { big: '{maxDistance} KM',   small: DÉFI MAX        }
-    - { big: '{dateShortMobile}.', small: '{dateWeekday}' }
-    - { big: '{locationCity}',     small: '(31)'          }
+    - { big: '{course1Distance} KM', small: '{course1Ascent} M D+' }   # 1re course (auto depuis les fiches)
+    - { big: '{course2Distance} KM', small: '{course2Ascent} M D+' }   # 2e course (auto depuis les fiches)
+    - { big: '{dateShortMobile}.',   small: '{dateWeekday}'        }
+    - { big: '{locationCity}',       small: 'HAUTE-GARONNE'        }
 
-  # ── Section « Les épreuves » ────────────────────────────────────────
+  # ── Section « Les courses » ─────────────────────────────────────────
   # Le contenu de chaque épreuve est dans src/content/races/*.md
   racesSection:
-    label: — §01 / LES ÉPREUVES
-    titleLine1: Deux courses.
-    titleLine2: Un seul territoire.
+    label: — §01 / LES COURSES
+    titleLine1: Deux épreuves
+    titleLine2: Un seul territoire
     # Accroche facultative à droite du titre. Décommenter pour l'afficher :
     # tagline: >-
     #   De la Boucle de l'Oppidum au Défi de Copillos, deux courses chronométrées
@@ -109,7 +111,7 @@ main:
     label: — §02 / LE SOIR
     titleLine1: 'Le '
     titleEmphasis: Banquet
-    titleLine2: des Chefs.
+    titleLine2: des Chefs
     body: >-
       La nuit tombée, le village se rassemble. Banquet organisé par le
       <em>Golf de Vieille-Toulouse</em>. Inscription séparée.
@@ -155,7 +157,7 @@ main:
   practicalInfo:
     label: — §04 / INFOS PRATIQUES
     titleLine1: Une journée,
-    titleEmphasis: un village.
+    titleEmphasis: un village
     tagline: >-
       Rassemblement au cœur du village de Vieille-Toulouse. Les courses
       s'élancent à partir de 15h30, l'arrivée des derniers Héritiers est
@@ -212,7 +214,7 @@ main:
   footer:
     legal: '© {year} · ASSOCIATION TRAIL DES TECTOSAGES'
     # Colonne « Ressources » du footer.
-    # Les sections du site (Épreuves, Histoire, Banquet, Infos pratiques, Solidarité) ne sont
+    # Les sections du site (Courses, Histoire, Banquet, Infos pratiques, Solidarité) ne sont
     # PAS répétées ici : elles sont déjà dans le menu de navigation du haut.
     eventLinks:
       - { label: "Affiche de l'événement", href: '{affichePdf}' }   # PDF statique en prod, générateur en dev

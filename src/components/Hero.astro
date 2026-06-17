@@ -10,7 +10,7 @@ const mediaUrl = withBase(event.heroMedia);
 const isVideo = /\.(mp4|webm|mov)$/i.test(event.heroMedia);
 const posterUrl = withBase('/images/hero-poster.jpg');
 ---
-<section id="top" class="relative overflow-hidden" style="min-height: 88vh;">
+<section id="top" class="relative overflow-hidden" style="min-height: 100vh; min-height: 100svh;">
   {isVideo ? (
     <>
       <!-- Poster stays behind the video; if autoplay is blocked the
