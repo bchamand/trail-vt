@@ -16,6 +16,6 @@ eligibility: À partir des Cadets (nés en 2010 et avant)
 startTime: 17h00
 difficulty: 4
 timed: true
-distance: 11.6                # km (valeur officielle, sinon GPX) — boucle Auzil + Pechbusque
+distance: 11.5                # km (valeur officielle, sinon GPX) — boucle Auzil + Pechbusque
 ascent: 400                   # D+ en m (valeur officielle, sinon GPX)
 ---
