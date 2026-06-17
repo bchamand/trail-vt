@@ -1,5 +1,6 @@
 ---
 import type { Track } from '../lib/gpx';
+import SectionKicker from './SectionKicker.astro';
 
 export interface RaceSegment {
   roman: string;
@@ -85,7 +86,7 @@ const clientPayload = {
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-7 lg:gap-15 items-start mb-10 lg:mb-15"
        style="margin-bottom: clamp(40px, 6vw, 60px);">
     <div>
-      <div class="mono-label mb-5">{section.label}</div>
+      <SectionKicker label={section.label} class="mb-5" />
       <h2 class="h2-med">{section.titleLine1}<br/><span class="italic opacity-75">{section.titleLine2}</span></h2>
     </div>
     {section.tagline && (

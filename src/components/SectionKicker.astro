@@ -1,0 +1,14 @@
+---
+interface Props {
+  label: string;
+  class?: string;
+}
+const { label, class: className = '' } = Astro.props;
+// « — §01 / L'HISTOIRE » → « 01 · L'HISTOIRE » (numéro épuré, sans § ni /).
+// Sans numéro reconnu, on retombe sur le libellé brut.
+const m = label.match(/§?\s*(\d+)\s*\/\s*(.+)$/);
+const number = m?.[1] ?? '';
+const name = (m?.[2] ?? label).trim();
+const text = number ? `${number} · ${name}` : name;
+---
+<div class:list={['mono-label', className]}>{text}</div>

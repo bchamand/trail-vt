@@ -73,7 +73,7 @@ main:
   # ── Section « Les courses » ─────────────────────────────────────────
   # Le contenu de chaque épreuve est dans src/content/races/*.md
   racesSection:
-    label: — §01 / LES COURSES
+    label: — §02 / LES COURSES
     titleLine1: Deux épreuves
     titleLine2: Un seul territoire
     # Accroche facultative à droite du titre. Décommenter pour l'afficher :
@@ -83,7 +83,7 @@ main:
 
   # ── Section « L'histoire » ──────────────────────────────────────────
   storytelling:
-    label: — §00 / L'HISTOIRE
+    label: — §01 / L'HISTOIRE
     title: 'Les traileurs sont-ils les'
     titleEmphasis: 'descendants des Tectosages ?'
     pillars:
@@ -108,7 +108,7 @@ main:
 
   # ── Section « Le banquet » ──────────────────────────────────────────
   banquet:
-    label: — §02 / LE SOIR
+    label: — §03 / LE SOIR
     titleLine1: 'Le '
     titleEmphasis: Banquet
     titleLine2: des Chefs
@@ -128,7 +128,7 @@ main:
 
   # ── Section « Notre solidarité » ────────────────────────────────────
   engagement:
-    label: — §03 / NOTRE SOLIDARITÉ
+    label: — §04 / NOTRE SOLIDARITÉ
     titleLine1: Une part des inscriptions
     titleLine2: 'pour la '
     titleEmphasis: Fondation Marie-Louise
@@ -155,7 +155,7 @@ main:
 
   # ── Section « Infos pratiques » ─────────────────────────────────────
   practicalInfo:
-    label: — §04 / INFOS PRATIQUES
+    label: — §05 / INFOS PRATIQUES
     titleLine1: Une journée,
     titleEmphasis: un village
     tagline: >-
@@ -185,7 +185,7 @@ main:
 
   # ── Section « Avec le soutien de » ──────────────────────────────────
   supporters:
-    label: — §05 / AVEC LE SOUTIEN DE
+    label: — §06 / AVEC LE SOUTIEN DE
     titleLine1: Un trail rendu possible par
     titleEmphasis: deux villages et de nombreux soutiens
     body: >-

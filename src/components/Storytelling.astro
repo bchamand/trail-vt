@@ -1,4 +1,6 @@
 ---
+import SectionKicker from './SectionKicker.astro';
+
 interface Props {
   data: {
     label: string;
@@ -10,7 +12,7 @@ interface Props {
 const { data } = Astro.props;
 ---
 <section id="histoire" class="py-18 px-5 sm:py-30 sm:px-10 lg:py-30 lg:px-20" style="padding-top: clamp(72px, 10vw, 120px); padding-bottom: clamp(72px, 10vw, 120px);">
-  <div class="mono-label mb-5">{data.label}</div>
+  <SectionKicker label={data.label} class="mb-5" />
   <h2 class="h2-big mb-10 sm:mb-15 max-w-[1000px]" style="margin-bottom: clamp(40px, 6vw, 60px);">
     {data.title} <em style="color: var(--color-accent); font-style: italic;">{data.titleEmphasis}</em>
   </h2>

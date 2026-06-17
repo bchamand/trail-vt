@@ -1,4 +1,6 @@
 ---
+import SectionKicker from './SectionKicker.astro';
+
 interface Props {
   data: {
     label: string;
@@ -29,7 +31,7 @@ const { meetingPlace, schedule } = data;
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-7 lg:gap-15 items-start"
        style="margin-bottom: clamp(36px, 5vw, 56px); gap: clamp(28px, 4vw, 60px);">
     <div>
-      <div class="mono-label mb-5">{data.label}</div>
+      <SectionKicker label={data.label} class="mb-5" />
       <h2 class="h2-med">{data.titleLine1}<br/><em style="font-style: italic; opacity: 0.75;">{data.titleEmphasis}</em></h2>
     </div>
     <p class="max-w-[480px] text-[15px] sm:text-[17px] leading-[1.6] opacity-78 m-0 lg:mt-[37px]" style="text-wrap: pretty;">

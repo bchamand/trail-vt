@@ -1,5 +1,6 @@
 ---
 import { withBase } from '../lib/url';
+import SectionKicker from './SectionKicker.astro';
 
 interface Props {
   data: {
@@ -17,7 +18,7 @@ const { data } = Astro.props;
   style="background: var(--color-bg-deep); padding: clamp(56px, 8vw, 120px) clamp(20px, 4vw, 80px);">
 
   <div class="max-w-[780px]" style="margin-bottom: clamp(32px, 4vw, 56px);">
-    <div class="mono-label mb-5">{data.label}</div>
+    <SectionKicker label={data.label} class="mb-5" />
     <h2 style="font-family: var(--font-serif); font-size: clamp(36px, 4vw, 56px); line-height: 1.05; font-weight: 400; margin: 0; letter-spacing: -0.025em;">
       {data.titleLine1}<br/><em style="color: var(--color-accent); font-style: italic;">{data.titleEmphasis}</em>
     </h2>
