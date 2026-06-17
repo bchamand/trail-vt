@@ -211,7 +211,7 @@ main:
     # PAS répétées ici : elles sont déjà dans le menu de navigation du haut.
     eventLinks:
       - { label: "Affiche de l'événement", href: '{affichePdf}' }   # PDF statique en prod, générateur en dev
-      - { label: Règlement,          href: '#'           }    # placeholder, à brancher plus tard
+      - { label: Règlement,          href: '/reglement.pdf' }   # règlement intérieur (PDF dans public/)
     contactLinks:
       - { label: '{email}', href: 'mailto:{email}' }
       - { label: Instagram,             href: '#' }
