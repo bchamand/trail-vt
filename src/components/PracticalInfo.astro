@@ -1,6 +1,7 @@
 ---
 import SectionKicker from './SectionKicker.astro';
 
+interface MeetPoint { kind: string; name: string; note?: string; lng: number; lat: number }
 interface Props {
   data: {
     label: string;
@@ -9,10 +10,7 @@ interface Props {
     tagline: string;
     meetingPlace: {
       label: string;
-      title: string;
-      address: string;
-      accessNote: string;
-      infoTiles: { key: string; value: string }[];
+      points: MeetPoint[];
     };
     schedule: {
       label: string;
@@ -22,6 +20,8 @@ interface Props {
 }
 const { data } = Astro.props;
 const { meetingPlace, schedule } = data;
+const venue = meetingPlace.points.find(p => p.kind === 'venue');
+const parking = meetingPlace.points.find(p => p.kind === 'parking');
 ---
 <section id="pratique"
   class="border-t border-[color:var(--color-line-soft)]"
@@ -41,28 +41,25 @@ const { meetingPlace, schedule } = data;
 
   <div class="grid grid-cols-1 lg:grid-cols-2" style="gap: clamp(32px, 4vw, 48px);">
 
-    <!-- Lieu de rencontre -->
-    <div class="border border-[color:var(--color-line)]" style="background: var(--color-bg-elev); padding: clamp(24px, 3vw, 32px) clamp(20px, 2.5vw, 28px);">
-      <div class="flex items-center gap-2.5 mb-5">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="1.7">
-          <path d="M12 2C7.5 2 4 5.5 4 10c0 6 8 12 8 12s8-6 8-12c0-4.5-3.5-8-8-8z"/>
-          <circle cx="12" cy="10" r="2.8"/>
-        </svg>
-        <span class="text-[10px] tracking-[0.26em]" style="font-family: var(--font-mono); color: var(--color-accent); font-weight: 600;">{meetingPlace.label}</span>
-      </div>
-      <div style="font-family: var(--font-serif); font-size: clamp(28px, 2.8vw, 36px); line-height: 1.05; margin-bottom: 10px;">{meetingPlace.title}</div>
-      <div class="text-[14px] sm:text-[15px] opacity-80 leading-[1.55] mb-5">
-        {meetingPlace.address}<br/>{meetingPlace.accessNote}
-      </div>
-
-      <!-- Infos du lieu (parking, retrait) — lignes label/valeur, pas de grille -->
-      <div>
-        {meetingPlace.infoTiles.map(tile => (
-          <div class="meet-row">
-            <span class="text-[10px] tracking-[0.22em] opacity-55" style="font-family: var(--font-mono);">{tile.key}</span>
-            <span class="text-[13px] sm:text-[14px] opacity-90" style="font-family: var(--font-mono);">{tile.value}</span>
+    <!-- Lieu de rencontre : carte (fond statique) à 2 repères, fondue dans le texte -->
+    <div class="lieu-card border border-[color:var(--color-line)]" style="background: var(--color-bg-deep);">
+      <div id="lieu-map" class="lieu-map" data-points={JSON.stringify(meetingPlace.points)} data-style="dark-matter"></div>
+      <div class="lieu-overlay"></div>
+      <div class="lieu-body">
+        <div class="flex items-center gap-2.5 mb-3">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="1.7" style="filter: drop-shadow(0 1px 4px rgba(0,0,0,0.7));">
+            <path d="M12 2C7.5 2 4 5.5 4 10c0 6 8 12 8 12s8-6 8-12c0-4.5-3.5-8-8-8z"/>
+            <circle cx="12" cy="10" r="2.8"/>
+          </svg>
+          <span class="text-[10px] tracking-[0.26em]" style="font-family: var(--font-mono); color: var(--color-accent); font-weight: 600; text-shadow: 0 1px 5px rgba(0,0,0,0.7);">{meetingPlace.label}</span>
+        </div>
+        {venue && (
+          <div>
+            <div class="lieu-venue">{venue.name}</div>
+            <p class="lieu-note">{venue.note}</p>
           </div>
-        ))}
+        )}
+        {parking && <div class="lieu-parking">Parking · {parking.name}</div>}
       </div>
     </div>
 
@@ -92,17 +89,18 @@ const { meetingPlace, schedule } = data;
 </section>
 
 <style>
-  .meet-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    gap: 16px;
-    padding: 13px 0;
+  /* carte en fond plein cadre ; le texte est posé en bas à gauche, sur un dégradé
+     diagonal qui n'assombrit que ce coin (carte dégagée à droite et en haut) */
+  .lieu-card { position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; align-items: flex-start; min-height: 320px; }
+  .lieu-map { position: absolute; inset: 0; }
+  .lieu-overlay {
+    position: absolute; inset: 0; pointer-events: none;
+    background: linear-gradient(to top right, rgba(15,20,18,0.95) 0%, rgba(15,20,18,0.68) 33%, rgba(15,20,18,0.22) 57%, transparent 72%);
   }
-  /* filet uniquement ENTRE les lignes (pas au-dessus de la 1re, pas sous la dernière) */
-  .meet-row + .meet-row {
-    border-top: 1px solid var(--color-line);
-  }
+  .lieu-body { position: relative; max-width: clamp(220px, 62%, 360px); padding: clamp(16px, 2vw, 22px) clamp(20px, 2.5vw, 28px) clamp(22px, 2.8vw, 28px); }
+  .lieu-venue { font-family: var(--font-serif); font-size: clamp(21px, 2.1vw, 27px); line-height: 1.05; margin-bottom: 6px; text-shadow: 0 1px 8px rgba(0,0,0,0.55); }
+  .lieu-note { font-size: 13.5px; opacity: 0.85; line-height: 1.45; margin: 0; text-shadow: 0 1px 6px rgba(0,0,0,0.6); }
+  .lieu-parking { margin-top: 10px; font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.04em; opacity: 0.7; text-shadow: 0 1px 6px rgba(0,0,0,0.6); }
   .schedule-item {
     grid-template-columns: 70px 1fr;
     border-top: 1px solid var(--color-line-soft);
@@ -114,3 +112,36 @@ const { meetingPlace, schedule } = data;
     .schedule-item { grid-template-columns: 90px 1fr; }
   }
 </style>
+
+<script>
+  import maplibregl from 'maplibre-gl';
+  import { resolveMapStyle } from '../lib/map-style';
+
+  const el = document.getElementById('lieu-map');
+  if (el) {
+    const pts = JSON.parse(el.dataset.points || '[]') as { kind: string; lng: number; lat: number }[];
+    if (pts.length) {
+      const lngs = pts.map(p => p.lng);
+      const lats = pts.map(p => p.lat);
+      const map = new maplibregl.Map({
+        container: el,
+        style: resolveMapStyle(el.dataset.style || 'dark-matter'),
+        bounds: [[Math.min(...lngs), Math.min(...lats)], [Math.max(...lngs), Math.max(...lats)]],
+        fitBoundsOptions: { padding: { top: 30, bottom: 160, left: 40, right: 40 }, maxZoom: 16 },
+        interactive: false,
+        attributionControl: false,
+      });
+      pts.forEach(p => {
+        const m = document.createElement('div');
+        if (p.kind === 'parking') {
+          m.style.cssText = 'width:22px;height:22px;border-radius:50%;background:#0f1412;border:1.5px solid #d4a574;display:flex;align-items:center;justify-content:center;font-family:JetBrains Mono,monospace;font-size:11px;font-weight:700;color:#d4a574;box-shadow:0 2px 6px rgba(0,0,0,0.4);';
+          m.textContent = 'P';
+        } else {
+          m.style.cssText = 'width:24px;height:24px;pointer-events:none;';
+          m.innerHTML = '<div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:22px;height:22px;border-radius:50%;border:1.5px dashed #d4a574;"></div><div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:11px;height:11px;border-radius:50%;background:#d4a574;box-shadow:0 0 10px rgba(212,165,116,0.5);"></div>';
+        }
+        new maplibregl.Marker({ element: m, anchor: 'center' }).setLngLat([p.lng, p.lat]).addTo(map);
+      });
+    }
+  }
+</script>

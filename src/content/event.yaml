@@ -118,7 +118,7 @@ main:
       <em>Golf de Vieille-Toulouse</em>. Inscription séparée.
     places: 200                       # nombre de places au banquet
     registrationOpen: false           # inscriptions ouvertes ? false → affiche « à venir »
-    soonLabel: Inscriptions à venir   # affiché tant que les inscriptions ne sont pas ouvertes
+    soonLabel: Réservations à venir   # affiché tant que les réservations ne sont pas ouvertes
     cta: RÉSERVER SA PLACE →
     ctaUrl: https://chrono-start.com/
     # Lignes de soirée ajoutées au déroulé (autant que voulu, même horaire possible)
@@ -159,7 +159,10 @@ main:
     label: — §05 / INFOS PRATIQUES
     titleLine1: Une journée,
     titleEmphasis: un village
-    tagline: ''   # accroche retirée pour le moment — remettre le texte ici plus tard (zone conservée)
+    tagline: >-
+      Tout se passe au cœur du village de Vieille-Toulouse, à 15 minutes au sud
+      de Toulouse : retrait des dossards, départs, buvettes et repas réunis au
+      même endroit. Le parking est à un quart d'heure à pied.
     # ── Fiche du point de rencontre ──────────────────────────────────
     # Remplit la carte « Lieu de rencontre » ET ajoute l'ouverture du
     # village / retrait des dossards au déroulé de la journée (time).
@@ -167,12 +170,10 @@ main:
       time: 13h00                                   # retrait des dossards
       scheduleLabel: Retrait des dossards
       label: LIEU DE RENCONTRE
-      title: Place du Village
-      address: Place de Borde Haute · 31320 Vieille-Toulouse
-      accessNote: 15 min au sud de Toulouse centre
-      infoTiles:
-        - { key: RETRAIT DES DOSSARDS, value: 'Dès 13h00'       }
-        - { key: PARKING,              value: 'Ch. de Lespinas' }
+      # Repères de la carte : 1) le lieu principal (tout s'y passe), 2) le parking
+      points:
+        - { kind: venue,   name: 'Place de Borde Haute', note: 'Retrait des dossards, courses, buvettes & repas', lng: 1.4458088652590617, lat: 43.52652258200772 }
+        - { kind: parking, name: 'Chemin de Lespinas', note: 'Parking', lng: 1.448733469322468, lat: 43.51980329392832 }
     # Déroulé de la journée — GÉNÉRÉ AUTOMATIQUEMENT à partir de l'heure
     # d'ouverture ci-dessus, de l'heure de départ de chaque épreuve
     # (src/content/races/*.md) et du banquet, triés par heure.

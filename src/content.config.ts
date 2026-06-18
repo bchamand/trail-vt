@@ -111,10 +111,14 @@ const event = defineCollection({
       // ET ajoute son ouverture au déroulé de la journée (via time/scheduleLabel).
       meetingPlace: z.object({
         label: z.string(),
-        title: z.string(),
-        address: z.string(),
-        accessNote: z.string(),
-        infoTiles: z.array(z.object({ key: z.string(), value: z.string() })),
+        // Repères de la carte (fond statique) : 1er = lieu principal, 2e = parking
+        points: z.array(z.object({
+          kind: z.enum(['venue', 'parking']),
+          name: z.string(),
+          note: z.string().optional(),
+          lng: z.number(),
+          lat: z.number(),
+        })),
         time: z.string(),          // ex. « 13h00 » — ouverture / retrait des dossards
         scheduleLabel: z.string(), // ex. « Retrait des dossards · ouverture du village »
       }),
