@@ -55,14 +55,12 @@ const { meetingPlace, schedule } = data;
         {meetingPlace.address}<br/>{meetingPlace.accessNote}
       </div>
 
-      <!-- 2-column info tiles -->
-      <div class="grid grid-cols-2 gap-px border border-[color:var(--color-line)]"
-           style="background: var(--color-line);">
+      <!-- Infos du lieu (parking, retrait) — lignes label/valeur, pas de grille -->
+      <div>
         {meetingPlace.infoTiles.map(tile => (
-          <div style="background: var(--color-bg-elev); padding: 14px 16px;">
-            <div class="text-[9px] tracking-[0.22em] opacity-55 mb-1.5"
-                 style="font-family: var(--font-mono);">{tile.key}</div>
-            <div class="text-[13px] sm:text-[14px]" style="font-family: var(--font-mono);">{tile.value}</div>
+          <div class="meet-row">
+            <span class="text-[10px] tracking-[0.22em] opacity-55" style="font-family: var(--font-mono);">{tile.key}</span>
+            <span class="text-[13px] sm:text-[14px] opacity-90" style="font-family: var(--font-mono);">{tile.value}</span>
           </div>
         ))}
       </div>
@@ -94,6 +92,17 @@ const { meetingPlace, schedule } = data;
 </section>
 
 <style>
+  .meet-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 16px;
+    padding: 13px 0;
+  }
+  /* filet uniquement ENTRE les lignes (pas au-dessus de la 1re, pas sous la dernière) */
+  .meet-row + .meet-row {
+    border-top: 1px solid var(--color-line);
+  }
   .schedule-item {
     grid-template-columns: 70px 1fr;
     border-top: 1px solid var(--color-line-soft);

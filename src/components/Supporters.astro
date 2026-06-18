@@ -23,9 +23,7 @@ const { data } = Astro.props;
       {data.titleLine1}<br/><em style="color: var(--color-accent); font-style: italic;">{data.titleEmphasis}</em>
     </h2>
     <p class="text-[14px] sm:text-[15px] leading-[1.6] opacity-70 m-0 max-w-[640px]"
-       style="margin-top: 20px; text-wrap: pretty;">
-      {data.body}
-    </p>
+       style="margin-top: 20px; text-wrap: pretty;" set:html={data.body} />
   </div>
 
   <div class="supporters-grid grid gap-px border border-[color:var(--color-line)]"

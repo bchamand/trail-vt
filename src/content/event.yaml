@@ -37,7 +37,7 @@ main:
     Il y a 2300 ans, les Volques Tectosages, peuple celte en provenance de
     l'Est, s'installèrent sur le territoire de l'actuelle commune de
     Vieille-Toulouse, qui portait alors le nom de Tolosa Tectosagum.
-    Ce territoire sera le théâtre de deux courses : le Défi de Copillos
+    Ce territoire sera le théâtre de deux courses inédites : le Défi de Copillos
     (33 km) et la Boucle de l'Oppidum (11 km).
   heroMedia: /video/hero.mp4   # Vidéo (ou image) plein écran de l'accueil
 
@@ -114,6 +114,7 @@ main:
     titleLine2: des Chefs
     body: >-
       La nuit tombée, le village se rassemble. Banquet organisé par le
+      <em>Lions Club Toulouse Arènes Romaines</em> et le
       <em>Golf de Vieille-Toulouse</em>. Inscription séparée.
     places: 200                       # nombre de places au banquet
     registrationOpen: false           # inscriptions ouvertes ? false → affiche « à venir »
@@ -158,10 +159,7 @@ main:
     label: — §05 / INFOS PRATIQUES
     titleLine1: Une journée,
     titleEmphasis: un village
-    tagline: >-
-      Rassemblement au cœur du village de Vieille-Toulouse. Les courses
-      s'élancent à partir de 15h30, l'arrivée des derniers Héritiers est
-      attendue vers 21h45.
+    tagline: ''   # accroche retirée pour le moment — remettre le texte ici plus tard (zone conservée)
     # ── Fiche du point de rencontre ──────────────────────────────────
     # Remplit la carte « Lieu de rencontre » ET ajoute l'ouverture du
     # village / retrait des dossards au déroulé de la journée (time).
@@ -170,13 +168,11 @@ main:
       scheduleLabel: Retrait des dossards
       label: LIEU DE RENCONTRE
       title: Place du Village
-      address: 31320 Vieille-Toulouse · Haute-Garonne
+      address: Place de Borde Haute · 31320 Vieille-Toulouse
       accessNote: 15 min au sud de Toulouse centre
       infoTiles:
-        - { key: PARKING, value: 'Ch. de Lespinas'  }
-        - { key: NAVETTE, value: 'Dep. Ramonville'  }
-        - { key: RETRAIT, value: 'Dès 13h00'        }
-        - { key: GPS,     value: '43.526 · 1.445'   }
+        - { key: RETRAIT DES DOSSARDS, value: 'Dès 13h00'       }
+        - { key: PARKING,              value: 'Ch. de Lespinas' }
     # Déroulé de la journée — GÉNÉRÉ AUTOMATIQUEMENT à partir de l'heure
     # d'ouverture ci-dessus, de l'heure de départ de chaque épreuve
     # (src/content/races/*.md) et du banquet, triés par heure.
@@ -189,12 +185,12 @@ main:
     titleLine1: Un trail rendu possible par
     titleEmphasis: deux villages et de nombreux soutiens
     body: >-
-      Les communes de Vieille-Toulouse et de Pechbusque, le Golf de
-      Vieille-Toulouse et de nombreux propriétaires privés ont ouvert leurs
-      sentiers, leurs terrains et leurs portes — sans leur accord pour traverser
-      ces terres, le tracé n'existerait pas. Le Lions Club Toulouse Arènes
-      Romaines, lui, accompagne l'organisation. Un grand merci à
-      toutes et à tous.
+      Les communes de <em>Vieille-Toulouse</em> et de <em>Pechbusque</em>,
+      le <em>Golf de Vieille-Toulouse</em> et de nombreux <em>propriétaires privés</em>
+      ont ouvert leurs sentiers, leurs terrains et leurs portes — sans leur
+      accord pour traverser ces terres, le tracé n'existerait pas. Le
+      <em>Lions Club Toulouse Arènes Romaines</em>, lui, accompagne
+      l'organisation. Un grand merci à toutes et à tous.
     # posterWidth / posterPad : taille du logo sur l'AFFICHE (le site se débrouille seul).
     partners:
       - { name: Mairie,     sub: Vieille-Toulouse, logo: /images/logo-mairie-vieille-toulouse.png, posterWidth: 170, posterPad: '14px 20px' }
