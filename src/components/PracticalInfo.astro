@@ -54,11 +54,21 @@ const parking = meetingPlace.points.find(p => p.kind === 'parking');
         </div>
         {venue && (
           <div>
-            <div class="lieu-venue">{venue.name}</div>
+            <a class="lieu-venue lieu-link"
+               href={`https://www.google.com/maps/search/?api=1&query=${venue.lat},${venue.lng}`}
+               data-lat={venue.lat} data-lng={venue.lng} data-label={venue.name}
+               target="_blank" rel="noopener noreferrer" title="Ouvrir dans une app de plans"
+            >{venue.name}</a>
             <p class="lieu-note">{venue.note}</p>
           </div>
         )}
-        {parking && <div class="lieu-parking">Parking · {parking.name}</div>}
+        {parking && (
+          <a class="lieu-parking lieu-link"
+             href={`https://www.google.com/maps/search/?api=1&query=${parking.lat},${parking.lng}`}
+             data-lat={parking.lat} data-lng={parking.lng} data-label={parking.name}
+             target="_blank" rel="noopener noreferrer" title="Ouvrir dans une app de plans"
+          >Parking · {parking.name}</a>
+        )}
       </div>
     </div>
 
@@ -109,9 +119,15 @@ const parking = meetingPlace.points.find(p => p.kind === 'parking');
       mask-image: linear-gradient(to right, #000 84%, transparent 100%);
     }
   }
-  .lieu-venue { font-family: var(--font-serif); font-size: clamp(21px, 2.1vw, 27px); line-height: 1.05; margin-bottom: 6px; text-shadow: 0 1px 8px rgba(0,0,0,0.55); }
+  .lieu-venue { display: inline-block; font-family: var(--font-serif); font-size: clamp(21px, 2.1vw, 27px); line-height: 1.05; margin-bottom: 6px; text-shadow: 0 1px 8px rgba(0,0,0,0.55); }
   .lieu-note { font-size: 13.5px; opacity: 0.85; line-height: 1.45; margin: 0; text-shadow: 0 1px 6px rgba(0,0,0,0.6); }
-  .lieu-parking { margin-top: 10px; font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.04em; opacity: 0.7; text-shadow: 0 1px 6px rgba(0,0,0,0.6); }
+  .lieu-parking { display: inline-block; margin-top: 10px; font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.04em; opacity: 0.7; text-shadow: 0 1px 6px rgba(0,0,0,0.6); }
+  /* « Place de Borde Haute » et la ligne Parking sont cliquables → ouvrent l'app
+     de plans (Apple Plans iOS / geo: Android / Google Maps web) — voir le <script> */
+  .lieu-link { color: inherit; text-decoration: none; cursor: pointer; transition: color 0.18s ease; }
+  .lieu-link:hover { color: var(--color-accent); }
+  .lieu-venue.lieu-link:hover { text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 1px; }
+  .lieu-parking.lieu-link:hover { text-decoration: underline; text-underline-offset: 3px; }
   .schedule-item {
     grid-template-columns: 70px 1fr;
     border-top: 1px solid var(--color-line-soft);
@@ -155,4 +171,25 @@ const parking = meetingPlace.points.find(p => p.kind === 'parking');
       });
     }
   }
+
+  // « Lieu de rencontre » → ouvre l'app de plans par défaut sur les bonnes
+  // coordonnées : Apple Plans (iOS), app par défaut via geo: (Android),
+  // Google Maps dans un onglet (desktop, via le href du lien).
+  const ua = navigator.userAgent || '';
+  const isIOS = /iPad|iPhone|iPod/.test(ua);
+  const isAndroid = /Android/.test(ua);
+  document.querySelectorAll<HTMLAnchorElement>('.lieu-link').forEach(a => {
+    a.addEventListener('click', (e) => {
+      const { lat, lng, label = '' } = a.dataset;
+      if (!lat || !lng) return;
+      if (isIOS) {
+        e.preventDefault();
+        window.location.href = `https://maps.apple.com/?ll=${lat},${lng}&q=${encodeURIComponent(label)}`;
+      } else if (isAndroid) {
+        e.preventDefault();
+        window.location.href = `geo:${lat},${lng}?q=${lat},${lng}(${encodeURIComponent(label)})`;
+      }
+      // desktop : le lien <a target="_blank"> ouvre Google Maps
+    });
+  });
 </script>
