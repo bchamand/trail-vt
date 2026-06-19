@@ -1,44 +1,51 @@
 ---
 import type { EventView } from '../lib/event';
 import { withBase } from '../lib/url';
+import fs from 'node:fs';
+import path from 'node:path';
 
 interface Props {
   event: EventView;
 }
 const { event } = Astro.props;
-const mediaUrl = withBase(event.heroMedia);
-const isVideo = /\.(mp4|webm|mov)$/i.test(event.heroMedia);
+
+// Vidéos du hero : tous les fichiers public/video/heroN.mp4, triés par numéro,
+// joués les uns à la suite des autres (en boucle). Ajouter / retirer une vidéo
+// = déposer / supprimer un fichier « heroN.mp4 » dans public/video/, rien d'autre.
+let heroVideos: string[] = [];
+try {
+  heroVideos = fs.readdirSync(path.join(process.cwd(), 'public', 'video'))
+    .filter(f => /^hero\d+\.mp4$/i.test(f))
+    .sort((a, b) => parseInt(a.match(/\d+/)![0], 10) - parseInt(b.match(/\d+/)![0], 10))
+    .map(f => withBase(`/video/${f}`));
+} catch { /* dossier absent → le poster suffit */ }
+// Repli : aucune heroN.mp4 → on retombe sur event.heroMedia (vidéo unique).
+if (heroVideos.length === 0 && /\.(mp4|webm|mov)$/i.test(event.heroMedia)) {
+  heroVideos = [withBase(event.heroMedia)];
+}
+const hasVideo = heroVideos.length > 0;
 const posterUrl = withBase('/images/hero-poster.jpg');
 ---
 <section id="top" class="relative overflow-hidden" style="min-height: 100vh; min-height: 100svh;">
-  {isVideo ? (
-    <>
-      <!-- Poster stays behind the video; if autoplay is blocked the
-           video is removed client-side so no play button can appear. -->
-      <img
-        id="hero-poster"
-        src={posterUrl}
-        alt=""
-        class="absolute inset-0 w-full object-cover pointer-events-none"
-        style="height: 110%; object-position: center 40%; filter: brightness(0.7) contrast(1.1) saturate(0.85); transform: translateY(0) scale(1.05);"
-      />
-      <video
-        id="hero-media"
-        src={mediaUrl}
-        autoplay
-        muted
-        loop
-        playsinline
-        preload="metadata"
-        class="absolute inset-0 w-full object-cover pointer-events-none"
-        style="height: 110%; object-position: center 40%; filter: brightness(0.7) contrast(1.1) saturate(0.85); transform: translateY(0) scale(1.05);"
-      />
-    </>
-  ) : (
-    <img
+  <!-- Poster (frame statique) toujours présent en fond ; si l'autoplay est
+       bloqué, la vidéo est retirée côté client et le poster reste seul. -->
+  <img
+    id="hero-poster"
+    src={posterUrl}
+    alt=""
+    class="absolute inset-0 w-full object-cover pointer-events-none"
+    style="height: 110%; object-position: center 40%; filter: brightness(0.7) contrast(1.1) saturate(0.85); transform: translateY(0) scale(1.05);"
+  />
+  {hasVideo && (
+    <video
       id="hero-media"
-      src={mediaUrl}
-      alt=""
+      src={heroVideos[0]}
+      data-playlist={JSON.stringify(heroVideos)}
+      autoplay
+      muted
+      loop={heroVideos.length === 1}
+      playsinline
+      preload="auto"
       class="absolute inset-0 w-full object-cover pointer-events-none"
       style="height: 110%; object-position: center 40%; filter: brightness(0.7) contrast(1.1) saturate(0.85); transform: translateY(0) scale(1.05);"
     />
@@ -99,9 +106,7 @@ const posterUrl = withBase('/images/hero-poster.jpg');
 
     <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-5"
          style="margin-top: clamp(20px, 3vw, 32px);">
-      <p class="max-w-[620px] text-[13px] sm:text-[15px] opacity-80 leading-[1.5] m-0" style="text-wrap: pretty;">
-        {event.description}
-      </p>
+      <p class="max-w-[620px] text-[13px] sm:text-[15px] opacity-80 leading-[1.5] m-0" style="text-wrap: pretty;" set:html={event.description} />
       <div class="sm:hidden w-full">
         <a href={event.urls.registration} target="_blank" rel="noopener noreferrer"
            class="btn-gold w-full" style="padding: 16px 28px;">{event.heroCtaLabel}</a>
@@ -157,10 +162,32 @@ const posterUrl = withBase('/images/hero-poster.jpg');
     }
   }, { passive: true });
 
-  // If autoplay is blocked (low-power mode on iOS/macOS Safari), drop
-  // the video entirely — the poster stays, the native play-button
-  // overlay can't appear since the <video> is no longer in the DOM.
   if (video) {
+    // Lecture en chaîne : hero1 → hero2 → … → hero1 (boucle). Une seule vidéo
+    // → attribut `loop` natif côté HTML, donc rien à faire ici.
+    let playlist: string[] = [];
+    try { playlist = JSON.parse(video.dataset.playlist || '[]'); } catch {}
+    if (playlist.length > 1) {
+      let i = 0;
+      // précharge la vidéo suivante pour limiter la coupure entre deux clips
+      const prefetch = (url: string) => {
+        const l = document.createElement('link');
+        l.rel = 'prefetch';
+        l.href = url;
+        document.head.appendChild(l);
+      };
+      prefetch(playlist[1]);
+      video.addEventListener('ended', () => {
+        i = (i + 1) % playlist.length;
+        video.src = playlist[i];
+        video.play().catch(() => {});
+        prefetch(playlist[(i + 1) % playlist.length]);
+      });
+    }
+
+    // If autoplay is blocked (low-power mode on iOS/macOS Safari), drop
+    // the video entirely — the poster stays, the native play-button
+    // overlay can't appear since the <video> is no longer in the DOM.
     const giveUp = () => video.remove();
     video.play?.().catch(giveUp);
     setTimeout(() => { if (video.paused) giveUp(); }, 1200);

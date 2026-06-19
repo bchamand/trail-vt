@@ -37,9 +37,9 @@ main:
     Il y a 2300 ans, les Volques Tectosages, peuple celte en provenance de
     l'Est, s'installèrent sur le territoire de l'actuelle commune de
     Vieille-Toulouse, qui portait alors le nom de Tolosa Tectosagum.
-    Ce territoire sera le théâtre de deux courses inédites : le Défi de Copillos
-    (33 km) et la Boucle de l'Oppidum (11 km).
-  heroMedia: /video/hero.mp4   # Vidéo (ou image) plein écran de l'accueil
+    Ce territoire sera le théâtre de deux courses inédites : le <em>Défi de Copillos</em>
+    (33 km) et la <em>Boucle de l'Oppidum</em> (11 km).
+  heroMedia: /video/hero1.mp4  # Repli ; sinon le hero enchaîne toutes les public/video/heroN.mp4
 
   # Fond de carte. Choix : dark-matter, positron, voyager,
   # openfreemap-liberty/positron/dark, ign-plan-v2, ign-scan-25, ign-photo.
@@ -65,8 +65,8 @@ main:
 
   # ── Bandeau de chiffres sous l'accueil ──────────────────────────────
   stats:
-    - { big: '{course1Distance} KM', small: '{course1Ascent} M D+' }   # 1re course (auto depuis les fiches)
-    - { big: '{course2Distance} KM', small: '{course2Ascent} M D+' }   # 2e course (auto depuis les fiches)
+    - { big: '{course1Distance} KM', small: '{course1Ascent} D+' }   # 1re course (auto depuis les fiches)
+    - { big: '{course2Distance} KM', small: '{course2Ascent} D+' }   # 2e course (auto depuis les fiches)
     - { big: '{dateShortMobile}.',   small: '{dateWeekday}'        }
     - { big: '{locationCity}',       small: 'HAUTE-GARONNE'        }
 
