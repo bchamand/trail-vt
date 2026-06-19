@@ -27,28 +27,33 @@ const hasVideo = heroVideos.length > 0;
 const posterUrl = withBase('/images/hero-poster.jpg');
 ---
 <section id="top" class="relative overflow-hidden" style="min-height: 100vh; min-height: 100svh;">
-  <!-- Poster (frame statique) toujours présent en fond ; si l'autoplay est
-       bloqué, la vidéo est retirée côté client et le poster reste seul. -->
-  <img
-    id="hero-poster"
-    src={posterUrl}
-    alt=""
-    class="absolute inset-0 w-full object-cover pointer-events-none"
-    style="height: 110%; object-position: center 40%; filter: brightness(0.7) contrast(1.1) saturate(0.85); transform: translateY(0) scale(1.05);"
-  />
+  <!-- Poster (frame statique) en fond. Au-dessus, DEUX calques vidéo (a sous b)
+       qui se fondent l'un dans l'autre : pendant qu'un clip joue, le suivant est
+       préchargé dans le calque caché, puis on bascule l'opacité → la vidéo
+       s'enchaîne sans jamais laisser réapparaître le poster entre deux clips.
+       Si l'autoplay est bloqué, les vidéos sont retirées et le poster reste. -->
+  <img id="hero-poster" src={posterUrl} alt="" class="hero-layer" />
   {hasVideo && (
-    <video
-      id="hero-media"
-      src={heroVideos[0]}
-      data-playlist={JSON.stringify(heroVideos)}
-      autoplay
-      muted
-      loop={heroVideos.length === 1}
-      playsinline
-      preload="auto"
-      class="absolute inset-0 w-full object-cover pointer-events-none"
-      style="height: 110%; object-position: center 40%; filter: brightness(0.7) contrast(1.1) saturate(0.85); transform: translateY(0) scale(1.05);"
-    />
+    <>
+      <video
+        id="hero-a"
+        class="hero-layer hero-vid"
+        data-playlist={JSON.stringify(heroVideos)}
+        src={heroVideos[0]}
+        autoplay
+        muted
+        playsinline
+        preload="auto"
+      />
+      <video
+        id="hero-b"
+        class="hero-layer hero-vid"
+        muted
+        playsinline
+        preload="auto"
+        style="opacity: 0;"
+      />
+    </>
   )}
 
   <div class="absolute inset-0 pointer-events-none"
@@ -120,6 +125,21 @@ const posterUrl = withBase('/images/hero-poster.jpg');
 </section>
 
 <style>
+  /* calques média du hero (poster + 2 vidéos) : même cadrage et traitement */
+  .hero-layer {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 110%;
+    object-fit: cover;
+    object-position: center 40%;
+    filter: brightness(0.7) contrast(1.1) saturate(0.85);
+    transform: translateY(0) scale(1.05);
+    pointer-events: none;
+  }
+  /* fondu d'opacité entre les deux calques vidéo (voir le <script>) */
+  .hero-vid { transition: opacity 0.6s ease; }
+
   .hero-tagline-bar {
     position: absolute;
     top: 0;
@@ -143,11 +163,12 @@ const posterUrl = withBase('/images/hero-poster.jpg');
 </style>
 
 <script>
-  const video = document.getElementById('hero-media') as HTMLVideoElement | null;
+  const a = document.getElementById('hero-a') as HTMLVideoElement | null;
+  const b = document.getElementById('hero-b') as HTMLVideoElement | null;
   const poster = document.getElementById('hero-poster') as HTMLImageElement | null;
-  const layers = [video, poster].filter(Boolean) as HTMLElement[];
+  const layers = [a, b, poster].filter(Boolean) as HTMLElement[];
 
-  // Parallax applies to whichever layers remain.
+  // Parallaxe sur les calques présents.
   let ticking = false;
   function update() {
     const y = window.scrollY;
@@ -156,40 +177,43 @@ const posterUrl = withBase('/images/hero-poster.jpg');
     ticking = false;
   }
   window.addEventListener('scroll', () => {
-    if (!ticking) {
-      requestAnimationFrame(update);
-      ticking = true;
-    }
+    if (!ticking) { requestAnimationFrame(update); ticking = true; }
   }, { passive: true });
 
-  if (video) {
-    // Lecture en chaîne : hero1 → hero2 → … → hero1 (boucle). Une seule vidéo
-    // → attribut `loop` natif côté HTML, donc rien à faire ici.
+  if (a && b) {
     let playlist: string[] = [];
-    try { playlist = JSON.parse(video.dataset.playlist || '[]'); } catch {}
+    try { playlist = JSON.parse(a.dataset.playlist || '[]'); } catch {}
+
     if (playlist.length > 1) {
-      let i = 0;
-      // précharge la vidéo suivante pour limiter la coupure entre deux clips
-      const prefetch = (url: string) => {
-        const l = document.createElement('link');
-        l.rel = 'prefetch';
-        l.href = url;
-        document.head.appendChild(l);
+      // Deux calques (b au-dessus de a). Le clip suivant est préchargé dans le
+      // calque caché ; à la fin du clip courant on le lance et on bascule
+      // l'opacité de b (fondu) → enchaînement sans réapparition du poster.
+      let showing = a, hidden = b, idx = 0;
+      b.src = playlist[1];
+      b.load();
+      const onEnded = (e: Event) => {
+        if (e.target !== showing) return;
+        idx = (idx + 1) % playlist.length;
+        const incoming = hidden, outgoing = showing;
+        incoming.currentTime = 0;
+        incoming.play().catch(() => {});
+        b.style.opacity = incoming === b ? '1' : '0';
+        showing = incoming;
+        hidden = outgoing;
+        // une fois le fondu fini, précharge le clip d'après dans le calque caché
+        const followIdx = (idx + 1) % playlist.length;
+        window.setTimeout(() => { outgoing.src = playlist[followIdx]; outgoing.load(); }, 700);
       };
-      prefetch(playlist[1]);
-      video.addEventListener('ended', () => {
-        i = (i + 1) % playlist.length;
-        video.src = playlist[i];
-        video.play().catch(() => {});
-        prefetch(playlist[(i + 1) % playlist.length]);
-      });
+      a.addEventListener('ended', onEnded);
+      b.addEventListener('ended', onEnded);
+    } else {
+      a.loop = true; // une seule vidéo → boucle native
     }
 
-    // If autoplay is blocked (low-power mode on iOS/macOS Safari), drop
-    // the video entirely — the poster stays, the native play-button
-    // overlay can't appear since the <video> is no longer in the DOM.
-    const giveUp = () => video.remove();
-    video.play?.().catch(giveUp);
-    setTimeout(() => { if (video.paused) giveUp(); }, 1200);
+    // Autoplay bloqué (mode éco iOS/macOS Safari) → on retire les deux vidéos,
+    // le poster reste (aucun bouton « play » natif ne peut apparaître).
+    const giveUp = () => { a.remove(); b.remove(); };
+    a.play?.().catch(giveUp);
+    setTimeout(() => { if (a.paused) giveUp(); }, 1200);
   }
 </script>
