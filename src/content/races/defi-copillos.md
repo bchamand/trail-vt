@@ -11,8 +11,10 @@ title: Défi de Copillos
 type: La course reine
 description: >-
   Quatre boucles successives avec départ groupé — qualification ou élimination à chaque passage
-  selon un temps limite. Seule la dernière boucle est classante : elle
-  sacre les Héritiers de Copillos.
+  selon un temps limite. Les coureurs qui terminent la boucle avant le temps limite disposent
+  d'un temps de récupération avant de prendre le départ groupé de la prochaine boucle.
+  Seule la dernière boucle est classante, c'est là qu'il faut tout donner : elle sacre
+  les Héritiers de Copillos.
 bibs: 100                 # nombre de dossards (limite)
 eligibility: À partir des Espoirs
 startTime: 15h00
