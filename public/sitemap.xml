@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Sitemap maintenu à la main (site à 2 pages indexables).
+  Ne PAS lister /affiche ni /affiche/pdf : ces pages sont retirées du
+  déploiement par la CI. Ajouter ici toute nouvelle page indexable.
+-->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://www.traildestectosages.fr/</loc>
+  </url>
+  <url>
+    <loc>https://www.traildestectosages.fr/mentions-legales/</loc>
+  </url>
+</urlset>

@@ -64,6 +64,7 @@ export default defineConfig({
   site: 'https://www.traildestectosages.fr',
   // L'affiche imprimable est une page du site : /affiche (et /affiche/pdf pour l'export PDF).
   // En dev, /affiche?edit-mask ouvre l'éditeur visuel des masques (voir le plugin ci-dessus).
+  // Le sitemap est un fichier statique maintenu à la main : public/sitemap.xml.
   vite: {
     plugins: [tailwindcss(), afficheMaskEditor],
   },

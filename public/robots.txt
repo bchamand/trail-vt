@@ -1,0 +1,7 @@
+# Trail des Tectosages — règles pour les robots d'indexation.
+# Tout le site est ouvert au crawl ; le sitemap aide les moteurs
+# (Google, Bing, Qwant…) à découvrir les pages.
+User-agent: *
+Allow: /
+
+Sitemap: https://www.traildestectosages.fr/sitemap.xml
