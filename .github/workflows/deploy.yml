@@ -46,3 +46,19 @@ jobs:
     steps:
       - id: deployment
         uses: actions/deploy-pages@v5
+
+  # Notifie l'API Google Indexing une fois le site en ligne. No-op tant que le
+  # secret GOOGLE_INDEXING_KEY n'est pas défini (voir scripts/google-index.mjs).
+  # ⚠️ L'API Indexing ne couvre officiellement que JobPosting / BroadcastEvent ;
+  # le canal fiable reste sitemap.xml + Search Console.
+  notify-google:
+    needs: deploy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+      - run: node scripts/google-index.mjs
+        env:
+          GOOGLE_INDEXING_KEY: ${{ secrets.GOOGLE_INDEXING_KEY }}

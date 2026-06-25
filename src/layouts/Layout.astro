@@ -1,25 +1,57 @@
 ---
+import Seo from '../components/Seo.astro';
+
 interface Props {
   title: string;
   description: string;
   preconnect?: string[];
+  // Référencement (valeurs par défaut sensées dans Seo.astro) :
+  image?: string; // image de partage Open Graph / Twitter
+  imageWidth?: number;
+  imageHeight?: number;
+  ogType?: string; // 'website' | 'article'
+  siteName?: string;
+  jsonLd?: object; // données structurées Schema.org
+  noindex?: boolean;
 }
-const { title, description, preconnect = [] } = Astro.props;
+const {
+  title,
+  description,
+  preconnect = [],
+  image,
+  imageWidth,
+  imageHeight,
+  ogType,
+  siteName,
+  jsonLd,
+  noindex,
+} = Astro.props;
 ---
 <!doctype html>
 <html lang="fr">
   <head>
     <meta charset="UTF-8" />
-    <meta name="description" content={description} />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#0a0e0c" />
+    <Seo
+      title={title}
+      description={description}
+      image={image}
+      imageWidth={imageWidth}
+      imageHeight={imageHeight}
+      ogType={ogType}
+      siteName={siteName}
+      jsonLd={jsonLd}
+      noindex={noindex}
+    />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     {preconnect.map(host => (
       <link rel="preconnect" href={host} crossorigin />
     ))}
     <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
-    <title>{title}</title>
   </head>
   <body>
     <slot />

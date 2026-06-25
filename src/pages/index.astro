@@ -16,6 +16,7 @@ import CTA from '../components/CTA.astro';
 import Footer from '../components/Footer.astro';
 import { parseGpxFile } from '../lib/gpx';
 import { withBase } from '../lib/url';
+import { buildHomeStructuredData } from '../lib/seo';
 import { tileHosts } from '../lib/map-style';
 import { deriveEvent, expandTokens, fmtKm, toRoman } from '../lib/event';
 import '../styles/global.css';
@@ -130,8 +131,23 @@ const practicalInfo = {
 };
 
 const pageTitle = `${event.name} — ${event.location} · ${event.dateShort.toLowerCase()} ${event.year}`;
+
+// Données structurées Schema.org (SportsEvent + une sous-épreuve par course
+// visible), émises en JSON-LD statique dans le <head> → lisible au 1er crawl.
+const structuredData = buildHomeStructuredData({
+  event,
+  races,
+  site: Astro.site?.href ?? 'https://www.traildestectosages.fr/',
+  registrationUrl: event.urls.registration,
+});
 ---
-<Layout title={pageTitle} description={event.description} preconnect={tileHosts(event.mapStyle)}>
+<Layout
+  title={pageTitle}
+  description={event.description}
+  preconnect={tileHosts(event.mapStyle)}
+  siteName={event.name}
+  jsonLd={structuredData}
+>
   <Nav event={event} />
   <Hero event={event} />
   <DataStrip stats={event.stats} />

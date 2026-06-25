@@ -35,10 +35,36 @@ const event = expandTokens(derived, tokens);
 const home = withBase('/');
 const email = event.urls.contactEmail;
 const domain = 'traildestectosages.fr';
+
+// Données structurées : page légale + fil d'Ariane (Accueil › Mentions légales).
+const base = (Astro.site?.href ?? 'https://www.traildestectosages.fr/').replace(/\/+$/, '');
+const structuredData = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'WebPage',
+      '@id': `${base}/mentions-legales/`,
+      url: `${base}/mentions-legales/`,
+      name: `Mentions légales · ${event.name}`,
+      inLanguage: 'fr-FR',
+      isPartOf: { '@id': `${base}/#website` },
+    },
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Accueil', item: `${base}/` },
+        { '@type': 'ListItem', position: 2, name: 'Mentions légales', item: `${base}/mentions-legales/` },
+      ],
+    },
+  ],
+};
 ---
 <Layout
   title={`Mentions légales · ${event.name}`}
   description={`Mentions légales et politique de confidentialité du site ${domain}.`}
+  siteName={event.name}
+  ogType="article"
+  jsonLd={structuredData}
 >
   <!-- En-tête minimal : ramène à l'accueil (pas de menu d'ancres ici) -->
   <header class="lg-header">
