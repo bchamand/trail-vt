@@ -10,6 +10,8 @@
     "build": "astro build",
     "preview": "astro preview",
     "render:affiche": "node scripts/render-affiche-pdf.mjs",
+    "indexnow": "node scripts/indexnow.mjs",
+    "indexnow:key": "node scripts/indexnow-key.mjs",
     "astro": "astro"
   },
   "dependencies": {
