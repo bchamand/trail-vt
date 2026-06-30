@@ -130,7 +130,9 @@ const practicalInfo = {
   schedule: { ...event.practicalInfo.schedule, items: scheduleItems },
 };
 
-const pageTitle = `${event.name} — ${event.location} · ${event.dateShort.toLowerCase()} ${event.year}`;
+// <title> compact (lieu sans « (31) », date courte) → s'affiche en entier dans Google.
+const titlePlace = event.location.replace(/\s*\([^)]*\)/, '');
+const pageTitle = `${event.name} — ${titlePlace}, ${event.dateShortMobile.toLowerCase()}. ${event.year}`;
 
 // Données structurées Schema.org (SportsEvent + une sous-épreuve par course
 // visible), émises en JSON-LD statique dans le <head> → lisible au 1er crawl.
@@ -143,7 +145,7 @@ const structuredData = buildHomeStructuredData({
 ---
 <Layout
   title={pageTitle}
-  description={event.description}
+  description={event.seoDescription ?? event.description}
   preconnect={tileHosts(event.mapStyle)}
   siteName={event.name}
   jsonLd={structuredData}

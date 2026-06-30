@@ -50,6 +50,7 @@ const event = defineCollection({
     locationCity: z.string(),
     tagline: z.string(),
     description: z.string(),
+    seoDescription: z.string().optional(), // extrait court pour Google (meta) ; sinon « description »
     heroMedia: z.string(),
     mapStyle: z.string().default('dark-matter'),
     urls: z.object({

@@ -106,7 +106,7 @@ export function buildHomeStructuredData({ event, races, site, registrationUrl }:
     '@type': 'SportsEvent',
     '@id': `${base}/#event`,
     name: `${event.name} ${event.year}`,
-    description: stripHtml(event.description),
+    description: stripHtml(event.seoDescription ?? event.description),
     sport: 'Trail',
     startDate: day,
     endDate: day,

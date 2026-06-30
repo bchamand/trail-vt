@@ -39,6 +39,13 @@ main:
     Vieille-Toulouse, qui portait alors le nom de Tolosa Tectosagum.
     Ce territoire sera le théâtre de deux courses inédites : le <em>Défi de Copillos</em>
     (33 km) et la <em>Boucle de l'Oppidum</em> (11 km).
+  # Extrait court pour Google (balise meta description + aperçus de partage).
+  # ~150 caractères, infos pratiques en tête (lieu, date, courses) → meilleur
+  # extrait dans les résultats. À défaut, la « description » ci-dessus est utilisée.
+  seoDescription: >-
+    Trail à Vieille-Toulouse le 17 octobre 2026 : le Défi de Copillos (33 km)
+    et la Boucle de l'Oppidum (11 km), sur les traces des Volques Tectosages.
+
   heroMedia: /video/hero1.mp4  # Repli ; sinon le hero enchaîne toutes les public/video/heroN.mp4
 
   # Fond de carte. Choix : dark-matter, positron, voyager,
